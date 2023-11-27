@@ -19,4 +19,8 @@ public interface NewsRepository extends JpaRepository<News, Integer> {
     @Transactional
     @Query("SELECT n FROM news n WHERE n.timePublishedNewsMsk >= :twentyFourHoursAgo ORDER BY n.timePublishedNewsMsk DESC")
     List<News> findAllPublishedNewsInLastTwentyFourHours(@Param("twentyFourHoursAgo") LocalDateTime twentyFourHoursAgo);
+
+//    @Query("update news c set c.newsTitle = :name WHERE c.id = :customerId")
+//    void updateNews(@Param("updatedNews") News id, @Param("name") String name);
+
 }

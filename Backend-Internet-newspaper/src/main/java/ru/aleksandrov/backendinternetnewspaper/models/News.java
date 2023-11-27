@@ -1,6 +1,7 @@
 package ru.aleksandrov.backendinternetnewspaper.models;
 
 import lombok.*;
+import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -32,12 +33,14 @@ public class News {
     private LocalDateTime timePublishedNewsMsk;
 
     @OneToMany(mappedBy = "news")
+    @Cascade(org.hibernate.annotations.CascadeType.ALL)
     private List<Comment> comments;
 
     @OneToOne
     private Picture picture;
 
     @OneToMany(mappedBy = "news")
+    @Cascade(org.hibernate.annotations.CascadeType.ALL)
     private List<Like> likes;
 
     @ManyToMany(fetch = FetchType.EAGER)
