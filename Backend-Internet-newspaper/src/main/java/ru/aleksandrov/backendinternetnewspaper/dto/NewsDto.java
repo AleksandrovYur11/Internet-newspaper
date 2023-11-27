@@ -1,5 +1,6 @@
 package ru.aleksandrov.backendinternetnewspaper.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,12 +31,12 @@ public class NewsDto {
 
     @Past(message = "The publication date must be before the present time")
     private LocalDateTime timePublishedNewsMSK;
-
+//    @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<CommentDto> comments;
-
+//    @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<LikeDto> likes;
-
+//    @JsonInclude(JsonInclude.Include.NON_NULL)
     private PictureDto picture;
-
+//    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Set<ThemeDto> themes;
 }

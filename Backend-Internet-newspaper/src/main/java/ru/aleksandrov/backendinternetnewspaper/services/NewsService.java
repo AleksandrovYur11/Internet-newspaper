@@ -64,28 +64,45 @@ public class NewsService {
         newsRepository.delete(findById(idNews));
     }
 
-    public void updateNews(Integer idNews, NewsDto updatedNewsDto) {
+    public News updateNews(Integer idNews, NewsDto updatedNewsDto) {
         News news = findById(idNews);
+//        System.out.println(news.toString());
 
         LocalDateTime moscowTimeNow = LocalDateTime.now(ZoneId.of("Europe/Moscow"));
 
-        news.setNewsText(updatedNewsDto.getNewsText());
+//        news.setNewsText(updatedNewsDto.getNewsText());
+//        news.setNewsTitle(updatedNewsDto.getNewsTitle());
+
+//        news.setComments(updatedNewsDto.getComments().stream().map(mappingUtil::convertToComment)
+//                .collect(Collectors.toList()));
+//
+//        news.setLikes(updatedNewsDto.getLikes().stream().map(mappingUtil::convertToLike)
+//                .collect(Collectors.toList()));
+
+//        mappingUtil.convertToPicture(updatedNewsDto.getPicture()).setNews(news);
+//        news.setPicture(mappingUtil.convertToPicture(updatedNewsDto.getPicture()));
+
+//        news.setTimePublishedNewsMsk(moscowTimeNow);
+
+//        news.setTheme(updatedNewsDto.getThemes().stream().map(mappingUtil::convertToTheme)
+//                .collect(Collectors.toSet()));
+
+        System.out.println(news.toString());
+//        newsRepository.save(news);
+//-----------------------
         news.setNewsTitle(updatedNewsDto.getNewsTitle());
-
-        news.setComments(updatedNewsDto.getComments().stream().map(mappingUtil::convertToComment)
-                .collect(Collectors.toList()));
-
-        news.setLikes(updatedNewsDto.getLikes().stream().map(mappingUtil::convertToLike)
-                .collect(Collectors.toList()));
-
-        news.setPicture(mappingUtil.convertToPicture(updatedNewsDto.getPicture()));
+        news.setNewsText(updatedNewsDto.getNewsText());
         news.setTimePublishedNewsMsk(moscowTimeNow);
+//        news.setComments(updatedNewsDto.getComments());
+//        news.setLikes(updatedNewsDto.getLikes());
+//        news.setPicture(mappingUtil.convertToPicture(updatedNewsDto.getPicture()));
+//        mappingUtil.convertToPicture(updatedNewsDto.getPicture()).setNews(news);
+        System.out.println(news.toString());
 
-        news.setTheme(updatedNewsDto.getThemes().stream().map(mappingUtil::convertToTheme)
-                .collect(Collectors.toSet()));
-        news.setId(idNews);
-        newsRepository.save(news);
-
+//        news.setTheme(updatedNewsDto.getThemes().stream().map(mappingUtil::convertToTheme).collect(Collectors.toSet()));
+//        updatedNewsDto.getThemes().stream().map(mappingUtil::convertToTheme).collect(Collectors.toSet()).stream().map(thema -> thema.s)
+       News update = newsRepository.save(news);
+       return update;
     }
 
     public News getNewsById(int idNews) {
@@ -111,5 +128,19 @@ public class NewsService {
         return newsDTO;
     }
 
+//    public void updateNews(Integer idNews, NewsDto updatedNewsDto) {
+//        LocalDateTime moscowTimeNow = LocalDateTime.now(ZoneId.of("Europe/Moscow"));
+//        newsRepository.findById(idNews).map(
+//                news -> {
+//                    news.setNewsTitle(updatedNewsDto.getNewsText());
+//                    news.setNewsText(updatedNewsDto.getNewsTitle());
+//                    news.setTimePublishedNewsMsk(moscowTimeNow);
+//                    news.setPicture(mappingUtil.convertToPicture(updatedNewsDto.getPicture()));
+//                    news.setTheme(updatedNewsDto.getThemes().stream().map(mappingUtil::convertToTheme)
+//                            .collect(Collectors.toSet()));
+//                    News news1 = newsRepository.save(news);
+//                    return news;
+//                });
+//    }
 
 }

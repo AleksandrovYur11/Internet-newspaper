@@ -17,7 +17,7 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
-//@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @Slf4j
 @RequestMapping("/news")
@@ -43,7 +43,7 @@ public class NewsController {
 //                String resultTimeString = news.getTimePublishedNewsMsk().format(formatter);
 //                newsDTO.setTimePublishedNewsMSK(resultTimeString);
 
-    @GetMapping( "/fresh")
+    @GetMapping( "/fresh-news")
     public ResponseEntity<List<NewsDto>> getAllNewsAtTwentyFourHours() {
 
         LocalDateTime twentyFourHoursAgo = ZonedDateTime.now(ZoneId.of("Europe/Moscow"))
@@ -88,7 +88,7 @@ public class NewsController {
     }
 
     @PutMapping( "/{idNews}")
-    @PreAuthorize("hasRole('ADMIN')")
+//    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<HttpStatus> updateNews(@PathVariable("idNews") Integer id,
                                                  @RequestBody NewsDto updatedNewsDto) {
         try {

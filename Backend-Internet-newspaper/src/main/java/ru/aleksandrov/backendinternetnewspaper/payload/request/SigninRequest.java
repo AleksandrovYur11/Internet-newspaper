@@ -1,13 +1,11 @@
 package ru.aleksandrov.backendinternetnewspaper.payload.request;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class LoginRequest {
+public class SigninRequest {
     private String email;
     private String password;
 }

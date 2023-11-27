@@ -6,6 +6,7 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import ru.aleksandrov.backendinternetnewspaper.dto.UserDto;
 import ru.aleksandrov.backendinternetnewspaper.models.User;
+import ru.aleksandrov.backendinternetnewspaper.payload.request.SignupRequest;
 import ru.aleksandrov.backendinternetnewspaper.repositories.UserRepository;
 
 @Component
@@ -22,13 +23,13 @@ public class UserValidator implements Validator {
 
     @Override
     public boolean supports(Class<?> clazz) {
-        return UserDto.class.equals(clazz);
+        return SignupRequest.class.equals(clazz);
     }
 
     @Override
     public void validate(Object target, Errors errors) {
-        UserDto userDTO = (UserDto) target;
-        User user = mappingUtil.convertToUser(userDTO);
+        SignupRequest signupRequest = (SignupRequest) target;
+        User user = mappingUtil.convertToUser(signupRequest);
 
 
         if (userRepository.existsByEmail(user.getEmail())) {
