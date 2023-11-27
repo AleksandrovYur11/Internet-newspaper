@@ -1,11 +1,12 @@
 package ru.aleksandrov.backendinternetnewspaper.models;
 
 import lombok.*;
+import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Past;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -29,15 +30,17 @@ public class News {
     private String newsText;
 
     @Past(message = "The publication date must be before the present time")
-    private Date datePublishedNews;
+    private LocalDateTime timePublishedNewsMsk;
 
     @OneToMany(mappedBy = "news")
+    @Cascade(org.hibernate.annotations.CascadeType.ALL)
     private List<Comment> comments;
 
     @OneToOne
     private Picture picture;
 
     @OneToMany(mappedBy = "news")
+    @Cascade(org.hibernate.annotations.CascadeType.ALL)
     private List<Like> likes;
 
     @ManyToMany(fetch = FetchType.EAGER)

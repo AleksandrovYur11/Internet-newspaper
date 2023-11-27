@@ -1,6 +1,7 @@
 package ru.aleksandrov.backendinternetnewspaper.models;
 
 import lombok.*;
+import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
@@ -45,9 +46,11 @@ public class User {
     private String password;
 
     @OneToMany(mappedBy = "authorComment")
+    @Cascade(org.hibernate.annotations.CascadeType.ALL)
     private List<Comment> comments;
 
     @OneToMany(mappedBy = "user")
+    @Cascade(org.hibernate.annotations.CascadeType.ALL)
     private List<Like> likes;
 
     @OneToOne(mappedBy = "user")
