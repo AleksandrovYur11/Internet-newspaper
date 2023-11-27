@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Backend-Internet-newspaper/Backend-Internet-newspaper.iml" filepath="$PROJECT_DIR$/Backend-Internet-newspaper/Backend-Internet-newspaper.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/Internet-newspaper.iml" filepath="$PROJECT_DIR$/.idea/Internet-newspaper.iml" />
     </modules>
   </component>
 </project>
