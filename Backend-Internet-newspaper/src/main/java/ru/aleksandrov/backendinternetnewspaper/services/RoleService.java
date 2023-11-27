@@ -11,7 +11,6 @@ import ru.aleksandrov.backendinternetnewspaper.repositories.RoleRepository;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 
 @Service

@@ -9,7 +9,7 @@ import java.util.List;
 @Getter
 @Setter
 @AllArgsConstructor
-public class LoginResponse {
+public class SignupResponse {
     private String accessToken;
     private String refreshToken;
     private Integer id;

@@ -27,7 +27,4 @@ public class UserDto {
     @Email(message = "Write this line as an email")
     private String email;
 
-    @NotBlank(message = "Password could be not empty")
-    private String password;
-
 }

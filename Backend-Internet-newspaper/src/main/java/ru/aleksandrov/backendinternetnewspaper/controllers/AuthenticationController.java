@@ -11,16 +11,14 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.aleksandrov.backendinternetnewspaper.dto.UserDto;
 import ru.aleksandrov.backendinternetnewspaper.models.RefreshToken;
 import ru.aleksandrov.backendinternetnewspaper.models.User;
-import ru.aleksandrov.backendinternetnewspaper.payload.request.LoginRequest;
+import ru.aleksandrov.backendinternetnewspaper.payload.request.SigninRequest;
 import ru.aleksandrov.backendinternetnewspaper.payload.request.RefreshTokenRequest;
-import ru.aleksandrov.backendinternetnewspaper.payload.response.LoginResponse;
+import ru.aleksandrov.backendinternetnewspaper.payload.request.SignupRequest;
+import ru.aleksandrov.backendinternetnewspaper.payload.response.SignupResponse;
 import ru.aleksandrov.backendinternetnewspaper.payload.response.RefreshTokenResponse;
 import ru.aleksandrov.backendinternetnewspaper.security.JWT.JwtUtils;
 import ru.aleksandrov.backendinternetnewspaper.security.exception.TokenRefreshException;
@@ -34,8 +32,7 @@ import ru.aleksandrov.backendinternetnewspaper.util.UserValidator;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
-
-
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/auth")
 @Slf4j
@@ -68,10 +65,10 @@ public class AuthenticationController {
     }
 
     @PostMapping("/signin")
-    public ResponseEntity<LoginResponse> login(@RequestBody @Valid LoginRequest loginRequest) {
+    public ResponseEntity<SignupResponse> login(@RequestBody @Valid SigninRequest signinRequest) {
         Authentication authentication = authenticationManager
-                .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(),
-                        loginRequest.getPassword()));
+                .authenticate(new UsernamePasswordAuthenticationToken(signinRequest.getEmail(),
+                        signinRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication );
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
@@ -80,7 +77,7 @@ public class AuthenticationController {
         List<String> roles = userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
 
-        LoginResponse response = new LoginResponse(accessJwt, refreshToken.getToken(), userDetails.getId(),
+        SignupResponse response = new SignupResponse(accessJwt, refreshToken.getToken(), userDetails.getId(),
                 userDetails.getName(), roles);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
@@ -107,15 +104,15 @@ public class AuthenticationController {
 
     @PostMapping("/signup")
     public ResponseEntity<?> perfectRegistration(@RequestBody
-                                                 @Valid UserDto userDTO,
+                                                 @Valid SignupRequest signupRequest,
                                                  BindingResult bindingResult) {
-        userValidator.validate(userDTO, bindingResult);
+        userValidator.validate(signupRequest, bindingResult);
 //        List<FieldError> fieldErrorList = bindingResult.getFieldErrors();
 //        if (!fieldErrorList.isEmpty()) {
 //            throw new MethodArgumentNotValidException(new MethodParameter(null, -1), bindingResult);
 //        }
 //
-        User newUser = mappingUtil.convertToUser(userDTO);
+        User newUser = mappingUtil.convertToUser(signupRequest);
         roleService.setDefaultRole(newUser);
         registrationService.register(newUser);
 

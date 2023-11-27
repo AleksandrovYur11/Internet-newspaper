@@ -25,7 +25,8 @@ public class News {
     @NotBlank(message = "Tile news could be not empty")
     private String newsTitle;
 
-    @Column(length = 10485760)
+    @Lob
+    @Column(columnDefinition = "TEXT")
     @NotBlank(message = "Text news could be not empty")
     private String newsText;
 
@@ -33,14 +34,14 @@ public class News {
     private LocalDateTime timePublishedNewsMsk;
 
     @OneToMany(mappedBy = "news")
-    @Cascade(org.hibernate.annotations.CascadeType.ALL)
+    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
     private List<Comment> comments;
 
     @OneToOne
     private Picture picture;
 
     @OneToMany(mappedBy = "news")
-    @Cascade(org.hibernate.annotations.CascadeType.ALL)
+    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
     private List<Like> likes;
 
     @ManyToMany(fetch = FetchType.EAGER)
@@ -48,6 +49,20 @@ public class News {
             joinColumns = @JoinColumn(name = "news_id"),
             inverseJoinColumns = @JoinColumn(name = "theme_id"))
     private Set<Theme> theme = new HashSet<>();
+
+    @Override
+    public String toString() {
+        return "News{" +
+                "id=" + id +
+                ", newsTitle='" + newsTitle + '\'' +
+                ", newsText='" + newsText + '\'' +
+                ", timePublishedNewsMsk=" + timePublishedNewsMsk +
+                ", comments=" + comments +
+                ", picture=" + picture +
+                ", likes=" + likes +
+                ", theme=" + theme +
+                '}';
+    }
 }
 
 

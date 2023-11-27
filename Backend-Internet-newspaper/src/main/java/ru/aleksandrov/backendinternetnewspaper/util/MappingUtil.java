@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.aleksandrov.backendinternetnewspaper.dto.*;
 import ru.aleksandrov.backendinternetnewspaper.models.*;
+import ru.aleksandrov.backendinternetnewspaper.payload.request.SignupRequest;
 
 
 @Service
@@ -47,6 +48,9 @@ public class MappingUtil {
 
     public User convertToUser(UserDto userDto){
         return modelMapper.map(userDto, User.class);
+    }
+    public User convertToUser(SignupRequest signupRequest){
+        return modelMapper.map(signupRequest, User.class);
     }
     public ThemeDto convertToThemeDto(Theme theme){ return  modelMapper.map(theme, ThemeDto.class);}
     public Theme convertToTheme(ThemeDto themeDto){ return  modelMapper.map(themeDto, Theme.class);}
