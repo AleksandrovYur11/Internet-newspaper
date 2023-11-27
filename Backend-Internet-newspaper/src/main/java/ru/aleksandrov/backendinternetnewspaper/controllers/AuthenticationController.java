@@ -16,8 +16,25 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import ru.aleksandrov.backendinternetnewspaper.dto.UserDto;
+import ru.aleksandrov.backendinternetnewspaper.models.RefreshToken;
+import ru.aleksandrov.backendinternetnewspaper.models.User;
+import ru.aleksandrov.backendinternetnewspaper.payload.request.LoginRequest;
+import ru.aleksandrov.backendinternetnewspaper.payload.request.RefreshTokenRequest;
+import ru.aleksandrov.backendinternetnewspaper.payload.response.LoginResponse;
+import ru.aleksandrov.backendinternetnewspaper.payload.response.RefreshTokenResponse;
+import ru.aleksandrov.backendinternetnewspaper.security.JWT.JwtUtils;
+import ru.aleksandrov.backendinternetnewspaper.security.exception.TokenRefreshException;
+import ru.aleksandrov.backendinternetnewspaper.security.services.RefreshTokenService;
+import ru.aleksandrov.backendinternetnewspaper.security.services.UserDetailsImpl;
+import ru.aleksandrov.backendinternetnewspaper.services.RegistrationService;
+import ru.aleksandrov.backendinternetnewspaper.services.RoleService;
+import ru.aleksandrov.backendinternetnewspaper.util.MappingUtil;
+import ru.aleksandrov.backendinternetnewspaper.util.UserValidator;
 
+import javax.validation.Valid;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @RestController
@@ -54,13 +71,15 @@ public class AuthenticationController {
     @PostMapping("/signin")
     public ResponseEntity<LoginResponse> login(@RequestBody @Valid LoginRequest loginRequest) {
         Authentication authentication = authenticationManager
-                .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
+                .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(),
+                        loginRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication );
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         String accessJwt = jwtUtils.generateJwtToken(userDetails);
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
-        List<String> roles = userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();
+        List<String> roles = userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList());
 
         LoginResponse response = new LoginResponse(accessJwt, refreshToken.getToken(), userDetails.getId(),
                 userDetails.getName(), roles);
@@ -99,7 +118,7 @@ public class AuthenticationController {
 //
         User newUser = mappingUtil.convertToUser(userDTO);
         roleService.setDefaultRole(newUser);
-        User savedUser = registrationService.register(newUser);
+        registrationService.register(newUser);
 
         return new ResponseEntity<>("Created new user", HttpStatus.CREATED);
     }

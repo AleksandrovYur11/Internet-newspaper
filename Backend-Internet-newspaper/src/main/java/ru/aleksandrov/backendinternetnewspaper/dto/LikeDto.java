@@ -9,6 +9,6 @@ import lombok.*;
 @Builder
 public class LikeDto {
 
-    private Long id;
+    private Integer id;
     private UserDto user;
 }

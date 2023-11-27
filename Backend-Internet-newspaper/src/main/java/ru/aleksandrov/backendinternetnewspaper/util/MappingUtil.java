@@ -18,19 +18,19 @@ public class MappingUtil {
         this.modelMapper = modelMapper;
     }
 
-    public NewsDto convertToNewsDTO(News news) {
+    public NewsDto convertToNewsDto(News news) {
         return modelMapper.map(news, NewsDto.class);
     }
 
-    public CommentDto convertToCommentDTO(Comment comment) {
+    public CommentDto convertToCommentDto(Comment comment) {
         return modelMapper.map(comment, CommentDto.class);
     }
 
-    public Comment convertToComment(CommentDto commentDTO){
-        return modelMapper.map(commentDTO, Comment.class);
+    public Comment convertToComment(CommentDto commentDto){
+        return modelMapper.map(commentDto, Comment.class);
     }
 
-    public LikeDto convertToLikeDTO(Like like) {
+    public LikeDto convertToLikeDto(Like like) {
         return modelMapper.map(like, LikeDto.class);
     }
     public Like convertToLike(LikeDto likeDto) {
@@ -38,15 +38,15 @@ public class MappingUtil {
     }
 
 
-    public PictureDto convertToPictureDTO(Picture picture){
+    public PictureDto convertToPictureDto(Picture picture){
         return  modelMapper.map(picture, PictureDto.class);
     }
     public Picture convertToPicture(PictureDto pictureDto){
         return  modelMapper.map(pictureDto, Picture.class);
     }
 
-    public User convertToUser(UserDto userDTO){
-        return modelMapper.map(userDTO, User.class);
+    public User convertToUser(UserDto userDto){
+        return modelMapper.map(userDto, User.class);
     }
     public ThemeDto convertToThemeDto(Theme theme){ return  modelMapper.map(theme, ThemeDto.class);}
     public Theme convertToTheme(ThemeDto themeDto){ return  modelMapper.map(themeDto, Theme.class);}
