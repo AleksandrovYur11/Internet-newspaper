@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.aleksandrov.backendinternetnewspaper.dto.NewsDto;
+import ru.aleksandrov.backendinternetnewspaper.dto.ThemeDto;
 import ru.aleksandrov.backendinternetnewspaper.models.*;
 import ru.aleksandrov.backendinternetnewspaper.repositories.NewsRepository;
 import ru.aleksandrov.backendinternetnewspaper.util.MappingUtil;
@@ -56,8 +57,8 @@ public class NewsService {
         return newsRepository.findAll();
     }
 
-    public List<News> findAllPublishedNewsInLastTwentyFourHours(LocalDateTime twentyFourHoursAgo) {
-        return newsRepository.findAllPublishedNewsInLastTwentyFourHours(twentyFourHoursAgo);
+    public List<News> getNewsInLastTwentyFourHours(LocalDateTime twentyFourHoursAgo) {
+        return newsRepository.findNewsInLastTwentyFourHours(twentyFourHoursAgo);
     }
 
     public void deleteNewsById(Integer idNews) {
@@ -142,5 +143,13 @@ public class NewsService {
 //                    return news;
 //                });
 //    }
+
+    public List<News> geNewsByUserThemes(Set<Theme> favoriteThemes, Set<Theme> forbiddenThemes) {
+        return newsRepository.findNewsByUserThemes(favoriteThemes, forbiddenThemes);
+    }
+
+
+
+
 
 }

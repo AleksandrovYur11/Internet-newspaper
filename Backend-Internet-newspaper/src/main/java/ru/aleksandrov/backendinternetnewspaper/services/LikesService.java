@@ -31,7 +31,7 @@ public class LikesService {
         likesRepositories.save(like);
     }
 
-    public void removeLike(News news, User user) {
+    public void deleteLike(News news, User user) {
         Optional<Like> optionalLike= likesRepositories.findLikeByNewsAndUser(news, user);
         if (optionalLike.isPresent()){
             Like like = optionalLike.get();

@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import ru.aleksandrov.backendinternetnewspaper.models.Comment;
 import ru.aleksandrov.backendinternetnewspaper.models.News;
 import ru.aleksandrov.backendinternetnewspaper.repositories.CommentRepository;
-import ru.aleksandrov.backendinternetnewspaper.repositories.UserRepository;
 import ru.aleksandrov.backendinternetnewspaper.security.services.UserDetailsImpl;
 
 import javax.persistence.EntityNotFoundException;
@@ -17,13 +16,13 @@ import java.util.Optional;
 @Service
 @Slf4j
 public class CommentService {
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final CommentRepository commentRepository;
     private final NewsService newsService;
 
     @Autowired
-    public CommentService(UserRepository userRepository, CommentRepository commentRepository, NewsService newsService) {
-        this.userRepository = userRepository;
+    public CommentService(UserService userService, CommentRepository commentRepository, NewsService newsService) {
+        this.userService = userService;
         this.commentRepository = commentRepository;
         this.newsService = newsService;
     }
@@ -53,7 +52,7 @@ public class CommentService {
 
     public void addNewComment(UserDetailsImpl userDetailsImpl, Comment comment, Integer idNews) {
         Comment newComment = new Comment();
-        newComment.setAuthorComment(userRepository.findById(userDetailsImpl.getId()).get());
+        newComment.setAuthorComment(userService.findById(userDetailsImpl.getId()));
         newComment.setNews(newsService.findById(idNews));
         newComment.setTextComment(comment.getTextComment());
         newComment.setDatePublishedComment(new Date());
@@ -61,9 +60,9 @@ public class CommentService {
         log.info("Save new comment from user: " + userDetailsImpl.getName());
     }
 
-    public void removeComment(UserDetailsImpl userDetailsImpl, Integer idComment) {
-        if (userDetailsImpl.getId() == findById(idComment).getId()) {
-            commentRepository.deleteById(idComment);
+    public void deleteComment(UserDetailsImpl userDetailsImpl, Integer idComment) {
+        if (userDetailsImpl.getId() == findById(idComment).getAuthorComment().getId()) {
+            commentRepository.deleteCommentByUserIdAndCommentId(userDetailsImpl.getId(), idComment);
         } else {
             log.error("Comment with this " + idComment + " not found");
             throw new EntityNotFoundException("Comment with this " + idComment + " not found");
