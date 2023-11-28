@@ -21,7 +21,7 @@ import javax.validation.Valid;
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/comment")
-public class  CommentController {
+public class CommentController {
 
     private final CommentService commentService;
     private final NewsService newsService;
@@ -39,7 +39,6 @@ public class  CommentController {
         this.mappingUtil = mappingUtil;
         this.commentRepository = commentRepository;
     }
-
 
 
 //---------------------------------------------------------------
@@ -68,7 +67,7 @@ public class  CommentController {
 //        }
 //    }
 
-    @PostMapping("/add/{idNews}")
+    @PostMapping("/{idNews}")
 //    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<?> addComment(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl,
                                         @PathVariable("idNews") int idNews,
@@ -90,21 +89,21 @@ public class  CommentController {
         }
     }
 
-    @PostMapping("/remove/{idComment}")
+    @DeleteMapping("/user/{idComment}")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<HttpStatus> userRemoveComment(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl,
-                                                    @PathVariable("idComment") Integer idComment) {
+    public ResponseEntity<HttpStatus> userDeleteComment(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl,
+                                                        @PathVariable("idComment") Integer idComment) {
         try {
-            commentService.removeComment(userDetailsImpl, idComment);
+            commentService.deleteComment(userDetailsImpl, idComment);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 
-    @PostMapping("/remove")
+    @DeleteMapping("/admin/{idComment}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<HttpStatus> adminRemoveComment(@RequestParam("idComment") Integer idComment) {
+    public ResponseEntity<HttpStatus> adminDeleteComment(@PathVariable("idComment") Integer idComment) {
         try {
             commentRepository.deleteById(idComment);
             return new ResponseEntity<>(HttpStatus.OK);

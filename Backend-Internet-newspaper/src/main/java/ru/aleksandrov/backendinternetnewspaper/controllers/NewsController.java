@@ -7,8 +7,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.aleksandrov.backendinternetnewspaper.dto.NewsDto;
+import ru.aleksandrov.backendinternetnewspaper.dto.ThemeDto;
 import ru.aleksandrov.backendinternetnewspaper.models.*;
 import ru.aleksandrov.backendinternetnewspaper.services.NewsService;
+import ru.aleksandrov.backendinternetnewspaper.services.ThemeService;
 
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
@@ -16,18 +18,21 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.stream.Collectors;
 
-@CrossOrigin(origins = "http://localhost:5173")
+//@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @Slf4j
 @RequestMapping("/news")
 public class NewsController {
 
     private final NewsService newsService;
+    private final ThemeService themeService;
 
     @Autowired
-    public NewsController(NewsService newsService) {
+    public NewsController(NewsService newsService, ThemeService themeService) {
         this.newsService = newsService;
+        this.themeService = themeService;
     }
 
     //    @GetMapping("/news/{id}")
@@ -43,25 +48,48 @@ public class NewsController {
 //                String resultTimeString = news.getTimePublishedNewsMsk().format(formatter);
 //                newsDTO.setTimePublishedNewsMSK(resultTimeString);
 
-    @GetMapping( "/fresh-news")
+    @GetMapping("/fresh-news")
     public ResponseEntity<List<NewsDto>> getAllNewsAtTwentyFourHours() {
-
-        LocalDateTime twentyFourHoursAgo = ZonedDateTime.now(ZoneId.of("Europe/Moscow"))
-                .minus(24, ChronoUnit.HOURS).toLocalDateTime();
-        List<News> newsList = newsService.findAllPublishedNewsInLastTwentyFourHours(twentyFourHoursAgo);
-        List<NewsDto> newsDTOList = new ArrayList<>(newsList.size());
+        List<NewsDto> newsListDto;
         try {
-            for (News news : newsList) {
-                newsDTOList.add(newsService.convertToNewsDto(news));
-            }
+            LocalDateTime twentyFourHoursAgo = ZonedDateTime.now(ZoneId.of("Europe/Moscow"))
+                    .minus(24, ChronoUnit.HOURS).toLocalDateTime();
+            newsListDto = newsService.getNewsInLastTwentyFourHours(twentyFourHoursAgo).stream()
+                    .map(newsService::convertToNewsDto).collect(Collectors.toList());
             log.info("Get news that is 24 hours old: Success");
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(newsDTOList, HttpStatus.OK);
+        return new ResponseEntity<>(newsListDto, HttpStatus.OK);
     }
 
-    @PostMapping( "/create")
+    @GetMapping("/user-themes")
+//    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<List<NewsDto>> getNewsByUserThemes(@RequestParam("favoritesThemes") List<String> favoritesThemes,
+                                                             @RequestParam("forbiddenThemes") List<String> forbiddenThemes) {
+        List<NewsDto> newsListDto;
+        try {
+            Set<Theme> setFavoritesThemes = new HashSet<>();
+            Set<Theme> setForbiddenThemes = new HashSet<>();
+
+            for (String nameTheme : favoritesThemes) {
+                setFavoritesThemes.add(themeService.findByName(nameTheme));
+            }
+
+            for (String nameTheme : forbiddenThemes) {
+                setForbiddenThemes.add(themeService.findByName(nameTheme));
+            }
+            newsListDto = newsService.geNewsByUserThemes(setFavoritesThemes, setForbiddenThemes).stream()
+                    .map(newsService::convertToNewsDto).collect(Collectors.toList());
+
+            log.info("Get news that is 24 hours old: Success");
+        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(newsListDto, HttpStatus.OK);
+    }
+
+    @PostMapping("/create")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<HttpStatus> createNews(@RequestBody NewsDto newNewsDto) {
         try {
@@ -74,7 +102,7 @@ public class NewsController {
     }
 
 
-    @GetMapping( "/{idNews}")
+    @GetMapping("/{idNews}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<NewsDto> getNewsById(@PathVariable("idNews") Integer id) {
 
@@ -87,7 +115,7 @@ public class NewsController {
         }
     }
 
-    @PutMapping( "/{idNews}")
+    @PutMapping("/{idNews}")
 //    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<HttpStatus> updateNews(@PathVariable("idNews") Integer id,
                                                  @RequestBody NewsDto updatedNewsDto) {

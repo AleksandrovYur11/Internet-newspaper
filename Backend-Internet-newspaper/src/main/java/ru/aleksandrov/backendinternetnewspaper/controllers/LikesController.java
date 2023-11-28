@@ -31,7 +31,7 @@ public class LikesController {
         this.userService = userService;
     }
 
-    @PostMapping("/add/{idNews}")
+    @PostMapping("/{idNews}")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<HttpStatus> addLike(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl,
                                               @PathVariable("idNews") int idNews) {
@@ -47,10 +47,10 @@ public class LikesController {
 
     @DeleteMapping("/{idNews}")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<HttpStatus> userRemoveLike(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl,
+    public ResponseEntity<HttpStatus> userDeleteLike(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl,
                                                      @PathVariable("idNews") int idNews) {
         try {
-            likesService.removeLike(newsService.findById(idNews),
+            likesService.deleteLike(newsService.findById(idNews),
                     userService.findById(userDetailsImpl.getId()));
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception e) {
