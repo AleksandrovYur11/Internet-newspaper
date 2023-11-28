@@ -9,6 +9,10 @@ import ru.aleksandrov.backendinternetnewspaper.repositories.CommentRepository;
 import ru.aleksandrov.backendinternetnewspaper.security.services.UserDetailsImpl;
 
 import javax.persistence.EntityNotFoundException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -51,11 +55,12 @@ public class CommentService {
 
 
     public void addNewComment(UserDetailsImpl userDetailsImpl, Comment comment, Integer idNews) {
+        LocalDateTime moscow = LocalDateTime.now(ZoneId.of("Europe/Moscow"));
         Comment newComment = new Comment();
         newComment.setAuthorComment(userService.findById(userDetailsImpl.getId()));
         newComment.setNews(newsService.findById(idNews));
         newComment.setTextComment(comment.getTextComment());
-        newComment.setDatePublishedComment(new Date());
+        newComment.setDatePublishedComment(moscow);
         commentRepository.save(newComment);
         log.info("Save new comment from user: " + userDetailsImpl.getName());
     }
