@@ -8,11 +8,14 @@ import ru.aleksandrov.backendinternetnewspaper.dto.CommentDto;
 import ru.aleksandrov.backendinternetnewspaper.dto.NewsDto;
 import ru.aleksandrov.backendinternetnewspaper.models.*;
 import ru.aleksandrov.backendinternetnewspaper.repositories.NewsRepository;
+import ru.aleksandrov.backendinternetnewspaper.repositories.PictureRepository;
+import ru.aleksandrov.backendinternetnewspaper.repositories.ThemeRepository;
 import ru.aleksandrov.backendinternetnewspaper.util.MappingUtil;
 
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -24,11 +27,16 @@ public class NewsService {
 
     private final NewsRepository newsRepository;
     private final MappingUtil mappingUtil;
+    private final PictureRepository pictureRepository;
+    private final ThemeRepository themeRepository;
 
     @Autowired
-    public NewsService(NewsRepository newsRepository, MappingUtil mappingUtil) {
+    public NewsService(NewsRepository newsRepository, MappingUtil mappingUtil,
+                       PictureRepository pictureRepository, ThemeRepository themeRepository) {
         this.newsRepository = newsRepository;
         this.mappingUtil = mappingUtil;
+        this.pictureRepository = pictureRepository;
+        this.themeRepository = themeRepository;
     }
 
     public News findById(Integer idNews) {
@@ -65,45 +73,33 @@ public class NewsService {
         newsRepository.delete(findById(idNews));
     }
 
-    public News updateNews(Integer idNews, NewsDto updatedNewsDto) {
+    public void updateNews(Integer idNews, NewsDto updatedNewsDto) {
         News news = findById(idNews);
-//        System.out.println(news.toString());
-
-        LocalDateTime moscowTimeNow = LocalDateTime.now(ZoneId.of("Europe/Moscow"));
-
-//        news.setNewsText(updatedNewsDto.getNewsText());
-//        news.setNewsTitle(updatedNewsDto.getNewsTitle());
-
-//        news.setComments(updatedNewsDto.getComments().stream().map(mappingUtil::convertToComment)
-//                .collect(Collectors.toList()));
-//
-//        news.setLikes(updatedNewsDto.getLikes().stream().map(mappingUtil::convertToLike)
-//                .collect(Collectors.toList()));
-
-//        mappingUtil.convertToPicture(updatedNewsDto.getPicture()).setNews(news);
-//        news.setPicture(mappingUtil.convertToPicture(updatedNewsDto.getPicture()));
-
-//        news.setTimePublishedNewsMsk(moscowTimeNow);
-
-//        news.setTheme(updatedNewsDto.getThemes().stream().map(mappingUtil::convertToTheme)
-//                .collect(Collectors.toSet()));
-
-        System.out.println(news.toString());
-//        newsRepository.save(news);
-//-----------------------
         news.setNewsTitle(updatedNewsDto.getNewsTitle());
         news.setNewsText(updatedNewsDto.getNewsText());
-        news.setTimePublishedNewsMsk(moscowTimeNow);
+//        news.setTimePublishedNewsMsk(moscowTimeNow);
 //        news.setComments(updatedNewsDto.getComments());
 //        news.setLikes(updatedNewsDto.getLikes());
-//        news.setPicture(mappingUtil.convertToPicture(updatedNewsDto.getPicture()));
-//        mappingUtil.convertToPicture(updatedNewsDto.getPicture()).setNews(news);
-        System.out.println(news.toString());
+        Picture newPicture = mappingUtil.convertToPicture(updatedNewsDto.getPicture());
+        if (pictureRepository.findByUrl(newPicture.getUrl()).isPresent()) {
+            news.setPicture(mappingUtil.convertToPicture(updatedNewsDto.getPicture()));
+        } else {
+            pictureRepository.save(newPicture);
+            news.setPicture(newPicture);
+        }
 
-//        news.setTheme(updatedNewsDto.getThemes().stream().map(mappingUtil::convertToTheme).collect(Collectors.toSet()));
-//        updatedNewsDto.getThemes().stream().map(mappingUtil::convertToTheme).collect(Collectors.toSet()).stream().map(thema -> thema.s)
-        News update = newsRepository.save(news);
-        return update;
+        Set<Theme> themes = updatedNewsDto.getThemes().stream().map(mappingUtil::convertToTheme).collect(Collectors.toSet());
+        Set<Theme> resultThemes = new HashSet<>();
+        for (Theme theme : themes) {
+            if (!themeRepository.findThemeByName(theme.getName()).isPresent()) {
+                themeRepository.save(theme);
+                resultThemes.add(theme);
+            } else {
+                resultThemes.add(themeRepository.findThemeByName(theme.getName()).get());
+            }
+        }
+        news.setTheme(resultThemes);
+        newsRepository.save(news);
     }
 
     public News getNewsById(int idNews) {
