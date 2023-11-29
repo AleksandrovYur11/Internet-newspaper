@@ -30,4 +30,14 @@ public class ThemeService {
             throw new EntityNotFoundException("Theme with this " + nameTheme + " not found");
         }
     }
+
+    public Theme findByName(Integer idTheme) {
+        Optional<Theme> themeOptional = themeRepository.findById(idTheme);
+        if (themeOptional.isPresent()) {
+            return themeOptional.get();
+        } else {
+            log.error("Theme with this " + idTheme + " not found");
+            throw new EntityNotFoundException("Theme with this " + idTheme + " not found");
+        }
+    }
 }
