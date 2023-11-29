@@ -82,6 +82,7 @@ public class CommentController {
         }
         try {
             Comment comment = mappingUtil.convertToComment(commentDTO);
+
             commentService.addNewComment(userDetailsImpl, comment, idNews);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception e) {
