@@ -32,11 +32,15 @@ public interface NewsRepository extends JpaRepository<News, Integer> {
 //    List<News> findNewsByUserThemes(@Param("favoritesThemes") Theme favoritesThemes,
 //                                    @Param("forbiddenThemes") Theme forbiddenThemes);
 
+//    @Transactional
+//    @Query("SELECT n FROM news n WHERE n.theme IN :favoritesThemes AND n NOT IN " +
+//            "(SELECT news FROM news n JOIN news.theme theme WHERE theme IN :forbiddenThemes)")
+//    List<News> findNewsByUserThemes(@Param("favoritesThemes") Set<Theme> favoritesThemes,
+//                                    @Param("forbiddenThemes") Set<Theme> forbiddenThemes);
+
+
     @Transactional
-    @Query("SELECT n FROM news n WHERE n.theme IN :favoritesThemes AND n NOT IN " +
-            "(SELECT news FROM news news JOIN news.theme theme WHERE theme IN :forbiddenThemes)")
+    @Query("SELECT n FROM news n WHERE n.theme IN :favoritesThemes AND n.theme NOT IN :forbiddenThemes")
     List<News> findNewsByUserThemes(@Param("favoritesThemes") Set<Theme> favoritesThemes,
                                     @Param("forbiddenThemes") Set<Theme> forbiddenThemes);
-
-
 }

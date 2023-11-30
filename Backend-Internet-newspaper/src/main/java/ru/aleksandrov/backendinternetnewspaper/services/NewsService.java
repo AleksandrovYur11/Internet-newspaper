@@ -88,17 +88,18 @@ public class NewsService {
             news.setPicture(newPicture);
         }
 
-        Set<Theme> themes = updatedNewsDto.getThemes().stream().map(mappingUtil::convertToTheme).collect(Collectors.toSet());
-        Set<Theme> resultThemes = new HashSet<>();
+        Set<Theme> themes = updatedNewsDto.getThemes().stream()
+                .map(mappingUtil::convertToTheme).collect(Collectors.toSet());
+        Set<Theme> dbThemes = new HashSet<>();
         for (Theme theme : themes) {
             if (!themeRepository.findThemeByName(theme.getName()).isPresent()) {
                 themeRepository.save(theme);
-                resultThemes.add(theme);
+                dbThemes.add(theme);
             } else {
-                resultThemes.add(themeRepository.findThemeByName(theme.getName()).get());
+                dbThemes.add(themeRepository.findThemeByName(theme.getName()).get());
             }
         }
-        news.setTheme(resultThemes);
+        news.setTheme(dbThemes);
         newsRepository.save(news);
     }
 

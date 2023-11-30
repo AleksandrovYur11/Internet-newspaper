@@ -8,7 +8,10 @@ import ru.aleksandrov.backendinternetnewspaper.models.Theme;
 import ru.aleksandrov.backendinternetnewspaper.repositories.ThemeRepository;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -21,6 +24,19 @@ public class ThemeService {
         this.themeRepository = themeRepository;
     }
 
+
+    public Set<Theme> getDbThemes(Set<Theme> setThemesWithoutId){
+        Set<Theme> dbThemes = new HashSet<>();
+        for (Theme theme : setThemesWithoutId) {
+            if (!themeRepository.findThemeByName(theme.getName()).isPresent()) {
+                themeRepository.save(theme);
+                dbThemes.add(theme);
+            } else {
+                dbThemes.add(themeRepository.findThemeByName(theme.getName()).get());
+            }
+        }
+        return dbThemes;
+    }
     public Theme findByName(String nameTheme) {
         Optional<Theme> themeOptional = themeRepository.findThemeByName(nameTheme);
         if (themeOptional.isPresent()) {
