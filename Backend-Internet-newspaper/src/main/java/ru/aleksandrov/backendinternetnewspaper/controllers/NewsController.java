@@ -58,39 +58,38 @@ public class NewsController {
 
     @GetMapping("/fresh-news")
     public ResponseEntity<List<NewsDto>> getAllNewsAtTwentyFourHours() {
-        List<NewsDto> newsListDto;
         try {
             LocalDateTime twentyFourHoursAgo = ZonedDateTime.now(ZoneId.of("Europe/Moscow"))
                     .minus(24, ChronoUnit.HOURS).toLocalDateTime();
-            newsListDto = newsService.getNewsInLastTwentyFourHours(twentyFourHoursAgo).stream()
+            List<NewsDto> newsListDto = newsService.getNewsInLastTwentyFourHours(twentyFourHoursAgo).stream()
                     .map(newsService::convertToNewsDto).collect(Collectors.toList());
             log.info("Get news that is 24 hours old: Success");
+            return new ResponseEntity<>(newsListDto, HttpStatus.OK);
         } catch (EntityNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(newsListDto, HttpStatus.OK);
     }
 
     @GetMapping("/user-themes")
-//    @PreAuthorize("hasRole('USER')")
-//    public ResponseEntity<List<NewsDto>> getNewsByUserThemes(@RequestBody NewsRequest newsRequest) {
-//        List<NewsDto> newsListDto;
-//        try {
-//
-//            Set<Theme> themes = newsRequest.getFavoritesThemes().
-//                    stream().map(mappingUtil::convertToTheme).collect(Collectors.toSet());
-//            Set<Theme> resultThemes = new HashSet<>();
-//            for (Theme theme : themes) {
-//                if (!themeRepository.findThemeByName(theme.getName()).isPresent()) {
-//                    themeRepository.save(theme);
-//                    resultThemes.add(theme);
-//                } else {
-//                    resultThemes.add(themeRepository.findThemeByName(theme.getName()).get());
-//                }
-//            }
-//            news.setTheme(resultThemes);
-//
-//
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<List<NewsDto>> getNewsByUserThemes(@RequestBody NewsRequest newsRequest) {
+        try {
+
+            Set<Theme> favoritesThemes = newsRequest.getFavoritesThemes().
+                    stream().map(mappingUtil::convertToTheme).collect(Collectors.toSet());
+
+            Set<Theme> forbiddenThemes = newsRequest.getFavoritesThemes().
+                    stream().map(mappingUtil::convertToTheme).collect(Collectors.toSet());
+
+            Set<Theme> dbFavoriteThemes = themeService.getDbThemes(favoritesThemes);
+            Set<Theme> dbForbiddenThemes = themeService.getDbThemes(forbiddenThemes);
+            List<NewsDto> newsListDto = newsService.geNewsByUserThemes(dbFavoriteThemes, dbForbiddenThemes).stream()
+                    .map(newsService::convertToNewsDto).collect(Collectors.toList());
+
+//           return new ResponseEntity<>(newsService.geNewsByUserThemes(dbFavoriteThemes, dbForbiddenThemes).stream()
+//                   .map(newsService::convertToNewsDto).collect(Collectors.toList()))
+
+
 //            Set<Theme> setFavoritesThemes = new HashSet<>();
 //            Set<Theme> setForbiddenThemes = new HashSet<>();
 //
@@ -109,14 +108,16 @@ public class NewsController {
 //            }
 //            newsListDto = newsService.geNewsByUserThemes(setFavoritesThemes, setForbiddenThemes).stream()
 //                    .map(newsService::convertToNewsDto).collect(Collectors.toList());
-//
-//            log.info("Get news with favorite themes: " + favoritesThemes + " and without " + forbiddenThemes + ": Success",
-//                    favoritesThemes, forbiddenThemes);
-//        } catch (EntityNotFoundException e) {
-//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//        }
+
+            log.info("Get news with favorite themes: " + favoritesThemes + " and without " +
+                            "forbidden themes: " + forbiddenThemes + ": Success",
+                    favoritesThemes, forbiddenThemes);
+            return new ResponseEntity<>(newsListDto, HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
 //        return new ResponseEntity<>(newsListDto, HttpStatus.OK);
-//    }
+    }
 
     @PostMapping("/create")
     @PreAuthorize("hasRole('ADMIN')")

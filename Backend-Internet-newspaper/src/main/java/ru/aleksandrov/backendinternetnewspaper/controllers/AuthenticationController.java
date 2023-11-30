@@ -64,7 +64,7 @@ public class AuthenticationController {
         this.roleService = roleService;
     }
 
-    @PostMapping("/signin")
+    @PostMapping("/sign-in")
     public ResponseEntity<SignupResponse> login(@RequestBody @Valid SigninRequest signinRequest) {
         Authentication authentication = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(signinRequest.getEmail(),
@@ -102,7 +102,7 @@ public class AuthenticationController {
 //        }
 //    }
 
-    @PostMapping("/signup")
+    @PostMapping("/sign-up")
     public ResponseEntity<?> perfectRegistration(@RequestBody
                                                  @Valid SignupRequest signupRequest,
                                                  BindingResult bindingResult) {
@@ -119,7 +119,7 @@ public class AuthenticationController {
         return new ResponseEntity<>("Created new user", HttpStatus.CREATED);
     }
 
-    @PostMapping("/refreshToken")
+    @PostMapping("/refresh-token")
     public ResponseEntity<?> refreshToken(@Valid @RequestBody RefreshTokenRequest refreshTokenRequest) {
         String refreshToken = refreshTokenRequest.getRefreshToken();
         return refreshTokenService.findByToken(refreshToken)
@@ -134,7 +134,7 @@ public class AuthenticationController {
                         "Refresh token is not in database"));
     }
 
-    @PostMapping("/signout")
+    @PostMapping("/sign-out")
     public ResponseEntity<?> logoutUser(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         int userId = userDetails.getId();
         refreshTokenService.deleteRefreshToken(userId);

@@ -44,7 +44,7 @@ public class SecurityConfig {
                 .exceptionHandling((exception) -> exception
                         .authenticationEntryPoint(unauthorizedHandler))
                 .authorizeHttpRequests((requests) -> requests
-                        .antMatchers("/auth/**", "/news/**").permitAll()
+                        .antMatchers("/auth/sign-in", "/auth/sign-up", "/news/fresh-news").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);
 
