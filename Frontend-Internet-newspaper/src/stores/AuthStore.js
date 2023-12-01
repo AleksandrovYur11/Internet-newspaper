@@ -1,17 +1,32 @@
 import { defineStore } from "pinia"
 
-import axios from 'axios'
+export const useAuthStore = defineStore("auth",  {
+    state: () => ({
+        JWT: null, 
+        selectedRole: null,
+        modal: false,
 
-// import { fetchWrapper } from "@/router/fetch-wrapper"
-
-// const baseUrl = `${import.meta.env.VITE_API_URL}/users`;
-
-export const useAuthStore = defineStore("auth", ()=> {
-//    const  signup = async (payload) =>{
-//     try {
-//         let response
-//     }
-//    }
+    }),
+    actions: {
+        setAuthUser(responseData){
+            this.JWT = responseData.accessToken
+            // console.log(responseData)
+        },
+        selectRole(role){
+            this.selectedRole = role
+        },
+        sbrosRole(){
+            this.selectedRole = null
+            console.log(this.selectedRole)
+        },
+        showModal(){
+            this.modal = true
+        },
+        closeModal(){
+            this.modal = false
+        }
+    },
 })
+
     
         
