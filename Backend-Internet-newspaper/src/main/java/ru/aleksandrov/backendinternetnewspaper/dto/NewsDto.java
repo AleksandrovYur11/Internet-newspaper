@@ -25,7 +25,7 @@ public class NewsDto {
     @NotBlank(message = "Text news could be not empty")
     private String newsText;
 
-    @Past(message = "The publication date must be before the present time")
+//    @Past(message = "The publication date must be before the present time")
     private LocalDateTime timePublishedNewsMSK;
 //    @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<CommentDto> comments;
