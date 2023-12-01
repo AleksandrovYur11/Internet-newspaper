@@ -27,7 +27,7 @@ import NomeView from "@/views/HomeView.vue"
             meta: { requiresAuth: true } 
         },
         {
-            path: "/news/showAllNews",
+            path: "/news/fresh-news",
             name: "news",
             component: NewsView,
         }

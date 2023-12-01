@@ -15,7 +15,7 @@ export default defineConfig({
   },
   server: {
     // proxy: {
-    //   '/auth': {
+    //   '/comment': {
     //     target: 'http://localhost:8085',
     //     changeOrigin: true,
     //     headers: {
@@ -24,6 +24,17 @@ export default defineConfig({
     //       'Access-Control-Allow-Headers': 'Content-Type, Authorization'
     //     }
     //   }
-    // }
+    proxy: {
+      '/comment': {
+        target: 'http://localhost:8085',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/comment/, ''),
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+        }
+      }
+    }
   }
 })

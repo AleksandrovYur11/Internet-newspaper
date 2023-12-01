@@ -4,20 +4,21 @@ import { ref, computed } from "vue"
 
 import router from '@/router/index.js'
 
-import { useUsersStore } from "@/stores/UsersStore"
-const Users = useUsersStore()
+import { useAuthStore } from "@/stores/AuthStore"
+import { BCloseButton } from "bootstrap-vue-next";
+const AuthUser = useAuthStore()
 
 //написать валидацию для почты и пароля потом! + не давать вводить пароль некоторые символы
 const textEmail = ref(null)
 const validation_email = computed(() => {
     if (textEmail.value)
-        return textEmail.value.length > 4 && textEmail.value.length < 20
+        return textEmail.value.length > 4 && textEmail.value.length < 30
 })
 
 const textPassword = ref(null)
 const validation_password = computed(() => {
     if (textPassword.value)
-        return textPassword.value.length > 4 && textPassword.value.length < 20
+        return textPassword.value.length > 4 && textPassword.value.length < 30
 })
 
 ///////////////////////////////require////////////
@@ -47,14 +48,19 @@ const login = async () => {
         }
 
         const responseData = await response.json()
-        const jwtToken = responseData.token
-        const name = responseData.name
-        console.log(responseData)
-        console.log("JWT Token:", jwtToken)
 
-        localStorage.setItem('AccessToken', jwtToken);
-        localStorage.setItem('name', name);
-        router.push('/auth/home')
+        AuthUser.setAuthUser(responseData)
+
+
+        const jwtToken = responseData.accessToken
+        //const name = responseData.name
+        console.log(responseData)
+        // console.log("JWT Token:", jwtToken)
+
+        // sessionStorage.setItem('jwtToken', 'ваш_токен');
+        sessionStorage.setItem('jwtToken', jwtToken);
+        
+        router.push('/news/fresh-news')
 
     } catch (error) {
         console.error("Authentication error:", error)
@@ -62,27 +68,6 @@ const login = async () => {
 }
 
 /////////////////
-
-const fetchData = async () => {
-    try {
-        const response = await fetch("http://localhost:8085/auth/my", {
-            method: "GET",
-            headers: {
-        
-                // "Authorization": `Bearer ${jwtToken}`,
-            },
-        });
-
-        if (!response.ok) {
-            throw new Error("Failed to fetch data");
-        }
-
-        const responseData = await response.text();
-        console.log("Response data:", responseData);
-    } catch (error) {
-        console.error("Fetch error:", error);
-    }
-};
 
 </script>
 
