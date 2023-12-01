@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  myapp:
+    build:
+      context: .
+    container_name: internet-newspaper
+    depends_on:
+      - psql-db
+    ports:
+      - "8085:8085"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://psql-db:5432/Internet-newspaper
+      - SPRING_DATASOURCE_USER=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgre
+
+
+  psql-db:
+    image: postgres:latest
+    container_name: psql-db
+    environment:
+      - POSTGRES_DB=Internet-newspaper
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgre
+    ports:
+      - "5432:5432"

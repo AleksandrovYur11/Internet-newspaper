@@ -55,12 +55,12 @@ public class CommentService {
 
 
     public void addNewComment(UserDetailsImpl userDetailsImpl, Comment comment, Integer idNews) {
-        LocalDateTime moscow = LocalDateTime.now(ZoneId.of("Europe/Moscow"));
+        LocalDateTime moscowTimeNow = LocalDateTime.now(ZoneId.of("Europe/Moscow"));
         Comment newComment = new Comment();
         newComment.setAuthorComment(userService.findById(userDetailsImpl.getId()));
         newComment.setNews(newsService.findById(idNews));
         newComment.setTextComment(comment.getTextComment());
-        newComment.setDatePublishedComment(moscow);
+        newComment.setDatePublishedComment(moscowTimeNow);
         commentRepository.save(newComment);
         log.info("Save new comment from user: " + userDetailsImpl.getName());
     }

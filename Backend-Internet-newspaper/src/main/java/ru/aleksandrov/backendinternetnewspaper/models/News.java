@@ -30,7 +30,7 @@ public class News {
     @NotBlank(message = "Text news could be not empty")
     private String newsText;
 
-    @Past(message = "The publication date must be before the present time")
+//    @Past(message = "The publication date must be before the present time")
     private LocalDateTime timePublishedNewsMsk;
 
     @OneToMany(mappedBy = "news")
