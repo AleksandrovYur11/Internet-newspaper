@@ -2,10 +2,7 @@
 import MainBlock from "@/components/MainBlock.vue"
 import { ref, computed } from "vue"
 
-import router from '@/router/index.js'
-
 import { useAuthStore } from "@/stores/AuthStore"
-import { BCloseButton } from "bootstrap-vue-next";
 const AuthUser = useAuthStore()
 
 //написать валидацию для почты и пароля потом! + не давать вводить пароль некоторые символы
@@ -20,54 +17,6 @@ const validation_password = computed(() => {
     if (textPassword.value)
         return textPassword.value.length > 4 && textPassword.value.length < 30
 })
-
-///////////////////////////////require////////////
-const login = async () => {
-    
-    const loginData = {
-        email: textEmail.value,
-        password: textPassword.value,
-    }
-
-    console.log(loginData)
-
-    try {
-        const response = await fetch("http://localhost:8085/auth/signin", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(loginData),
-        })
-
-        if (!response.ok) {
-            alert('Неправильный вход!')
-            textEmail.value = null
-            textPassword.value = null
-            throw new Error("Authentication failed")
-        }
-
-        const responseData = await response.json()
-
-        AuthUser.setAuthUser(responseData)
-
-
-        const jwtToken = responseData.accessToken
-        //const name = responseData.name
-        console.log(responseData)
-        // console.log("JWT Token:", jwtToken)
-
-        // sessionStorage.setItem('jwtToken', 'ваш_токен');
-        sessionStorage.setItem('jwtToken', jwtToken);
-        
-        router.push('/news/fresh-news')
-
-    } catch (error) {
-        console.error("Authentication error:", error)
-    }
-}
-
-/////////////////
 
 </script>
 
@@ -124,7 +73,7 @@ const login = async () => {
                 </b-form-group>
                 <!-- type = "submit" -->
                 <b-button
-                    @click="login()"
+                    @click="AuthUser.login(textEmail, textPassword)"
                     variant="primary"
                     class="submit_btn"
                     >Submit</b-button

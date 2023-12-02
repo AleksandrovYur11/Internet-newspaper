@@ -6,8 +6,6 @@ import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
 
-router.replace('/auth/news')
-
 import "bootstrap/dist/css/bootstrap.css"
 import "bootstrap-vue-next/dist/bootstrap-vue-next.css"
 
