@@ -28,12 +28,8 @@ public class ThemeService {
     public Set<Theme> getDbThemes(Set<Theme> setThemesWithoutId){
         Set<Theme> dbThemes = new HashSet<>();
         for (Theme theme : setThemesWithoutId) {
-            if (!themeRepository.findThemeByName(theme.getName()).isPresent()) {
-                themeRepository.save(theme);
-                dbThemes.add(theme);
-            } else {
-                dbThemes.add(themeRepository.findThemeByName(theme.getName()).get());
-            }
+            Optional<Theme> themeOptional = themeRepository.findThemeByName(theme.getName());
+            themeOptional.ifPresent(dbThemes::add);
         }
         return dbThemes;
     }

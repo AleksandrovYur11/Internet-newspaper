@@ -5,6 +5,7 @@ import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -48,6 +49,7 @@ public class News {
     @JoinTable(name =  "news_theme",
             joinColumns = @JoinColumn(name = "news_id"),
             inverseJoinColumns = @JoinColumn(name = "theme_id"))
+    @NotNull(message = "News must have at least one theme")
     private Set<Theme> theme = new HashSet<>();
 
     @Override

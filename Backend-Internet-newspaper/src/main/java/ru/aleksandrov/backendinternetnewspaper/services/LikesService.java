@@ -24,7 +24,7 @@ public class LikesService {
         this.likesRepositories = likesRepositories;
     }
 
-    public void addLike(News news, User user) {
+    public void saveLike(News news, User user) {
         Like like = new Like();
         like.setNews(news);
         like.setUser(user);
