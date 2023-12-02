@@ -2,70 +2,41 @@
 import MainBlock from "@/components/MainBlock.vue"
 import {ref, computed} from 'vue'
 
+import {useAuthStore} from "@/stores/AuthStore.js"
+const AuthStore = useAuthStore()
 
-import router from '@/router/index.js'
+const regData = ref({
+    textName: null, 
+    textSurname: null,
+    textEmail: null,
+    textPassword: null,
+    textRepeatPassword: null
+})
 
-const textName = ref(null)
 const validation_name = computed(() => {
-    if (textName.value)
-        return textName.value.length > 4 && textName.value.length < 13
+    if (regData.textName)
+        return regData.textName.length > 4 && regData.textName.length < 13
 })
 
-const textSurname = ref(null)
 const validation_surname = computed(() => {
-    if (textSurname.value)
-        return textSurname.value.length > 4 && textSurname.value.length < 13
+    if (regData.textSurname)
+        return regData.textSurname.length > 4 && regData.textSurname.length < 13
 })
 
-const textEmail = ref(null)
 const validation_email = computed(() => {
-    if (textEmail.value)
-        return textEmail.value.length > 4 && textEmail.value.length < 25
+    if (regData.textEmail)
+        return regData.textEmail.length > 4 && regData.textEmail.length < 25
 })
 
-const textPassword = ref(null)
 const validation_password = computed(() => {
-    if (textPassword.value)
-        return textPassword.value.length > 4 && textPassword.value.length < 25
+    if (regData.textPassword)
+        return regData.textPassword.length > 4 && regData.textPassword.length < 25
 })
 
-const textRepeatPassword = ref(null)
 const validation_repeat_password = computed(() => {
-    if (textRepeatPassword.value)
-        return textRepeatPassword.value.length > 4 && textRepeatPassword.value.length < 25
+    if (regData.textRepeatPassword)
+        return regData.textRepeatPassword.length > 4 && regData.textRepeatPassword.length < 25
 })
-
-//////////////////////////////////////
-const register = async () => {
-  const userData = {
-    name: textName.value,
-    surname: textSurname.value,
-    email: textEmail.value, 
-    password: textPassword.value, 
-  };
-
-  try {
-    const response = await fetch("http://localhost:8085/auth/signup", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(userData),
-    });
-
-    if (!response.ok) {
-      // Обработка ошибок при регистрации
-      throw new Error("Registration failed");
-    }
-
-    router.push('/auth/signin')
-   
-    
-  } catch (error) {
-    console.error("Registration error:", error);
-  }
-};
-
 
 </script>
 
@@ -86,7 +57,7 @@ const register = async () => {
                 >
                     <b-form-input
                         id="text_name"
-                        v-model="textName"
+                        v-model="regData.textName"
                         type="text"
                         placeholder="Александр"
                         :state="validation_name"
@@ -107,7 +78,7 @@ const register = async () => {
                 >
                     <b-form-input
                         id="text_surname"
-                        v-model="textSurname"
+                        v-model="regData.textSurname"
                         type="text"
                         placeholder="Александров"
                         :state="validation_surname"
@@ -128,7 +99,7 @@ const register = async () => {
                 >
                     <b-form-input
                         id="text_email"
-                        v-model="textEmail"
+                        v-model="regData.textEmail"
                         type="email"
                         placeholder="user.userovich@gmail.com"
                         :state="validation_email"
@@ -148,7 +119,7 @@ const register = async () => {
                     class="mb-2"
                 >
                     <b-form-input
-                        v-model="textPassword"
+                        v-model="regData.textPassword"
                         required
                         type="password"
                         id="text-password"
@@ -169,7 +140,7 @@ const register = async () => {
                     class="mb-2"
                 >
                     <b-form-input
-                        v-model="textRepeatPassword"
+                        v-model="regData.textRepeatPassword"
                         required
                         type="repeat_password"
                         id="text_repeat_password"
@@ -187,7 +158,7 @@ const register = async () => {
                     type="submit"
                     variant="success"
                     class="submit_btn"
-                    @click = "register()"
+                    @click = "AuthStore.register(regData)"
                     >Submit</b-button
                 >
             </b-form>

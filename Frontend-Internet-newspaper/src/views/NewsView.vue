@@ -1,51 +1,38 @@
 <script setup>
 import MainBlock from "@/components/MainBlock.vue"
 import PostBlock from "@/components/PostBlock.vue"
-
-
+import ModalForm from "@/components/ModalForm.vue"
 
 import { ref, onMounted } from "vue"
 
-const news = ref([])
+// const news = ref(JSON.parse(localStorage.getItem('news')))
 
-const getnews = async () => {
-    try {
-        const response = await fetch("http://localhost:8085/news/fresh-news", {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-            },
-        })
+import { useAuthStore } from "@/stores/AuthStore"
+const AuthUser = useAuthStore()
 
-        if (!response.ok) {
-            throw new Error("Failed to fetch data")
-        }
-
-        const responseData = await response.json()
-
-        console.log(responseData)
-        console.log(responseData[0].picture.url)
-
-        responseData.forEach((item) => {
-            news.value.push(item)
-            console.log(item)
-        })
-        console.log("Response data:", responseData)
-    } catch (error) {
-        console.error("Fetch error:", error)
-    }
-}
+import {useNewsStore} from "@/stores/NewsStore.js"
+const NewsStore = useNewsStore()
 
 onMounted(() => {
-    getnews()
+    NewsStore.getnews()
 })
+
+//let showModal = false
 </script>
 
 <template>
+    <modal-form
+        style="z-index: 1000000; position: relative;"
+        v-if="AuthUser.modal"
+    />
     <main-block>
         <template #container>
             <div class="news_container">
-                <post-block v-for="post in news" :post="post" :key="post.id"></post-block>
+                <post-block
+                    v-for="post in NewsStore.news"
+                    :post="post"
+                    :key="post.id"
+                ></post-block>
             </div>
         </template>
     </main-block>

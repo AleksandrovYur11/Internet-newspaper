@@ -34,7 +34,7 @@ const signout = async () => {
 
         console.log(responseData)
         localStorage.removeItem('AccessToken'); 
-        router.push("/auth/signin")
+        router.push("/auth/sign-in")
     } catch (error) {
         console.error("OUT error:", error)
     }
