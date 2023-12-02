@@ -68,7 +68,7 @@ public class CommentController {
 //    }
 
     @PostMapping("/{idNews}")
-//    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<?> addComment(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl,
                                         @PathVariable("idNews") int idNews,
                                         @RequestBody @Valid CommentDto commentDTO,
@@ -83,8 +83,9 @@ public class CommentController {
         try {
             Comment comment = mappingUtil.convertToComment(commentDTO);
 
-            commentService.addNewComment(userDetailsImpl, comment, idNews);
-            return new ResponseEntity<>(HttpStatus.OK);
+            Comment savedComment = commentService.saveComment(userDetailsImpl, comment, idNews);
+            CommentDto savedCommentDto = commentService.convertToCommentDto(savedComment);
+            return new ResponseEntity<>(savedCommentDto, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }

@@ -71,20 +71,71 @@ public class NewsController {
     }
 
     @GetMapping("/user-themes")
-    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<List<NewsDto>> getNewsByUserThemes(@RequestBody NewsRequest newsRequest) {
         try {
+            List<NewsDto> newsListDto = new ArrayList<>();
+            Set<Theme> dbFavoriteThemes = new HashSet<>();
+            Set<Theme> dbForbiddenThemes = new HashSet<>();
+            if (newsRequest.getFavoritesThemes() != null) {
+                Set<Theme> favoritesThemes = newsRequest.getFavoritesThemes().
+                        stream().map(mappingUtil::convertToTheme).collect(Collectors.toSet());
+                dbFavoriteThemes = themeService.getDbThemes(favoritesThemes);
+            } else {
+                dbFavoriteThemes = Collections.emptySet();
+            }
 
-            Set<Theme> favoritesThemes = newsRequest.getFavoritesThemes().
-                    stream().map(mappingUtil::convertToTheme).collect(Collectors.toSet());
+            if (newsRequest.getForbiddenThemes() != null) {
+                Set<Theme> forbiddenThemes = newsRequest.getForbiddenThemes().
+                        stream().map(mappingUtil::convertToTheme).collect(Collectors.toSet());
+                dbForbiddenThemes = themeService.getDbThemes(forbiddenThemes);
+            } else {
+                dbForbiddenThemes = Collections.emptySet();
+            }
 
-            Set<Theme> forbiddenThemes = newsRequest.getFavoritesThemes().
-                    stream().map(mappingUtil::convertToTheme).collect(Collectors.toSet());
+            if (!dbForbiddenThemes.isEmpty() && !dbFavoriteThemes.isEmpty()) {
+                newsListDto = newsService.getNewsByUserThemes(dbFavoriteThemes, dbForbiddenThemes).stream()
+                        .map(newsService::convertToNewsDto).collect(Collectors.toList());
+            } else if(dbForbiddenThemes.isEmpty() && !dbFavoriteThemes.isEmpty()){
+                newsListDto = newsService.getNewsByFavoriteUserThemes(dbFavoriteThemes).stream()
+                        .map(newsService::convertToNewsDto).collect(Collectors.toList());
+            } else if (!dbForbiddenThemes.isEmpty() && dbFavoriteThemes.isEmpty()) {
+                newsListDto = newsService.getNewsByForbiddenUserThemes(dbForbiddenThemes).stream()
+                        .map(newsService::convertToNewsDto).collect(Collectors.toList());
+            }
+//----------------------------
 
-            Set<Theme> dbFavoriteThemes = themeService.getDbThemes(favoritesThemes);
-            Set<Theme> dbForbiddenThemes = themeService.getDbThemes(forbiddenThemes);
-            List<NewsDto> newsListDto = newsService.geNewsByUserThemes(dbFavoriteThemes, dbForbiddenThemes).stream()
-                    .map(newsService::convertToNewsDto).collect(Collectors.toList());
+//            Set<Integer> dbFavoriteThemes = new HashSet<>();
+//            Set<Integer> dbForbiddenThemes = new HashSet<>();
+//            if (newsRequest.getFavoritesThemes() != null) {
+//                Set<Theme> favoritesThemes = newsRequest.getFavoritesThemes().
+//                        stream().map(mappingUtil::convertToTheme).collect(Collectors.toSet());
+//                dbFavoriteThemes = themeService.getIntegerDbThemes(favoritesThemes);
+//            } else {
+//                dbFavoriteThemes =  Collections.emptySet();
+//            }
+//
+//            if (newsRequest.getForbiddenThemes()!= null) {
+//                Set<Theme> forbiddenThemes = newsRequest.getForbiddenThemes().
+//                        stream().map(mappingUtil::convertToTheme).collect(Collectors.toSet());
+//                dbForbiddenThemes = themeService.getIntegerDbThemes(forbiddenThemes);
+//            } else {
+//                dbForbiddenThemes =  Collections.emptySet();
+//            }
+            ;
+//
+//            Set<Theme> forbiddenThemes = newsRequest.getForbiddenThemes().
+//                    stream().map(mappingUtil::convertToTheme).collect(Collectors.toSet());
+
+//            if (favoritesThemes == null && forbiddenThemes == null) {
+//                // Оба параметра пустые - вернуть пустой список новостей или обработать исключение
+//                new ResponseEntity<>(Collections.emptyList(), HttpStatus.OK); // или выбрасывайте исключение или делайте обработку по вашему усмотрению
+//            }
+
+//            Set<Theme> dbFavoriteThemes = themeService.getDbThemes(favoritesThemes);
+//            Set<Theme> dbForbiddenThemes = themeService.getDbThemes(forbiddenThemes);
+//            List<News> list = newsService.geNewsByUserThemes(dbFavoriteThemes, dbForbiddenThemes);
+//            List<NewsDto> newsListDto = newsService.geNewsByUserThemes(dbFavoriteThemes, dbForbiddenThemes).stream()
+//                    .map(newsService::convertToNewsDto).collect(Collectors.toList());
 
 //           return new ResponseEntity<>(newsService.geNewsByUserThemes(dbFavoriteThemes, dbForbiddenThemes).stream()
 //                   .map(newsService::convertToNewsDto).collect(Collectors.toList()))
@@ -109,9 +160,9 @@ public class NewsController {
 //            newsListDto = newsService.geNewsByUserThemes(setFavoritesThemes, setForbiddenThemes).stream()
 //                    .map(newsService::convertToNewsDto).collect(Collectors.toList());
 
-            log.info("Get news with favorite themes: " + favoritesThemes + " and without " +
-                            "forbidden themes: " + forbiddenThemes + ": Success",
-                    favoritesThemes, forbiddenThemes);
+//            log.info("Get news with favorite themes: " + favoritesThemes + " and without " +
+//                            "forbidden themes: " + forbiddenThemes + ": Success",
+//                    favoritesThemes, forbiddenThemes);
             return new ResponseEntity<>(newsListDto, HttpStatus.OK);
         } catch (EntityNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -121,11 +172,12 @@ public class NewsController {
 
     @PostMapping("/create")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<HttpStatus> createNews(@RequestBody NewsDto newNewsDto) {
+    public ResponseEntity<NewsDto> createNews(@RequestBody NewsDto newNewsDto) {
         try {
-            newsService.saveNews(newNewsDto);
-            log.info("Create new news title = {}: Success", newNewsDto);
-            return new ResponseEntity<>(HttpStatus.OK);
+            News savedNews = newsService.saveNews(newNewsDto);
+            NewsDto savedNewsDto = newsService.convertToNewsDto(savedNews);
+            log.info("Create new news title = {}: Success", savedNewsDto.getNewsTitle());
+            return new ResponseEntity<>(savedNewsDto, HttpStatus.OK);
         } catch (EntityNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -146,7 +198,7 @@ public class NewsController {
     }
 
     @PutMapping("/{idNews}")
-//    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<HttpStatus> updateNews(@PathVariable("idNews") Integer id,
                                                  @RequestBody NewsDto updatedNewsDto) {
         try {

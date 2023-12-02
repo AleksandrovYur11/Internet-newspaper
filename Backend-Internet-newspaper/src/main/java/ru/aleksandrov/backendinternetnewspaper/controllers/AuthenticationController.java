@@ -11,6 +11,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import ru.aleksandrov.backendinternetnewspaper.dto.UserDto;
 import ru.aleksandrov.backendinternetnewspaper.models.RefreshToken;
@@ -32,6 +33,7 @@ import ru.aleksandrov.backendinternetnewspaper.util.UserValidator;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
+
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/auth")
@@ -69,7 +71,7 @@ public class AuthenticationController {
         Authentication authentication = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(signinRequest.getEmail(),
                         signinRequest.getPassword()));
-        SecurityContextHolder.getContext().setAuthentication(authentication );
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         String accessJwt = jwtUtils.generateJwtToken(userDetails);
@@ -107,10 +109,10 @@ public class AuthenticationController {
                                                  @Valid SignupRequest signupRequest,
                                                  BindingResult bindingResult) {
         userValidator.validate(signupRequest, bindingResult);
-//        List<FieldError> fieldErrorList = bindingResult.getFieldErrors();
-//        if (!fieldErrorList.isEmpty()) {
-//            throw new MethodArgumentNotValidException(new MethodParameter(null, -1), bindingResult);
-//        }
+        List<FieldError> fieldErrorList = bindingResult.getFieldErrors();
+        if (!fieldErrorList.isEmpty()) {
+            return new ResponseEntity<>(bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST);
+        }
 //
         User newUser = mappingUtil.convertToUser(signupRequest);
         roleService.setDefaultRole(newUser);

@@ -1,6 +1,7 @@
 package ru.aleksandrov.backendinternetnewspaper.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -25,6 +26,7 @@ public interface CommentRepository extends JpaRepository<Comment, Integer> {
     List<Comment> findByNews(News news);
 
     @Transactional
-    @Query("DELETE FROM comments c WHERE c.id = :commentId AND c.authorComment = :userId")
+    @Modifying
+    @Query("DELETE FROM comments c WHERE c.id = :commentId AND c.authorComment.id = :userId")
     void deleteCommentByUserIdAndCommentId(@Param("userId") Integer userId, @Param("commentId") Integer commentId);
 }
