@@ -22,7 +22,6 @@ onMounted(() => {
 
 <template>
     <modal-form
-        style="z-index: 1000000; position: relative;"
         v-if="AuthUser.modal"
     />
     <main-block>

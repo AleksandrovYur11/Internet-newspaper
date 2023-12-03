@@ -175,8 +175,72 @@ export const useNewsStore = defineStore("news", {
                 console.error("Authentication error:", error)
             }
         },
-        // addNews(){
-
-        // }
+        async addNews(newsTitle, newsText, picture, themes) {
+            const picture_url_obg = {
+                url: picture
+            }
+            const newsData = {
+                newsTitle: newsTitle,
+                newsText: newsText,
+                picture: picture_url_obg,
+                themes: themes.split(',').map(theme => ({ name: theme.trim() }))
+            }
+            console.log(newsData)
+            const jwtToken = sessionStorage.getItem("jwtToken")
+            if (!jwtToken) {
+                console.error("Отсутствует JWT-токен!")
+                return
+            }
+            try {
+                console.log(jwtToken)
+                const response = await fetch(
+                    `http://localhost:8085/news/create`,
+                    {
+                        method: "POST",
+                        headers: new Headers({
+                            Authorization: "Bearer " + jwtToken,
+                            "Content-Type": "application/json",
+                        }),
+                        body: JSON.stringify(newsData),
+                    }
+                )
+                if (!response.ok) {
+                    alert("Неправильный вход!")
+                    throw new Error("Authentication failed")
+                }
+                const responseData = await response.json()
+                console.log(responseData)
+            } catch (error) {
+                console.error("Authentication error:", error)
+            }
+        },
+        async getInfoNews(new_id) {
+            const jwtToken = sessionStorage.getItem("jwtToken")
+            if (!jwtToken) {
+                console.error("Отсутствует JWT-токен!")
+                return
+            }
+            try {
+                console.log(jwtToken)
+                const response = await fetch(
+                    `http://localhost:8085/news/${new_id}`,
+                    {
+                        method: "GET",
+                        headers: new Headers({
+                            Authorization: "Bearer " + jwtToken,
+                            "Content-Type": "application/json",
+                        }),
+                    }
+                )
+                if (!response.ok) {
+                    alert("Неправильный вход!")
+                    throw new Error("Authentication failed")
+                }
+                const responseData = await response.json()
+                console.log(responseData)
+            } catch (error) {
+                console.error("Authentication error:", error)
+            }
+        },
     },
 })

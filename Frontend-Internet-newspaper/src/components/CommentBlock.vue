@@ -20,6 +20,10 @@ const user_role = ref(sessionStorage.getItem('user_role'))
 
 
 const new_comment = ref("")
+
+
+
+
 </script>
 
 <template>
@@ -66,7 +70,6 @@ const new_comment = ref("")
             <div class="com_cont">
 
                 <p>{{ item.textComment }}</p>
-                <!-- добавь проверку что админ -->
                 <span
                     v-if="user_id == item.user.id || user_role == 'ROLE_ADMIN'"
                     @click="NewsStore.deleteComment( item.id)"

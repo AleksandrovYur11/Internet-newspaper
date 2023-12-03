@@ -4,7 +4,7 @@ import FormBlock from '@/components/FormBlock.vue'
 </script>
 
 <template>
-    <div style = "min-height: 100vh; min-width: 100vw; max-width: 100vw;">
+    <div style = "min-height: 100vh; min-width: 100vw; max-width: 100vw; z-index: 1; position: relative;">
         <header>
             <slot name="header">
                 <nav-bar ></nav-bar>

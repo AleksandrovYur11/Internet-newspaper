@@ -32,6 +32,7 @@ onMounted(() => {
         <b-button
             style="margin-right: 10px"
             v-if="user_role === 'ROLE_ADMIN'"
+            @click = "NewsStore.getInfoNews(post.id)"
             >red</b-button
         >
         <div class="news_container">
