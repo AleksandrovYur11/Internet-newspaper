@@ -75,6 +75,7 @@ export const useNewsStore = defineStore("news", {
             }
         },
         async deleteComment(id_comment) {
+            const role = sessionStorage.getItem("user_role")
             const jwtToken = sessionStorage.getItem("jwtToken")
             console.log(jwtToken)
 
@@ -85,21 +86,38 @@ export const useNewsStore = defineStore("news", {
                 console.log(jwtToken)
             }
             try {
-                const response = await fetch(
-                    `http://localhost:8085/comment/user/${id_comment}`,
+                if (role == 'ROLE_ADMIN') {
+                   const response = await fetch(
+                    `http://localhost:8085/comment/admin/${id_comment}`,
                     {
                         method: "DELETE",
                         headers: new Headers({
                             Authorization: "Bearer " + jwtToken,
                             "Content-Type": "application/json",
                         }),
-                        // body: JSON.stringify(id_com),
                     }
                 )
                 if (!response.ok) {
                     alert("Удаление не прошло")
                     throw new Error("Authentication failed")
+                } 
+                } else if (role == 'ROLE_USER') {
+                    const response = await fetch(
+                        `http://localhost:8085/comment/user/${id_comment}`,
+                        {
+                            method: "DELETE",
+                            headers: new Headers({
+                                Authorization: "Bearer " + jwtToken,
+                                "Content-Type": "application/json",
+                            }),
+                        }
+                    )
+                    if (!response.ok) {
+                        alert("Удаление не прошло")
+                        throw new Error("Authentication failed")
+                    } 
                 }
+                
                 // const responseData = await response.json()
                 // console.log(responseData)
             } catch (error) {
