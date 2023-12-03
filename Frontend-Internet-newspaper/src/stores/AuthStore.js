@@ -5,7 +5,6 @@ export const useAuthStore = defineStore("auth",  {
     state: () => ({
         JWT: null, 
         selectedRole: null,
-        modal: false,
         user: null,
         role: null,
         reg_users: [],
@@ -116,14 +115,8 @@ export const useAuthStore = defineStore("auth",  {
             sessionStorage.removeItem('user_role')
             sessionStorage.removeItem('jwtToken')
         },
-        showModal(){
-            this.modal = true
-        },
-        closeModal(){
-            this.modal = false
-        },
         hasUser(user_id){
-            return this.users.some((user) => user.id === user_id);
+            return this.users.some((user) => user.id === user_id)
         }
     },
 })

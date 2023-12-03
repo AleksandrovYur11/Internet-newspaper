@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from "vue"
+import { ref, computed, onMounted } from "vue"
 
 import { useAuthStore } from "@/stores/AuthStore.js"
 const Auth = useAuthStore()
@@ -7,25 +7,33 @@ const Auth = useAuthStore()
 import { useNewsStore } from "@/stores/NewsStore"
 const NewsStore = useNewsStore()
 
- const newsTitle = ref('')
- const newsText= ref('')
- const picture = ref('')
- const  themes = ref('')
+const edit_news = JSON.parse(sessionStorage.getItem('news_for_edit'))
+
+ const newsTitle = ref(edit_news.newsTitle)
+ const newsText= ref(edit_news.newsText)
+ const picture = ref(edit_news.picture.url)
+ const  themes = ref(edit_news.themes.map(theme => theme.name).join(', '))
+
+//  onMounted(()=>{
+// const edit_news = sessionStorage.getItem('news_for_edit')
+
+//     newsTitle.value = edit_news.newsTitle
+
+//  })
 
 </script>
 
 <template>
     <div
         class="container"
-        @click.self="NewsStore.closeModal()"
+        @click.self="NewsStore.closeEdit()"
     >
     <b-form class="custom-form">
-        <!-- <div class="modal-content"> -->
             <div class="header_modal">
                 <h4>Create news</h4>
                 <span
                     class="close"
-                    @click="NewsStore.closeModal()"
+                    @click="NewsStore.closeEdit()"
                     >&times;</span
                 >
             </div>
@@ -40,7 +48,6 @@ const NewsStore = useNewsStore()
                         id="postTitle"
                         v-model="newsTitle"
                         type="text"
-                        placeholder="Чертила..."
                         :state="validation_title"
                         required
                     ></b-form-input>
@@ -120,7 +127,7 @@ const NewsStore = useNewsStore()
             <div class="footer_modal">
                 <b-button
                     type="submit"
-                    @click="NewsStore.addNews(newsTitle, newsText, picture, themes)"
+                    @click="NewsStore.updateNews(newsTitle, newsText, picture, themes, edit_news.id)"
                     class="submit_btn"
                     >Create</b-button
                 >

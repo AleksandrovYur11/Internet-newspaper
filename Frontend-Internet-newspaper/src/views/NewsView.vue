@@ -10,25 +10,32 @@ import { ref, onMounted } from "vue"
 import { useAuthStore } from "@/stores/AuthStore"
 const AuthUser = useAuthStore()
 
-import {useNewsStore} from "@/stores/NewsStore.js"
+import { useNewsStore } from "@/stores/NewsStore.js"
 const NewsStore = useNewsStore()
+
+import EditForm from "@/components/EditForm.vue"
+
+const news = ref([]);
 
 onMounted(() => {
     NewsStore.getnews()
+    news.value = JSON.parse(sessionStorage.getItem('news'))
+    console.log(news)
 })
+
+
 
 //let showModal = false
 </script>
 
 <template>
-    <modal-form
-        v-if="AuthUser.modal"
-    />
+    <edit-form v-if="NewsStore.edit"/>
+    <modal-form v-if="NewsStore.modal" />
     <main-block>
         <template #container>
             <div class="news_container">
                 <post-block
-                    v-for="post in NewsStore.news"
+                    v-for="post in news.slice().reverse()"
                     :post="post"
                     :key="post.id"
                 ></post-block>
