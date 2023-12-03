@@ -40,7 +40,7 @@ const user_role = ref(sessionStorage.getItem('user_role'))
                     "
                     class="d-flex flex-direction-row"
                 >
-                    <span>{{ AuthUser.role }}</span>
+                    <span>{{ user_role }}</span>
                     <b-button  v-if =  "user_role == 'ROLE_ADMIN'" @click="NewsStore.showModal()"> + </b-button>
                     <b-nav-item
                         to="/auth/sign-in"

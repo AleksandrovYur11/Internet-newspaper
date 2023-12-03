@@ -15,14 +15,14 @@ const { props } = defineProps({
     },
 })
 
-const user_id = ref(sessionStorage.getItem('user_id'))
-const user_role = ref(sessionStorage.getItem('user_role'))
-
+const user_id = ref(sessionStorage.getItem("user_id"))
+const user_role = ref(sessionStorage.getItem("user_role"))
 
 const new_comment = ref("")
 
-
-
+// const handleCreatePost = async () => {
+//     await NewsStore.sendcomment(post.id, new_comment)
+// }
 
 </script>
 
@@ -34,7 +34,7 @@ const new_comment = ref("")
                 size="sm"
                 placeholder="Ваш комментарий..."
                 v-model="new_comment"
-                @keyup.enter="NewsStore.sendcomment(post.id, new_comment)"
+                @keyup.enter="handleCreatePost"
                 style="
                     margin-right: 10px;
                     max-height: 100px;
@@ -68,11 +68,10 @@ const new_comment = ref("")
                 }}</span>
             </div>
             <div class="com_cont">
-
                 <p>{{ item.textComment }}</p>
                 <span
                     v-if="user_id == item.user.id || user_role == 'ROLE_ADMIN'"
-                    @click="NewsStore.deleteComment( item.id)"
+                    @click="NewsStore.deleteComment(item.id)"
                     style="cursor: pointer"
                 >
                     <img

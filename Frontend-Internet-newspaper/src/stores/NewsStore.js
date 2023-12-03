@@ -1,12 +1,14 @@
 import { defineStore } from "pinia"
+import { useAuthStore } from "./AuthStore"
 
 export const useNewsStore = defineStore("news", {
     state: () => ({
-        news: [],
+        news: null,
         likes: [],
         edit: false,
         modal: false,
-        news_for_edit: []
+        news_for_edit: [],
+        role: ''
     }),
     actions: {
         async getnews() {
@@ -25,15 +27,8 @@ export const useNewsStore = defineStore("news", {
                 }
                 const responseData = await response.json()
 
-                 //////////111111111111////////////
-        
-                sessionStorage.setItem('news',  JSON.stringify(responseData))
-                this.news = JSON.parse(sessionStorage.getItem('news'));
-                 //////////111111111111////////////
-                // console.log(JSON.parse(localStorage.getItem('news')))
-                // responseData.forEach((item) => {
-                //     this.news.push(item)
-                // })
+                this.news = responseData
+
                 console.log("Response data:", responseData)
 
             } catch (error) {
@@ -71,6 +66,7 @@ export const useNewsStore = defineStore("news", {
                     alert("Неправильный вход!")
                     throw new Error("Authentication failed")
                 }
+                this.getnews()
                 // const responseData = await response.json()
                 // console.log(responseData)
             } catch (error) {
@@ -120,7 +116,7 @@ export const useNewsStore = defineStore("news", {
                         throw new Error("Authentication failed")
                     } 
                 }
-                
+                this.getnews()
                 // const responseData = await response.json()
                 // console.log(responseData)
             } catch (error) {
@@ -189,7 +185,7 @@ export const useNewsStore = defineStore("news", {
                     }
                     console.log("добавлено")
                 }
-
+                this.getnews()
                 // const responseData = await response.json()
                 // console.log(responseData)
             } catch (error) {
@@ -231,6 +227,7 @@ export const useNewsStore = defineStore("news", {
                 }
                 const responseData = await response.json()
                 console.log(responseData)
+                this.getnews()
             } catch (error) {
                 console.error("Authentication error:", error)
             }
@@ -262,6 +259,7 @@ export const useNewsStore = defineStore("news", {
                 // this.news_for_edit.push(responseData)
                 sessionStorage.setItem('news_for_edit', JSON.stringify(responseData))
                 console.log(responseData)
+                this.getnews()
             } catch (error) {
                 console.error("Authentication error:", error)
             }
@@ -301,6 +299,7 @@ export const useNewsStore = defineStore("news", {
                     alert("Неправильный вход!")
                     throw new Error("Authentication failed")
                 }
+                this.getnews()
                 // this.getnews()
                 //const responseData = await response.json()
                 //console.log(responseData)

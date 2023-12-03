@@ -8,6 +8,8 @@ export const useAuthStore = defineStore("auth",  {
         user: null,
         role: null,
         reg_users: [],
+        news: null,
+        user_role: ''
     }),
     actions: {
         async login(textEmail, textPassword) {
@@ -33,14 +35,10 @@ export const useAuthStore = defineStore("auth",  {
                 }
         
                 const responseData = await response.json()
-                // AuthUser.setAuthUser(responseData)
-                //this.user = responseData.id
-                // console.log(this.users)
 
-                //////////111111111111////////////
                 sessionStorage.setItem('user_id', responseData.id)
                 sessionStorage.setItem('user_role', responseData.roles[0])
-                //////////111111111111////////////
+              
                 this.user = sessionStorage.getItem('user_id')
                 this.role = sessionStorage.getItem('user_role')
 
@@ -67,7 +65,7 @@ export const useAuthStore = defineStore("auth",  {
                 console.error("Authentication error:", error)
             }
         },
-        updateData(user) {
+        updateData(user) {  //что это???
             // Обновление состояния хранилища данными из запроса
             // Например, сохранение данных в состоянии
             this.$patch(user); // Предположим, что данные являются объектом
@@ -94,6 +92,9 @@ export const useAuthStore = defineStore("auth",  {
                 // Обработка ошибок при регистрации
                 throw new Error("Registration failed");
               }
+
+            //   const News = useNewsStore()
+            // this.news = News.getnews()
               //const responseData = await response.json()
               //this.reg_users.push(responseData)
               router.push('/auth/sign-in')

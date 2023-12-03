@@ -3,9 +3,7 @@ import MainBlock from "@/components/MainBlock.vue"
 import PostBlock from "@/components/PostBlock.vue"
 import ModalForm from "@/components/ModalForm.vue"
 
-import { ref, onMounted } from "vue"
-
-// const news = ref(JSON.parse(localStorage.getItem('news')))
+import { ref, onBeforeMount, onMounted } from "vue"
 
 import { useAuthStore } from "@/stores/AuthStore"
 const AuthUser = useAuthStore()
@@ -15,17 +13,14 @@ const NewsStore = useNewsStore()
 
 import EditForm from "@/components/EditForm.vue"
 
-const news = ref([]);
-
-onMounted(() => {
+onBeforeMount(() => {
     NewsStore.getnews()
-    news.value = JSON.parse(sessionStorage.getItem('news'))
-    console.log(news)
 })
 
+onMounted(async () => {
+   NewsStore.getnews()
+})
 
-
-//let showModal = false
 </script>
 
 <template>
@@ -35,7 +30,7 @@ onMounted(() => {
         <template #container>
             <div class="news_container">
                 <post-block
-                    v-for="post in news.slice().reverse()"
+                    v-for="post in NewsStore.news"
                     :post="post"
                     :key="post.id"
                 ></post-block>
