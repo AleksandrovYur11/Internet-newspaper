@@ -1,10 +1,12 @@
-package ru.aleksandrov.backendinternetnewspaper.models;
+package ru.aleksandrov.backendinternetnewspaper.model;
 
 import lombok.*;
 import org.hibernate.annotations.Cascade;
+import org.hibernate.validator.constraints.URL;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import java.util.List;
 
 @Entity(name = "picture")
 @AllArgsConstructor
@@ -17,13 +19,14 @@ public class  Picture {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @NotBlank(message = "URL picture could be not empty")
+
+    @URL(message = "URL picture must be format URL" )
     private String url;
 
     @Lob
     private byte[] picture;
 
-    @OneToOne(mappedBy = "picture")
+    @OneToMany(mappedBy = "picture")
     @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
-    private News news;
+    private List<News> news;
 }

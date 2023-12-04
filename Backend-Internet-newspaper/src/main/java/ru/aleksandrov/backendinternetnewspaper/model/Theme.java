@@ -1,4 +1,4 @@
-package ru.aleksandrov.backendinternetnewspaper.models;
+package ru.aleksandrov.backendinternetnewspaper.model;
 
 import lombok.*;
 
@@ -17,6 +17,6 @@ public class Theme {
     private Integer id;
 
     @Column(unique = true)
-    @NotBlank
+    @NotBlank(message = "Theme must be not empty")
     private String name;
 }

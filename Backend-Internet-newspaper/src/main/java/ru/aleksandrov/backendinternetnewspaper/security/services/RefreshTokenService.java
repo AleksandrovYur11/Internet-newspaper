@@ -3,7 +3,7 @@ package ru.aleksandrov.backendinternetnewspaper.security.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import ru.aleksandrov.backendinternetnewspaper.models.RefreshToken;
+import ru.aleksandrov.backendinternetnewspaper.model.RefreshToken;
 import ru.aleksandrov.backendinternetnewspaper.repositories.RefreshTokenRepository;
 import ru.aleksandrov.backendinternetnewspaper.repositories.UserRepository;
 import ru.aleksandrov.backendinternetnewspaper.security.exception.TokenRefreshException;

@@ -1,4 +1,4 @@
-package ru.aleksandrov.backendinternetnewspaper.models;
+package ru.aleksandrov.backendinternetnewspaper.model;
 
 import lombok.*;
 

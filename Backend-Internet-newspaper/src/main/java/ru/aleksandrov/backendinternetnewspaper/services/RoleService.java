@@ -4,9 +4,9 @@ package ru.aleksandrov.backendinternetnewspaper.services;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.aleksandrov.backendinternetnewspaper.models.ERole;
-import ru.aleksandrov.backendinternetnewspaper.models.Role;
-import ru.aleksandrov.backendinternetnewspaper.models.User;
+import ru.aleksandrov.backendinternetnewspaper.model.ERole;
+import ru.aleksandrov.backendinternetnewspaper.model.Role;
+import ru.aleksandrov.backendinternetnewspaper.model.User;
 import ru.aleksandrov.backendinternetnewspaper.repositories.RoleRepository;
 
 import javax.persistence.EntityNotFoundException;
@@ -23,17 +23,17 @@ public class RoleService {
         this.roleRepository = roleRepository;
     }
 
-    public Role findByName(ERole role) {
+    public Role getRoleByName(ERole role) {
         return roleRepository.findByName(role)
                 .orElseThrow(() -> {
-                    log.error("Role not found");
-                    return new EntityNotFoundException("Role not found");
+                    log.error("Role - " + role.name() + ": Not Found");
+                    return new EntityNotFoundException("Role - " + role.name() + ": Not Found");
                 });
     }
 
     public void setDefaultRole(User user) {
         Set<Role> role = new HashSet<>();
-        role.add(findByName(ERole.ROLE_USER));
+        role.add(getRoleByName(ERole.ROLE_USER));
         user.setRoles(role);
     }
 }

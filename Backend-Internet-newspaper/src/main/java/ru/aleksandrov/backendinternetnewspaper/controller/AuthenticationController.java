@@ -1,4 +1,4 @@
-package ru.aleksandrov.backendinternetnewspaper.controllers;
+package ru.aleksandrov.backendinternetnewspaper.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,17 +10,15 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
-import ru.aleksandrov.backendinternetnewspaper.dto.UserDto;
-import ru.aleksandrov.backendinternetnewspaper.models.RefreshToken;
-import ru.aleksandrov.backendinternetnewspaper.models.User;
+import ru.aleksandrov.backendinternetnewspaper.model.RefreshToken;
+import ru.aleksandrov.backendinternetnewspaper.model.User;
 import ru.aleksandrov.backendinternetnewspaper.payload.request.SigninRequest;
 import ru.aleksandrov.backendinternetnewspaper.payload.request.RefreshTokenRequest;
 import ru.aleksandrov.backendinternetnewspaper.payload.request.SignupRequest;
-import ru.aleksandrov.backendinternetnewspaper.payload.response.SignupResponse;
+import ru.aleksandrov.backendinternetnewspaper.payload.response.SigninResponse;
 import ru.aleksandrov.backendinternetnewspaper.payload.response.RefreshTokenResponse;
+import ru.aleksandrov.backendinternetnewspaper.repositories.UserRepository;
 import ru.aleksandrov.backendinternetnewspaper.security.JWT.JwtUtils;
 import ru.aleksandrov.backendinternetnewspaper.security.exception.TokenRefreshException;
 import ru.aleksandrov.backendinternetnewspaper.security.services.RefreshTokenService;
@@ -31,7 +29,9 @@ import ru.aleksandrov.backendinternetnewspaper.util.MappingUtil;
 import ru.aleksandrov.backendinternetnewspaper.util.UserValidator;
 
 import javax.validation.Valid;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "http://localhost:5173")
@@ -42,7 +42,7 @@ public class AuthenticationController {
 
     private final UserValidator userValidator;
     private final RegistrationService registrationService;
-
+    private final UserRepository userRepository;
     private final MappingUtil mappingUtil;
 
     private final AuthenticationManager authenticationManager;
@@ -54,11 +54,12 @@ public class AuthenticationController {
 
     @Autowired
     public AuthenticationController(UserValidator userValidator, RegistrationService registrationService,
-                                    MappingUtil mappingUtil, AuthenticationManager authenticationManager,
-                                    JwtUtils jwtUtils, RefreshTokenService refreshTokenService,
-                                    RoleService roleService) {
+                                    UserRepository userRepository, MappingUtil mappingUtil,
+                                    AuthenticationManager authenticationManager, JwtUtils jwtUtils,
+                                    RefreshTokenService refreshTokenService, RoleService roleService) {
         this.userValidator = userValidator;
         this.registrationService = registrationService;
+        this.userRepository = userRepository;
         this.mappingUtil = mappingUtil;
         this.authenticationManager = authenticationManager;
         this.jwtUtils = jwtUtils;
@@ -66,8 +67,9 @@ public class AuthenticationController {
         this.roleService = roleService;
     }
 
+
     @PostMapping("/sign-in")
-    public ResponseEntity<SignupResponse> login(@RequestBody @Valid SigninRequest signinRequest) {
+    public ResponseEntity<SigninResponse> login(@RequestBody @Valid SigninRequest signinRequest) {
         Authentication authentication = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(signinRequest.getEmail(),
                         signinRequest.getPassword()));
@@ -79,7 +81,7 @@ public class AuthenticationController {
         List<String> roles = userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
 
-        SignupResponse response = new SignupResponse(accessJwt, refreshToken.getToken(), userDetails.getId(),
+        SigninResponse response = new SigninResponse(accessJwt, refreshToken.getToken(), userDetails.getId(),
                 userDetails.getName(), roles);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
@@ -105,15 +107,31 @@ public class AuthenticationController {
 //    }
 
     @PostMapping("/sign-up")
-    public ResponseEntity<?> perfectRegistration(@RequestBody
-                                                 @Valid SignupRequest signupRequest,
-                                                 BindingResult bindingResult) {
-        userValidator.validate(signupRequest, bindingResult);
-        List<FieldError> fieldErrorList = bindingResult.getFieldErrors();
-        if (!fieldErrorList.isEmpty()) {
-            return new ResponseEntity<>(bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST);
+    public ResponseEntity<?> perfectRegistration(@RequestBody @Valid SignupRequest signupRequest) {
+//        userValidator.validate(signupRequest, bindingResult);
+        if (userRepository.existsByEmail(signupRequest.getEmail())) {
+            Map<String, String> error = new HashMap<>();
+            error.put("email", "User with this email already exists");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
         }
-//
+
+//        if (bindingResult.hasErrors()) {
+//            Map<String, String> errors = new HashMap<>();
+//            bindingResult.getFieldErrors().forEach(error -> {
+//                String fieldName = error.getField();
+//                String errorMessage = error.getDefaultMessage();
+//                errors.put(fieldName, errorMessage);
+//            });
+//            return ResponseEntity.badRequest().body(errors);
+//        }
+//        if (bindingResult.hasErrors()) {
+//            List<FieldError> errors = bindingResult.getFieldErrors();
+//            StringBuilder errorMessage = new StringBuilder();
+//            for (FieldError error : errors) {
+//                errorMessage.append(error.getDefaultMessage()).append("\n");
+//            }
+//            return new ResponseEntity<>(errorMessage.toString(), HttpStatus.BAD_REQUEST);
+//        }
         User newUser = mappingUtil.convertToUser(signupRequest);
         roleService.setDefaultRole(newUser);
         registrationService.register(newUser);

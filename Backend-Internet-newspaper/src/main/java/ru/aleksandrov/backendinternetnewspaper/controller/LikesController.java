@@ -1,4 +1,4 @@
-package ru.aleksandrov.backendinternetnewspaper.controllers;
+package ru.aleksandrov.backendinternetnewspaper.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -6,7 +6,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import ru.aleksandrov.backendinternetnewspaper.models.User;
 import ru.aleksandrov.backendinternetnewspaper.repositories.UserRepository;
 import ru.aleksandrov.backendinternetnewspaper.security.services.UserDetailsImpl;
 import ru.aleksandrov.backendinternetnewspaper.services.LikesService;
@@ -31,13 +30,13 @@ public class LikesController {
         this.userService = userService;
     }
 
-    @PostMapping("/{idNews}")
+    @PostMapping
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<?> addLike(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl,
-                                              @PathVariable("idNews") int idNews) {
+                                     @RequestParam("newsId") int newsId) {
         try {
-            likesService.saveLike(newsService.findById(idNews),
-                    userService.findById(userDetailsImpl.getId()));
+            likesService.saveLike(newsService.getNewsById(newsId),
+                    userService.getUserById(userDetailsImpl.getId()));
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -45,13 +44,13 @@ public class LikesController {
 
     }
 
-    @DeleteMapping("/{idNews}")
+    @DeleteMapping
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<?> userDeleteLike(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl,
-                                                     @PathVariable("idNews") int idNews) {
+    public ResponseEntity<?> deleteLike(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl,
+                                            @RequestParam("newsId") int newsId) {
         try {
-            likesService.deleteLike(newsService.findById(idNews),
-                    userService.findById(userDetailsImpl.getId()));
+            likesService.deleteLike(newsService.getNewsById(newsId),
+                    userService.getUserById(userDetailsImpl.getId()));
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

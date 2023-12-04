@@ -1,11 +1,10 @@
-package ru.aleksandrov.backendinternetnewspaper.models;
+package ru.aleksandrov.backendinternetnewspaper.model;
 
 import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Entity(name = "comments")
 @AllArgsConstructor
@@ -19,7 +18,7 @@ public class Comment {
     private Integer id;
 
     @Column(length = 1000)
-    @NotBlank(message = "Text comment news could be not empty")
+    @NotBlank(message = "Text comment news must be not empty")
     private String textComment;
 
     @ManyToOne

@@ -3,15 +3,13 @@ package ru.aleksandrov.backendinternetnewspaper.services;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.aleksandrov.backendinternetnewspaper.models.Comment;
-import ru.aleksandrov.backendinternetnewspaper.models.Theme;
+import ru.aleksandrov.backendinternetnewspaper.model.Theme;
 import ru.aleksandrov.backendinternetnewspaper.repositories.ThemeRepository;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -33,23 +31,23 @@ public class ThemeService {
         }
         return dbThemes;
     }
-    public Theme findByName(String nameTheme) {
-        Optional<Theme> themeOptional = themeRepository.findThemeByName(nameTheme);
+    public Theme findByName(String themeName) {
+        Optional<Theme> themeOptional = themeRepository.findThemeByName(themeName);
         if (themeOptional.isPresent()) {
             return themeOptional.get();
         } else {
-            log.error("Theme with this " + nameTheme + " not found");
-            throw new EntityNotFoundException("Theme with this " + nameTheme + " not found");
+            log.error("Theme with this " + themeName + " not found");
+            throw new EntityNotFoundException("Theme with this " + themeName + " not found");
         }
     }
 
-    public Theme findByName(Integer idTheme) {
-        Optional<Theme> themeOptional = themeRepository.findById(idTheme);
+    public Theme findByName(Integer themeId) {
+        Optional<Theme> themeOptional = themeRepository.findById(themeId);
         if (themeOptional.isPresent()) {
             return themeOptional.get();
         } else {
-            log.error("Theme with this " + idTheme + " not found");
-            throw new EntityNotFoundException("Theme with this " + idTheme + " not found");
+            log.error("Theme with this " + themeId + " not found");
+            throw new EntityNotFoundException("Theme with this " + themeId + " not found");
         }
     }
 }

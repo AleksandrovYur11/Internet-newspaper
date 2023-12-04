@@ -4,11 +4,10 @@ package ru.aleksandrov.backendinternetnewspaper.services;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.aleksandrov.backendinternetnewspaper.dto.CommentDto;
 import ru.aleksandrov.backendinternetnewspaper.dto.NewsDto;
 import ru.aleksandrov.backendinternetnewspaper.dto.PictureDto;
 import ru.aleksandrov.backendinternetnewspaper.dto.ThemeDto;
-import ru.aleksandrov.backendinternetnewspaper.models.*;
+import ru.aleksandrov.backendinternetnewspaper.model.*;
 import ru.aleksandrov.backendinternetnewspaper.repositories.NewsRepository;
 import ru.aleksandrov.backendinternetnewspaper.repositories.PictureRepository;
 import ru.aleksandrov.backendinternetnewspaper.repositories.ThemeRepository;
@@ -41,20 +40,18 @@ public class NewsService {
         this.themeRepository = themeRepository;
     }
 
-    public News findById(Integer idNews) {
-        Optional<News> optionalNews = newsRepository.findById(idNews);
-        if (optionalNews.isPresent()) {
-            return optionalNews.get();
-        } else {
-            log.error("News not found");
-            throw new EntityNotFoundException("News not found");
-        }
+    public News getNewsById(Integer newsId) {
+        return newsRepository.findById(newsId)
+                .orElseThrow(() -> {
+                    log.error("News with id = " + newsId + ": Not Found");
+                    return new EntityNotFoundException("News with id = " + newsId + ": Not Found");
+                });
     }
 
     public News saveNews(NewsDto newNewsDto) {
         LocalDateTime moscowTimeNow = LocalDateTime.now(ZoneId.of("Europe/Moscow"));
         News newNews = new News();
-        newNews.setNewsTitle(newNewsDto.getNewsText());
+        newNews.setNewsTitle(newNewsDto.getNewsTitle());
         newNews.setNewsText(newNewsDto.getNewsText());
         newNews.setTimePublishedNewsMsk(moscowTimeNow);
 //        News savedNews = newsRepository.save(News.builder()
@@ -99,12 +96,12 @@ public class NewsService {
         return newsRepository.findNewsInLastTwentyFourHours(twentyFourHoursAgo);
     }
 
-    public void deleteNewsById(Integer idNews) {
-        newsRepository.delete(findById(idNews));
+    public void deleteNewsById(Integer newsId) {
+        newsRepository.deleteById(newsId);
     }
 
-    public void updateNews(Integer idNews, NewsDto updatedNewsDto) {
-        News news = findById(idNews);
+    public void updateNews(Integer newsId, NewsDto updatedNewsDto) {
+        News news = getNewsById(newsId);
         news.setNewsTitle(updatedNewsDto.getNewsTitle());
         news.setNewsText(updatedNewsDto.getNewsText());
 //        news.setTimePublishedNewsMsk(moscowTimeNow);
@@ -137,9 +134,6 @@ public class NewsService {
         newsRepository.save(news);
     }
 
-    public News getNewsById(int idNews) {
-        return findById(idNews);
-    }
 
     public NewsDto convertToNewsDto(News news) {
         NewsDto newsDTO = mappingUtil.convertToNewsDto(news);
@@ -150,15 +144,15 @@ public class NewsService {
                     .collect(Collectors.toList()));
         }
 
-        List<Comment> comments = news.getComments();
-        if (!(comments == null)){
-            newsDTO.setComments(comments.stream().map((comment) -> {
-                        CommentDto commentDto = mappingUtil.convertToCommentDto(comment);
-                        commentDto.setUser(mappingUtil.convertToUserDto(comment.getAuthorComment()));
-                        return commentDto;
-                    })
-                    .collect(Collectors.toList()));
-        }
+//        List<Comment> comments = news.getComments();
+//        if (!(comments == null)){
+//            newsDTO.setComments(comments.stream().map((comment) -> {
+//                        CommentDto commentDto = mappingUtil.convertToCommentDto(comment);
+//                        commentDto.setUser(mappingUtil.convertToUserDto(comment.getAuthorComment()));
+//                        return commentDto;
+//                    })
+//                    .collect(Collectors.toList()));
+//        }
 
         Picture picture = news.getPicture();
         newsDTO.setPicture(mappingUtil.convertToPictureDto(picture));
@@ -188,7 +182,7 @@ public class NewsService {
     }
 
     public List<News> getNewsByFavoriteUserThemes(Set<Theme> favoriteThemes) {
-        return newsRepository.findNewsByFavoriteUserThemes(favoriteThemes);
+        return newsRepository.findNewsByFavoriteUserThemes(favoriteThemes, favoriteThemes.size());
     }
 
     public List<News> getNewsByForbiddenUserThemes(Set<Theme> forbiddenThemes) {

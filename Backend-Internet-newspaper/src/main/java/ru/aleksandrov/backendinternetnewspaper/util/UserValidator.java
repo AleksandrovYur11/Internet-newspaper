@@ -4,8 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
-import ru.aleksandrov.backendinternetnewspaper.dto.UserDto;
-import ru.aleksandrov.backendinternetnewspaper.models.User;
+import ru.aleksandrov.backendinternetnewspaper.model.User;
 import ru.aleksandrov.backendinternetnewspaper.payload.request.SignupRequest;
 import ru.aleksandrov.backendinternetnewspaper.repositories.UserRepository;
 
@@ -33,8 +32,7 @@ public class UserValidator implements Validator {
 
 
         if (userRepository.existsByEmail(user.getEmail())) {
-            errors.rejectValue("email", "409", "User with email " + user.getEmail() +" already exists");
-
+            errors.rejectValue("email", "409","User with email " + user.getEmail() +" already exists");
         }
 
 //        if (userRepository.findByEmail(user.getEmail()).isPresent()) {

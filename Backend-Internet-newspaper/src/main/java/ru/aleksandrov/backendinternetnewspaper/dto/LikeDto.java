@@ -2,11 +2,12 @@ package ru.aleksandrov.backendinternetnewspaper.dto;
 
 import lombok.*;
 
+import javax.validation.Valid;
+
 @Setter
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 public class LikeDto {
 
     private Integer id;
