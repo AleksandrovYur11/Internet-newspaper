@@ -3,8 +3,8 @@ package ru.aleksandrov.backendinternetnewspaper.services;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.aleksandrov.backendinternetnewspaper.models.News;
-import ru.aleksandrov.backendinternetnewspaper.models.Picture;
+import ru.aleksandrov.backendinternetnewspaper.model.News;
+import ru.aleksandrov.backendinternetnewspaper.model.Picture;
 import ru.aleksandrov.backendinternetnewspaper.repositories.PictureRepository;
 
 import javax.persistence.EntityNotFoundException;
@@ -42,28 +42,24 @@ public class PictureService {
     }
 
     public void savePictures(Picture picture) throws IOException {
-                picture.setPicture(downloadPicture(picture.getUrl()));
+        picture.setPicture(downloadPicture(picture.getUrl()));
         pictureRepository.save(picture);
     }
 
-    public byte[] getPictureById(Integer idPicture){
-        Optional<Picture> optionalPicture = pictureRepository.findPictureById(idPicture);
-        if(optionalPicture.isPresent()){
-             return optionalPicture.get().getPicture();
-        } else {
-            log.error("Picture not found");
-            throw new EntityNotFoundException("Picture not found");
-        }
+    public byte[] getPictureById(Integer pictureId) {
+        return pictureRepository.findPictureById(pictureId)
+                .orElseThrow(() -> {
+                    log.error("Picture with id = " + pictureId + ": Not Found");
+                    return new EntityNotFoundException("Picture with id = " + pictureId + ": Not Found");
+                }).getPicture();
     }
 
-    public Picture findByNews(News news){
-        Optional<Picture> optionalPicture = pictureRepository.findByNews(news);
-        if(optionalPicture.isPresent()){
-            return optionalPicture.get();
-        } else {
-            log.error("Picture not found");
-            throw new EntityNotFoundException("Picture not found");
-        }
+    public Picture findByNews(News news) {
+        return pictureRepository.findByNews(news)
+                .orElseThrow(() -> {
+                    log.error("Picture for news title = " + news.getNewsTitle() + ": Not Found");
+                    return new EntityNotFoundException("Picture for news title = " + news.getNewsTitle() + ": Not Found");
+                });
     }
 
 }

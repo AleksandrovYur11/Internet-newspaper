@@ -1,11 +1,13 @@
-package ru.aleksandrov.backendinternetnewspaper.models;
+package ru.aleksandrov.backendinternetnewspaper.model;
 
 import lombok.*;
 import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -24,13 +26,12 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @NotEmpty(message = "Name could be not empty")
+    @Size(min = 2, message = "Name must be at least 2 characters")
     private String name;
 
-    @NotEmpty(message = "Surname could be not empty")
+    @Size(min = 2, message = "Surname must be at least 2 characters")
     private String surname;
 
-    @NotEmpty(message = "Email could be not empty")
     @Column(name = "email", unique = true)
     @Email(message = "Write this line as an email")
     private String email;
@@ -41,8 +42,9 @@ public class User {
     inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
+    @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-zA-Z]).{8,}$",
+            message = "The password must contain uppercase and lowercase characters, as well as a number from 0 to 9")
     @Column(name = "password", unique = true)
-    @NotEmpty(message = "Password could be not empty")
     private String password;
 
     @OneToMany(mappedBy = "authorComment")

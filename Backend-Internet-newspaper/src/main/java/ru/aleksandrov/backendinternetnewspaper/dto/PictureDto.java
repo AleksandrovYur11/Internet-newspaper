@@ -1,6 +1,7 @@
 package ru.aleksandrov.backendinternetnewspaper.dto;
 
 import lombok.*;
+import org.hibernate.validator.constraints.URL;
 
 import javax.validation.constraints.NotBlank;
 
@@ -8,9 +9,8 @@ import javax.validation.constraints.NotBlank;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 public class PictureDto {
-
-    @NotBlank(message = "URL picture could be not empty")
+    @URL(message = "URL picture must be format URL" )
+    @NotBlank(message = "URL should be not empty")
     private String url;
 }

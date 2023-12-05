@@ -4,9 +4,9 @@ package ru.aleksandrov.backendinternetnewspaper.services;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.aleksandrov.backendinternetnewspaper.models.Like;
-import ru.aleksandrov.backendinternetnewspaper.models.News;
-import ru.aleksandrov.backendinternetnewspaper.models.User;
+import ru.aleksandrov.backendinternetnewspaper.model.Like;
+import ru.aleksandrov.backendinternetnewspaper.model.News;
+import ru.aleksandrov.backendinternetnewspaper.model.User;
 import ru.aleksandrov.backendinternetnewspaper.repositories.LikesRepositories;
 
 import javax.persistence.EntityNotFoundException;
@@ -29,24 +29,27 @@ public class LikesService {
         like.setNews(news);
         like.setUser(user);
         likesRepositories.save(like);
+        log.info("Save new like from user (email) = " + user.getEmail() + " for news = " + news.getNewsTitle() + ": Success");
     }
 
     public void deleteLike(News news, User user) {
-        Optional<Like> optionalLike= likesRepositories.findLikeByNewsAndUser(news, user);
-        if (optionalLike.isPresent()){
-            Like like = optionalLike.get();
-            likesRepositories.delete(like);
-        } else {
-            log.error("Like not found");
-            throw new EntityNotFoundException("Like not found");
-        }
+        Like like = likesRepositories.findLikeByNewsAndUser(news, user)
+                .orElseThrow(() -> {
+                    log.error("Like with user (email) and news title = " + user.getEmail() + " "
+                            + news.getNewsTitle() + ": Not Found");
+                    return new EntityNotFoundException("Like with user (email) and news title = " + user.getEmail() + " "
+                            + news.getNewsTitle() + ": Not Found");
+                });
+        likesRepositories.delete(like);
+        log.info("Delete like with user (email) and news title = " + user.getEmail() + " "
+                + news.getNewsTitle() + ": Not Found");
     }
 
-    public List<Like> findAll(){
+    public List<Like> findAll() {
         return likesRepositories.findAll();
     }
 
-    public List<Like> findLikeByNews(News news){
+    public List<Like> findLikeByNews(News news) {
         return likesRepositories.findLikeByNews(news);
     }
 }

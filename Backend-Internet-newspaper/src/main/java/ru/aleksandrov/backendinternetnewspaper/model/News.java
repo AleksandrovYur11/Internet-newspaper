@@ -1,4 +1,4 @@
-package ru.aleksandrov.backendinternetnewspaper.models;
+package ru.aleksandrov.backendinternetnewspaper.model;
 
 import lombok.*;
 import org.hibernate.annotations.Cascade;
@@ -6,7 +6,7 @@ import org.hibernate.annotations.Cascade;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Past;
+import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
@@ -23,22 +23,24 @@ public class News {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @NotBlank(message = "Tile news could be not empty")
+    @NotBlank(message = "Tile news must be not empty")
     private String newsTitle;
 
     @Lob
     @Column(columnDefinition = "TEXT")
-    @NotBlank(message = "Text news could be not empty")
+    @NotBlank(message = "Text news must be not empty")
     private String newsText;
 
 //    @Past(message = "The publication date must be before the present time")
+    @PastOrPresent(message = "The publication date must be before or in now present time")
     private LocalDateTime timePublishedNewsMsk;
 
     @OneToMany(mappedBy = "news")
     @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
     private List<Comment> comments;
 
-    @OneToOne
+    @ManyToOne
+    @JoinColumn(name = "picture_id", referencedColumnName = "id")
     private Picture picture;
 
     @OneToMany(mappedBy = "news")
@@ -52,19 +54,6 @@ public class News {
     @NotNull(message = "News must have at least one theme")
     private Set<Theme> theme = new HashSet<>();
 
-    @Override
-    public String toString() {
-        return "News{" +
-                "id=" + id +
-                ", newsTitle='" + newsTitle + '\'' +
-                ", newsText='" + newsText + '\'' +
-                ", timePublishedNewsMsk=" + timePublishedNewsMsk +
-                ", comments=" + comments +
-                ", picture=" + picture +
-                ", likes=" + likes +
-                ", theme=" + theme +
-                '}';
-    }
 }
 
 

@@ -4,7 +4,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.aleksandrov.backendinternetnewspaper.dto.*;
-import ru.aleksandrov.backendinternetnewspaper.models.*;
+import ru.aleksandrov.backendinternetnewspaper.model.*;
 import ru.aleksandrov.backendinternetnewspaper.payload.request.SignupRequest;
 
 

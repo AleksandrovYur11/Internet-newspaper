@@ -1,21 +1,22 @@
-package ru.aleksandrov.backendinternetnewspaper.controllers;
+package ru.aleksandrov.backendinternetnewspaper.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import ru.aleksandrov.backendinternetnewspaper.dto.NewsDto;
-import ru.aleksandrov.backendinternetnewspaper.dto.ThemeDto;
-import ru.aleksandrov.backendinternetnewspaper.models.*;
+import ru.aleksandrov.backendinternetnewspaper.model.*;
 import ru.aleksandrov.backendinternetnewspaper.payload.request.NewsRequest;
 import ru.aleksandrov.backendinternetnewspaper.repositories.ThemeRepository;
 import ru.aleksandrov.backendinternetnewspaper.services.NewsService;
 import ru.aleksandrov.backendinternetnewspaper.services.ThemeService;
 import ru.aleksandrov.backendinternetnewspaper.util.MappingUtil;
 
-import javax.persistence.EntityNotFoundException;
+import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -58,50 +59,77 @@ public class NewsController {
 
     @GetMapping("/fresh-news")
     public ResponseEntity<List<NewsDto>> getAllNewsAtTwentyFourHours() {
-        try {
-            LocalDateTime twentyFourHoursAgo = ZonedDateTime.now(ZoneId.of("Europe/Moscow"))
-                    .minus(24, ChronoUnit.HOURS).toLocalDateTime();
-            List<NewsDto> newsListDto = newsService.getNewsInLastTwentyFourHours(twentyFourHoursAgo).stream()
-                    .map(newsService::convertToNewsDto).collect(Collectors.toList());
-            log.info("Get news that is 24 hours old: Success");
-            return new ResponseEntity<>(newsListDto, HttpStatus.OK);
-        } catch (EntityNotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+
+        LocalDateTime twentyFourHoursAgo = ZonedDateTime.now(ZoneId.of("Europe/Moscow"))
+                .minus(24, ChronoUnit.HOURS).toLocalDateTime();
+        List<NewsDto> newsListDto = newsService.getNewsInLastTwentyFourHours(twentyFourHoursAgo).stream()
+                .map(newsService::convertToNewsDto).collect(Collectors.toList());
+        log.info("Get news that is 24 hours old: Success");
+        return new ResponseEntity<>(newsListDto, HttpStatus.OK);
     }
 
-    @GetMapping("/user-themes")
+    @PostMapping("/user-themes")
     public ResponseEntity<List<NewsDto>> getNewsByUserThemes(@RequestBody NewsRequest newsRequest) {
-        try {
-            List<NewsDto> newsListDto = new ArrayList<>();
-            Set<Theme> dbFavoriteThemes = new HashSet<>();
-            Set<Theme> dbForbiddenThemes = new HashSet<>();
-            if (newsRequest.getFavoritesThemes() != null) {
-                Set<Theme> favoritesThemes = newsRequest.getFavoritesThemes().
-                        stream().map(mappingUtil::convertToTheme).collect(Collectors.toSet());
-                dbFavoriteThemes = themeService.getDbThemes(favoritesThemes);
-            } else {
-                dbFavoriteThemes = Collections.emptySet();
-            }
+        List<NewsDto> newsListDto = new ArrayList<>();
+        Set<Theme> dbFavoriteThemes = new HashSet<>();
+        Set<Theme> dbForbiddenThemes = new HashSet<>();
 
-            if (newsRequest.getForbiddenThemes() != null) {
-                Set<Theme> forbiddenThemes = newsRequest.getForbiddenThemes().
-                        stream().map(mappingUtil::convertToTheme).collect(Collectors.toSet());
-                dbForbiddenThemes = themeService.getDbThemes(forbiddenThemes);
-            } else {
-                dbForbiddenThemes = Collections.emptySet();
-            }
+        Set<Theme> favoritesThemes = newsRequest.getFavoritesThemes() != null ?
+                newsRequest.getFavoritesThemes().stream()
+                        .map(mappingUtil::convertToTheme)
+                        .collect(Collectors.toSet()) :
+                Collections.emptySet();
 
-            if (!dbForbiddenThemes.isEmpty() && !dbFavoriteThemes.isEmpty()) {
-                newsListDto = newsService.getNewsByUserThemes(dbFavoriteThemes, dbForbiddenThemes).stream()
-                        .map(newsService::convertToNewsDto).collect(Collectors.toList());
-            } else if(dbForbiddenThemes.isEmpty() && !dbFavoriteThemes.isEmpty()){
-                newsListDto = newsService.getNewsByFavoriteUserThemes(dbFavoriteThemes).stream()
-                        .map(newsService::convertToNewsDto).collect(Collectors.toList());
-            } else if (!dbForbiddenThemes.isEmpty() && dbFavoriteThemes.isEmpty()) {
-                newsListDto = newsService.getNewsByForbiddenUserThemes(dbForbiddenThemes).stream()
-                        .map(newsService::convertToNewsDto).collect(Collectors.toList());
-            }
+        Set<Theme> forbiddenThemes = newsRequest.getForbiddenThemes() != null ?
+                newsRequest.getForbiddenThemes().stream()
+                        .map(mappingUtil::convertToTheme)
+                        .collect(Collectors.toSet()) :
+                Collections.emptySet();
+
+        if (!favoritesThemes.isEmpty() && !forbiddenThemes.isEmpty()) {
+            dbFavoriteThemes = themeService.getDbThemes(favoritesThemes);
+            dbForbiddenThemes = themeService.getDbThemes(forbiddenThemes);
+            newsListDto = newsService.getNewsByUserThemes(dbFavoriteThemes, dbForbiddenThemes).stream()
+                    .map(newsService::convertToNewsDto).collect(Collectors.toList());
+        } else if (!favoritesThemes.isEmpty()) {
+            dbFavoriteThemes = themeService.getDbThemes(favoritesThemes);
+            newsListDto = newsService.getNewsByFavoriteUserThemes(dbFavoriteThemes).stream()
+                    .map(newsService::convertToNewsDto).collect(Collectors.toList());
+        } else if (!forbiddenThemes.isEmpty()) {
+            dbForbiddenThemes = themeService.getDbThemes(forbiddenThemes);
+            newsListDto = newsService.getNewsByForbiddenUserThemes(dbForbiddenThemes).stream()
+                    .map(newsService::convertToNewsDto).collect(Collectors.toList());
+        }
+
+
+//        Set<Theme> dbFavoriteThemes = new HashSet<>();
+//        Set<Theme> dbForbiddenThemes = new HashSet<>();
+//        if (newsRequest.getFavoritesThemes() != null) {
+//            Set<Theme> favoritesThemes = newsRequest.getFavoritesThemes().
+//                    stream().map(mappingUtil::convertToTheme).collect(Collectors.toSet());
+//            dbFavoriteThemes = themeService.getDbThemes(favoritesThemes);
+//        } else {
+//            dbFavoriteThemes = Collections.emptySet();
+//        }
+//
+//        if (newsRequest.getForbiddenThemes() != null) {
+//            Set<Theme> forbiddenThemes = newsRequest.getForbiddenThemes().
+//                    stream().map(mappingUtil::convertToTheme).collect(Collectors.toSet());
+//            dbForbiddenThemes = themeService.getDbThemes(forbiddenThemes);
+//        } else {
+//            dbForbiddenThemes = Collections.emptySet();
+//        }
+//
+//        if (!dbForbiddenThemes.isEmpty() && !dbFavoriteThemes.isEmpty()) {
+//            newsListDto = newsService.getNewsByUserThemes(dbFavoriteThemes, dbForbiddenThemes).stream()
+//                    .map(newsService::convertToNewsDto).collect(Collectors.toList());
+//        } else if (dbForbiddenThemes.isEmpty() && !dbFavoriteThemes.isEmpty()) {
+//            newsListDto = newsService.getNewsByFavoriteUserThemes(dbFavoriteThemes).stream()
+//                    .map(newsService::convertToNewsDto).collect(Collectors.toList());
+//        } else if (!dbForbiddenThemes.isEmpty()) {
+//            newsListDto = newsService.getNewsByForbiddenUserThemes(dbForbiddenThemes).stream()
+//                    .map(newsService::convertToNewsDto).collect(Collectors.toList());
+//        }
 //----------------------------
 
 //            Set<Integer> dbFavoriteThemes = new HashSet<>();
@@ -121,7 +149,7 @@ public class NewsController {
 //            } else {
 //                dbForbiddenThemes =  Collections.emptySet();
 //            }
-            ;
+        ;
 //
 //            Set<Theme> forbiddenThemes = newsRequest.getForbiddenThemes().
 //                    stream().map(mappingUtil::convertToTheme).collect(Collectors.toSet());
@@ -163,62 +191,39 @@ public class NewsController {
 //            log.info("Get news with favorite themes: " + favoritesThemes + " and without " +
 //                            "forbidden themes: " + forbiddenThemes + ": Success",
 //                    favoritesThemes, forbiddenThemes);
-            return new ResponseEntity<>(newsListDto, HttpStatus.OK);
-        } catch (EntityNotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        return new ResponseEntity<>(newsListDto, HttpStatus.OK);
 //        return new ResponseEntity<>(newsListDto, HttpStatus.OK);
     }
 
-    @PostMapping("/create")
+    @PostMapping("/save")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<NewsDto> createNews(@RequestBody NewsDto newNewsDto) {
-        try {
-            News savedNews = newsService.saveNews(newNewsDto);
-            NewsDto savedNewsDto = newsService.convertToNewsDto(savedNews);
-            log.info("Create new news title = {}: Success", savedNewsDto.getNewsTitle());
-            return new ResponseEntity<>(savedNewsDto, HttpStatus.OK);
-        } catch (EntityNotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+    public ResponseEntity<NewsDto> createNews(@RequestBody @Valid NewsDto newNewsDto) throws IllegalAccessException {
+        News savedNews = newsService.saveNews(newNewsDto);
+        NewsDto savedNewsDto = newsService.convertToNewsDto(savedNews);
+        return new ResponseEntity<>(savedNewsDto, HttpStatus.CREATED);
     }
 
-
-    @GetMapping("/{idNews}")
+    @GetMapping("/{newsId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<NewsDto> getNewsById(@PathVariable("idNews") Integer id) {
-
-        try {
-            NewsDto editNewsDto = newsService.convertToNewsDto(newsService.getNewsById(id));
-            log.info("Get news by id = {}: Success", id);
-            return new ResponseEntity<>(editNewsDto, HttpStatus.OK);
-        } catch (EntityNotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+    public ResponseEntity<NewsDto> getNewsById(@PathVariable("newsId") Integer newsId) {
+        News news = newsService.getNewsById(newsId);
+        NewsDto editNewsDto = newsService.convertToNewsDto(news);
+//        log.info("Get news by id = {}: Success", newsId);
+        return new ResponseEntity<>(editNewsDto, HttpStatus.OK);
     }
 
-    @PutMapping("/{idNews}")
+    @PutMapping("/{newsId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<HttpStatus> updateNews(@PathVariable("idNews") Integer id,
-                                                 @RequestBody NewsDto updatedNewsDto) {
-        try {
-            newsService.updateNews(id, updatedNewsDto);
-            log.info("Update news by id = {}: Success", id);
-            return new ResponseEntity<>(HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+    public ResponseEntity<?> updateNews(@PathVariable("newsId") Integer newsId,
+                                        @RequestBody @Valid NewsDto updatedNewsDto) throws IllegalAccessException {
+        newsService.updateNews(newsId, updatedNewsDto);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @DeleteMapping("/{idNews}")
+    @DeleteMapping("/{newsId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<HttpStatus> deleteNews(@PathVariable("idNews") Integer id) {
-        try {
-            newsService.deleteNewsById(id);
-            log.info("Delete news by id = {}: Success", id);
-            return new ResponseEntity<>(HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+    public ResponseEntity<?> deleteNews(@PathVariable("newsId") Integer newsId) {
+        newsService.deleteNewsById(newsId);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

@@ -16,8 +16,6 @@ import javax.validation.constraints.NotBlank;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ThemeDto {
-
-    @Column(unique = true)
-    @NotBlank
+    @NotBlank(message = "Theme must be not empty")
     private String name;
 }

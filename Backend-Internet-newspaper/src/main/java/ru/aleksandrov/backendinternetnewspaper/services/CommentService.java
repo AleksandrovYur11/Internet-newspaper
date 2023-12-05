@@ -2,10 +2,11 @@ package ru.aleksandrov.backendinternetnewspaper.services;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import ru.aleksandrov.backendinternetnewspaper.dto.CommentDto;
-import ru.aleksandrov.backendinternetnewspaper.dto.NewsDto;
-import ru.aleksandrov.backendinternetnewspaper.models.*;
+import ru.aleksandrov.backendinternetnewspaper.model.*;
 import ru.aleksandrov.backendinternetnewspaper.repositories.CommentRepository;
 import ru.aleksandrov.backendinternetnewspaper.security.services.UserDetailsImpl;
 import ru.aleksandrov.backendinternetnewspaper.util.MappingUtil;
@@ -13,13 +14,8 @@ import ru.aleksandrov.backendinternetnewspaper.util.MappingUtil;
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
+
 
 @Service
 @Slf4j
@@ -46,44 +42,50 @@ public class CommentService {
         return commentRepository.findByNews(news);
     }
 
-    public void save(Comment comment) {
-        commentRepository.save(comment);
+
+    public Comment getCommentById(Integer commentId) {
+        return commentRepository.findById(commentId)
+                .orElseThrow(() -> {
+                    log.error("Comment with id = " + commentId + ": Not Found");
+                    return new EntityNotFoundException("Comment with id = " + commentId + ": Not Found");
+                });
     }
 
-    public Comment findById(Integer id) {
-        Optional<Comment> commentOptional = commentRepository.findById(id);
-        if (commentOptional.isPresent()) {
-            return commentOptional.get();
+    public void deleteCommentById(Integer commentId) {
+        if (commentRepository.existsById(commentId)) {
+            commentRepository.deleteById(commentId);
+            log.info("Delete comment with id = " + commentId + ": Success");
         } else {
-            log.error("Comment with this " + id + " not found");
-            throw new EntityNotFoundException("Comment with this " + id + " not found");
+            log.error("Comment with id = " + commentId + ": Not Found");
+            throw new EntityNotFoundException("Comment with id = " + commentId + ": Not Found");
         }
     }
 
 
-    public Comment saveComment(UserDetailsImpl userDetailsImpl, Comment comment, Integer idNews) {
+    public Comment saveComment(UserDetailsImpl userDetailsImpl, Comment comment, Integer newsId) {
         LocalDateTime moscowTimeNow = LocalDateTime.now(ZoneId.of("Europe/Moscow"));
         Comment newComment = new Comment();
-        newComment.setAuthorComment(userService.findById(userDetailsImpl.getId()));
-        newComment.setNews(newsService.findById(idNews));
+        newComment.setAuthorComment(userService.getUserById(userDetailsImpl.getId()));
+        newComment.setNews(newsService.getNewsById(newsId));
         newComment.setTextComment(comment.getTextComment());
         newComment.setDatePublishedComment(moscowTimeNow);
-        log.info("Save new comment from user: " + userDetailsImpl.getName());
+        log.info("Save new comment from user (email) = " + userDetailsImpl.getEmail());
         return commentRepository.save(newComment);
     }
 
-    public void deleteComment(UserDetailsImpl userDetailsImpl, Integer idComment) {
-        if (userDetailsImpl.getId() == findById(idComment).getAuthorComment().getId()) {
-            commentRepository.deleteCommentByUserIdAndCommentId(userDetailsImpl.getId(), idComment);
+    public void deleteComment(UserDetailsImpl userDetailsImpl, Integer commentId) {
+        int userId = userDetailsImpl.getId();
+        if (userId == getCommentById(commentId).getAuthorComment().getId()) {
+            commentRepository.deleteCommentByUserIdAndCommentId(userDetailsImpl.getId(), commentId);
+            log.info("Delete comment with id = " + commentId + ": Success");
         } else {
-            log.error("Comment with this " + idComment + " not found");
-            throw new EntityNotFoundException("Comment with this " + idComment + " not found");
+            throw new EntityNotFoundException("Comment with id = " + commentId + " and user (id) = " +
+                    userId + ": Not Found");
         }
     }
 
     public CommentDto convertToCommentDto(Comment comment) {
         CommentDto commentDto = mappingUtil.convertToCommentDto(comment);
-
         commentDto.setUser(mappingUtil.convertToUserDto(comment.getAuthorComment()));
 //
 //        List<Like> likes = news.getLikes();
@@ -104,6 +106,15 @@ public class CommentService {
 //        Set<Theme> themes = news.getTheme();
 //        newsDTO.setThemes(themes.stream().map(mappingUtil::convertToThemeDto).collect(Collectors.toSet()));
         return commentDto;
+    }
+
+
+    public Slice<Comment> getThreeComments(Integer newsId, Pageable pageable) {
+        return commentRepository.findThreeComments(newsId, pageable);
+    }
+
+    public Integer getCountComments(Integer newsId) {
+        return commentRepository.countByNewsId(newsId);
     }
 
 }

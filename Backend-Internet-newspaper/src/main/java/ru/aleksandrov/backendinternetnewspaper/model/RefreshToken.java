@@ -1,4 +1,4 @@
-package ru.aleksandrov.backendinternetnewspaper.models;
+package ru.aleksandrov.backendinternetnewspaper.model;
 
 import lombok.*;
 
@@ -22,7 +22,7 @@ public class RefreshToken {
     private User user;
 
     @Column(unique = true)
-    @NotBlank(message = "Refresh token could be not empty")
+    @NotBlank(message = "Refresh token must be not empty")
     private String token;
 
     @Column(nullable = false)
