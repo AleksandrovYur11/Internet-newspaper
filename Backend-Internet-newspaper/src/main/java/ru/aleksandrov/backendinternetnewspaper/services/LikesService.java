@@ -29,17 +29,20 @@ public class LikesService {
         like.setNews(news);
         like.setUser(user);
         likesRepositories.save(like);
+        log.info("Save new like from user (email) = " + user.getEmail() + " for news = " + news.getNewsTitle() + ": Success");
     }
 
     public void deleteLike(News news, User user) {
         Like like = likesRepositories.findLikeByNewsAndUser(news, user)
                 .orElseThrow(() -> {
-                    log.error("Like with user email and news title = " + user.getEmail() + " "
+                    log.error("Like with user (email) and news title = " + user.getEmail() + " "
                             + news.getNewsTitle() + ": Not Found");
-                    return new EntityNotFoundException("Like with user email and news title = " + user.getEmail() + " "
+                    return new EntityNotFoundException("Like with user (email) and news title = " + user.getEmail() + " "
                             + news.getNewsTitle() + ": Not Found");
                 });
         likesRepositories.delete(like);
+        log.info("Delete like with user (email) and news title = " + user.getEmail() + " "
+                + news.getNewsTitle() + ": Not Found");
     }
 
     public List<Like> findAll() {

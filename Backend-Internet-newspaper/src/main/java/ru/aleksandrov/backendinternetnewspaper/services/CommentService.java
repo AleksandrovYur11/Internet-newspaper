@@ -42,9 +42,6 @@ public class CommentService {
         return commentRepository.findByNews(news);
     }
 
-    public void save(Comment comment) {
-        commentRepository.save(comment);
-    }
 
     public Comment getCommentById(Integer commentId) {
         return commentRepository.findById(commentId)
@@ -52,6 +49,16 @@ public class CommentService {
                     log.error("Comment with id = " + commentId + ": Not Found");
                     return new EntityNotFoundException("Comment with id = " + commentId + ": Not Found");
                 });
+    }
+
+    public void deleteCommentById(Integer commentId) {
+        if (commentRepository.existsById(commentId)) {
+            commentRepository.deleteById(commentId);
+            log.info("Delete comment with id = " + commentId + ": Success");
+        } else {
+            log.error("Comment with id = " + commentId + ": Not Found");
+            throw new EntityNotFoundException("Comment with id = " + commentId + ": Not Found");
+        }
     }
 
 
@@ -67,17 +74,18 @@ public class CommentService {
     }
 
     public void deleteComment(UserDetailsImpl userDetailsImpl, Integer commentId) {
-        if (userDetailsImpl.getId() == getCommentById(commentId).getAuthorComment().getId()) {
+        int userId = userDetailsImpl.getId();
+        if (userId == getCommentById(commentId).getAuthorComment().getId()) {
             commentRepository.deleteCommentByUserIdAndCommentId(userDetailsImpl.getId(), commentId);
+            log.info("Delete comment with id = " + commentId + ": Success");
         } else {
-            log.error("Comment with id = " + commentId + ": Not Found");
-            throw new EntityNotFoundException("Comment with id = " + commentId + ": Not Found");
+            throw new EntityNotFoundException("Comment with id = " + commentId + " and user (id) = " +
+                    userId + ": Not Found");
         }
     }
 
     public CommentDto convertToCommentDto(Comment comment) {
         CommentDto commentDto = mappingUtil.convertToCommentDto(comment);
-
         commentDto.setUser(mappingUtil.convertToUserDto(comment.getAuthorComment()));
 //
 //        List<Like> likes = news.getLikes();
@@ -101,11 +109,11 @@ public class CommentService {
     }
 
 
-    public Slice<Comment> getThreeComments(Integer newsId, Pageable pageable){
-       return commentRepository.findThreeComments(newsId, pageable);
+    public Slice<Comment> getThreeComments(Integer newsId, Pageable pageable) {
+        return commentRepository.findThreeComments(newsId, pageable);
     }
 
-    public Integer getCountComments(Integer newsId){
+    public Integer getCountComments(Integer newsId) {
         return commentRepository.countByNewsId(newsId);
     }
 

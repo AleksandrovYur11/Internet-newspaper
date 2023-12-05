@@ -26,7 +26,6 @@ import ru.aleksandrov.backendinternetnewspaper.security.services.UserDetailsImpl
 import ru.aleksandrov.backendinternetnewspaper.services.RegistrationService;
 import ru.aleksandrov.backendinternetnewspaper.services.RoleService;
 import ru.aleksandrov.backendinternetnewspaper.util.MappingUtil;
-import ru.aleksandrov.backendinternetnewspaper.util.UserValidator;
 
 import javax.validation.Valid;
 import java.util.HashMap;
@@ -40,7 +39,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class AuthenticationController {
 
-    private final UserValidator userValidator;
     private final RegistrationService registrationService;
     private final UserRepository userRepository;
     private final MappingUtil mappingUtil;
@@ -53,11 +51,9 @@ public class AuthenticationController {
     private final RoleService roleService;
 
     @Autowired
-    public AuthenticationController(UserValidator userValidator, RegistrationService registrationService,
-                                    UserRepository userRepository, MappingUtil mappingUtil,
-                                    AuthenticationManager authenticationManager, JwtUtils jwtUtils,
-                                    RefreshTokenService refreshTokenService, RoleService roleService) {
-        this.userValidator = userValidator;
+    public AuthenticationController(RegistrationService registrationService, UserRepository userRepository,
+                                    MappingUtil mappingUtil, AuthenticationManager authenticationManager,
+                                    JwtUtils jwtUtils, RefreshTokenService refreshTokenService, RoleService roleService) {
         this.registrationService = registrationService;
         this.userRepository = userRepository;
         this.mappingUtil = mappingUtil;
@@ -66,7 +62,6 @@ public class AuthenticationController {
         this.refreshTokenService = refreshTokenService;
         this.roleService = roleService;
     }
-
 
     @PostMapping("/sign-in")
     public ResponseEntity<SigninResponse> login(@RequestBody @Valid SigninRequest signinRequest) {
@@ -81,62 +76,25 @@ public class AuthenticationController {
         List<String> roles = userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
 
-        SigninResponse response = new SigninResponse(accessJwt, refreshToken.getToken(), userDetails.getId(),
+        SigninResponse signinResponse = new SigninResponse(accessJwt, refreshToken.getToken(), userDetails.getId(),
                 userDetails.getName(), roles);
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return new ResponseEntity<>(signinResponse, HttpStatus.OK);
     }
-
-//    @PostMapping("/signup")
-//    public ResponseEntity<?> perfectRegistration(@RequestBody @Valid UserDto userDTO,
-//                                                 BindingResult bindingResult) {
-//        userValidator.validate(userDTO, bindingResult);
-//        List<FieldError> fieldErrorList = bindingResult.getFieldErrors();
-//        if (!fieldErrorList.isEmpty()) {
-//            return new ResponseEntity<>(fieldErrorList.stream().map(DefaultMessageSourceResolvable::getDefaultMessage)
-//                    .collect(Collectors.toList()), HttpStatus.BAD_REQUEST);
-//        }
-//        try {
-//            User newUser = mappingUtil.convertToUser(userDTO);
-//            System.out.println(newUser.toString());
-//            registrationService.register(newUser);
-//            return new ResponseEntity<>("Created new user", HttpStatus.CREATED);
-//        } catch (Exception e) {
-//            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-//        }
-//    }
 
     @PostMapping("/sign-up")
     public ResponseEntity<?> perfectRegistration(@RequestBody @Valid SignupRequest signupRequest) {
-//        userValidator.validate(signupRequest, bindingResult);
         if (userRepository.existsByEmail(signupRequest.getEmail())) {
             Map<String, String> error = new HashMap<>();
             error.put("email", "User with this email already exists");
             return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
         }
 
-//        if (bindingResult.hasErrors()) {
-//            Map<String, String> errors = new HashMap<>();
-//            bindingResult.getFieldErrors().forEach(error -> {
-//                String fieldName = error.getField();
-//                String errorMessage = error.getDefaultMessage();
-//                errors.put(fieldName, errorMessage);
-//            });
-//            return ResponseEntity.badRequest().body(errors);
-//        }
-//        if (bindingResult.hasErrors()) {
-//            List<FieldError> errors = bindingResult.getFieldErrors();
-//            StringBuilder errorMessage = new StringBuilder();
-//            for (FieldError error : errors) {
-//                errorMessage.append(error.getDefaultMessage()).append("\n");
-//            }
-//            return new ResponseEntity<>(errorMessage.toString(), HttpStatus.BAD_REQUEST);
-//        }
         User newUser = mappingUtil.convertToUser(signupRequest);
         roleService.setDefaultRole(newUser);
         registrationService.register(newUser);
 
-        return new ResponseEntity<>("Created new user", HttpStatus.CREATED);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PostMapping("/refresh-token")
@@ -158,6 +116,6 @@ public class AuthenticationController {
     public ResponseEntity<?> logoutUser(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         int userId = userDetails.getId();
         refreshTokenService.deleteRefreshToken(userId);
-        return ResponseEntity.ok("Logout successful!");
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

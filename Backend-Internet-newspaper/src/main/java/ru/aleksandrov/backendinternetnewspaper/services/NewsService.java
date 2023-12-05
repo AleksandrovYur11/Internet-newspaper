@@ -48,7 +48,7 @@ public class NewsService {
                 });
     }
 
-    public News saveNews(NewsDto newNewsDto) {
+    public News saveNews(NewsDto newNewsDto) throws IllegalAccessException {
         LocalDateTime moscowTimeNow = LocalDateTime.now(ZoneId.of("Europe/Moscow"));
         News newNews = new News();
         newNews.setNewsTitle(newNewsDto.getNewsTitle());
@@ -85,6 +85,7 @@ public class NewsService {
 //        savedNews.setTheme(dbThemes);
         setPictureAndThemesForNews(newNews, newNewsDto.getPicture(), newNewsDto.getThemes());
         newsRepository.save(newNews);
+        log.info("Create new news by title = {}: Success", newNews.getNewsTitle());
         return newNews;
     }
 
@@ -98,9 +99,10 @@ public class NewsService {
 
     public void deleteNewsById(Integer newsId) {
         newsRepository.deleteById(newsId);
+        log.info("Delete news by id = {}: Success", newsId);
     }
 
-    public void updateNews(Integer newsId, NewsDto updatedNewsDto) {
+    public void updateNews(Integer newsId, NewsDto updatedNewsDto) throws IllegalAccessException {
         News news = getNewsById(newsId);
         news.setNewsTitle(updatedNewsDto.getNewsTitle());
         news.setNewsText(updatedNewsDto.getNewsText());
@@ -132,6 +134,7 @@ public class NewsService {
 
         setPictureAndThemesForNews(news, updatedNewsDto.getPicture(), updatedNewsDto.getThemes());
         newsRepository.save(news);
+        log.info("Update news by title = {}: Success", news.getNewsTitle());
     }
 
 
@@ -190,27 +193,55 @@ public class NewsService {
     }
 
 
-    private void setPictureAndThemesForNews(News news, PictureDto pictureDto, Set<ThemeDto> themesDto) {
-        Picture newPicture = mappingUtil.convertToPicture(pictureDto);
-        if (pictureRepository.findByUrl(pictureDto.getUrl()).isPresent()) {
-            news.setPicture(mappingUtil.convertToPicture(pictureDto));
-        } else {
-            pictureRepository.save(newPicture);
-            news.setPicture(newPicture);
-        }
+    private void setPictureAndThemesForNews(News news, PictureDto pictureDto, Set<ThemeDto> themesDto)
+            throws IllegalAccessException {
 
-        Set<Theme> themes = themesDto.stream()
-                .map(mappingUtil::convertToTheme).collect(Collectors.toSet());
-        Set<Theme> dbThemes = new HashSet<>();
-        for (Theme theme : themes) {
-            if (!themeRepository.findThemeByName(theme.getName()).isPresent()) {
-                themeRepository.save(theme);
-                dbThemes.add(theme);
+        if (pictureDto == null && themesDto == null){
+            throw new IllegalAccessException("Please select the url for the image and name theme for the news");
+        }
+        try {
+            Picture newPicture = mappingUtil.convertToPicture(pictureDto);
+            Optional<Picture> optionalPicture = pictureRepository.findByUrl(pictureDto.getUrl());
+            if (optionalPicture.isPresent()) {
+                newPicture = optionalPicture.get();
+                news.setPicture(newPicture);
             } else {
-                dbThemes.add(themeRepository.findThemeByName(theme.getName()).get());
+                pictureRepository.save(newPicture);
+                news.setPicture(newPicture);
             }
+        } catch (Exception exception) {
+            throw new IllegalAccessException("Please select the url for the image");
         }
-        news.setTheme(dbThemes);
-    }
 
+        try {
+            Set<Theme> themes = themesDto.stream()
+                    .map(mappingUtil::convertToTheme).collect(Collectors.toSet());
+            Set<Theme> dbThemes = new HashSet<>();
+            for (Theme theme : themes) {
+                if (!themeRepository.findThemeByName(theme.getName()).isPresent()) {
+                    themeRepository.save(theme);
+                    dbThemes.add(theme);
+                } else {
+                    dbThemes.add(themeRepository.findThemeByName(theme.getName()).get());
+                }
+            }
+            news.setTheme(dbThemes);
+        } catch (Exception exception) {
+            throw new IllegalAccessException("Please select name theme for the news");
+        }
+//        Set<Theme> themes = themesDto.stream()
+//                .map(mappingUtil::convertToTheme).collect(Collectors.toSet());
+//        Set<Theme> dbThemes = new HashSet<>();
+//        for (Theme theme : themes) {
+//            if (!themeRepository.findThemeByName(theme.getName()).isPresent()) {
+//                themeRepository.save(theme);
+//                dbThemes.add(theme);
+//            } else {
+//                dbThemes.add(themeRepository.findThemeByName(theme.getName()).get());
+//            }
+//        }
+//        news.setTheme(dbThemes);
+//    }
+
+    }
 }

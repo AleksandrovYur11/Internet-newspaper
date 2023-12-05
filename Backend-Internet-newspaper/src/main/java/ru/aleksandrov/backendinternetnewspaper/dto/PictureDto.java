@@ -11,5 +11,6 @@ import javax.validation.constraints.NotBlank;
 @NoArgsConstructor
 public class PictureDto {
     @URL(message = "URL picture must be format URL" )
+    @NotBlank(message = "URL should be not empty")
     private String url;
 }

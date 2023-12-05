@@ -27,6 +27,6 @@ public class  Picture {
     private byte[] picture;
 
     @OneToMany(mappedBy = "picture")
-    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
+//    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
     private List<News> news;
 }

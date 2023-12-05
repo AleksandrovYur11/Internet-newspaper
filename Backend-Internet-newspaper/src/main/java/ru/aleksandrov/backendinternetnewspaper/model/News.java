@@ -40,6 +40,7 @@ public class News {
     private List<Comment> comments;
 
     @ManyToOne
+    @JoinColumn(name = "picture_id", referencedColumnName = "id")
     private Picture picture;
 
     @OneToMany(mappedBy = "news")

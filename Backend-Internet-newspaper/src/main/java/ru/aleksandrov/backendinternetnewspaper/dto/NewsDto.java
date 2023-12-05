@@ -1,6 +1,7 @@
 package ru.aleksandrov.backendinternetnewspaper.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,6 +14,7 @@ import ru.aleksandrov.backendinternetnewspaper.model.Theme;
 
 
 import javax.persistence.*;
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
@@ -37,11 +39,12 @@ public class NewsDto {
 
     @PastOrPresent(message = "The publication date must be before or in now present time")
     private LocalDateTime timePublishedNewsMSK;
-//    @JsonInclude(JsonInclude.Include.NON_NULL)
+
     private List<LikeDto> likes;
-//    @JsonInclude(JsonInclude.Include.NON_NULL)
+
+    @Valid
     private PictureDto picture;
-//    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @Valid
     private Set<ThemeDto> themes;
 }
 
