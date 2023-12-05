@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from "vue"
+import { ref, computed, onMounted, onBeforeMount } from "vue"
 
 import { useAuthStore } from "@/stores/AuthStore.js"
 const Auth = useAuthStore()
@@ -7,25 +7,49 @@ const Auth = useAuthStore()
 import { useNewsStore } from "@/stores/NewsStore"
 const NewsStore = useNewsStore()
 
- const newsTitle = ref('')
- const newsText= ref('')
- const picture = ref('')
- const  themes = ref('')
+const { props } = defineProps({
+    post: {
+        type: Object,
+        required: true,
+    },
+})
+
+// skdjskdjs
+const newsTitle = ref('jj')
+const newsText= ref('kk')
+const picture = ref('ll')
+const  themes = ref('dd')
+
+onBeforeMount(() => {
+   NewsStore.getInfoNews(NewsStore.edit_post_id)
+   console.log('ooooo')
+   console.log(NewsStore.news_for_edit);
+})
+
+onMounted(()=>{
+    if (NewsStore.news_for_edit) {
+    newsTitle.value = NewsStore.news_for_edit.newsTitle;
+    newsText.value = NewsStore.news_for_edit.newsText;
+    picture.value = NewsStore.news_for_edit.picture.url;
+    themes.value = NewsStore.news_for_edit.themes.map(theme => theme.name).join(', ');
+  } else {
+    console.log('No edit news data available');
+  }
+})
 
 </script>
 
 <template>
-    <div
+    <div 
         class="container"
-        @click.self="NewsStore.closeModal()"
+        @click.self="NewsStore.closeEdit()"
     >
     <b-form class="custom-form">
-        <!-- <div class="modal-content"> -->
             <div class="header_modal">
-                <h4>Create news</h4>
+                <h4>Edit news</h4>
                 <span
                     class="close"
-                    @click="NewsStore.closeModal()"
+                    @click="NewsStore.closeEdit()"
                     >&times;</span
                 >
             </div>
@@ -40,7 +64,6 @@ const NewsStore = useNewsStore()
                         id="postTitle"
                         v-model="newsTitle"
                         type="text"
-                        placeholder="Чертила..."
                         :state="validation_title"
                         required
                     ></b-form-input>
@@ -120,14 +143,9 @@ const NewsStore = useNewsStore()
             <div class="footer_modal">
                 <b-button
                     type="submit"
-                    @click="NewsStore.addNews(newsTitle, newsText, picture, themes)"
+                    @click="NewsStore.updateNews(newsTitle, newsText, picture, themes, NewsStore.edit_post_id)"
                     class="submit_btn"
-                    >Create</b-button
-                >
-                <b-button
-                    type="submit"
-                    class="submit_btn"
-                    >Create</b-button
+                    >Edit</b-button
                 >
             </div>
           </b-form>

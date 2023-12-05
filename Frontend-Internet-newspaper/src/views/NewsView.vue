@@ -3,28 +3,25 @@ import MainBlock from "@/components/MainBlock.vue"
 import PostBlock from "@/components/PostBlock.vue"
 import ModalForm from "@/components/ModalForm.vue"
 
-import { ref, onMounted } from "vue"
-
-// const news = ref(JSON.parse(localStorage.getItem('news')))
+import { ref, onBeforeMount, onMounted } from "vue"
 
 import { useAuthStore } from "@/stores/AuthStore"
 const AuthUser = useAuthStore()
 
-import {useNewsStore} from "@/stores/NewsStore.js"
+import { useNewsStore } from "@/stores/NewsStore.js"
 const NewsStore = useNewsStore()
 
-onMounted(() => {
+import EditForm from "@/components/EditForm.vue"
+
+onBeforeMount(() => {
     NewsStore.getnews()
 })
-
-//let showModal = false
+// ldldldlld
 </script>
 
 <template>
-    <modal-form
-        style="z-index: 1000000; position: relative;"
-        v-if="AuthUser.modal"
-    />
+    <edit-form v-if="NewsStore.edit === true"/>
+    <modal-form v-if="NewsStore.modal === true" />
     <main-block>
         <template #container>
             <div class="news_container">

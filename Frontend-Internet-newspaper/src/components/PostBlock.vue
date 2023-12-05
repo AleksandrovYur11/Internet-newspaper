@@ -1,6 +1,6 @@
 <script setup>
 import { defineProps } from "vue"
-import { ref , onMounted} from "vue"
+import { ref, onMounted } from "vue"
 
 const { props } = defineProps({
     post: {
@@ -19,19 +19,19 @@ import CommentBlock from "@/components/CommentBlock.vue"
 
 const showComments = ref(false)
 
-const user_id = ref(sessionStorage.getItem('user_id'))
-const user_role = ref(sessionStorage.getItem('user_role'))
+const user_id = ref(sessionStorage.getItem("user_id"))
+const user_role = ref(sessionStorage.getItem("user_role"))
 
-onMounted(() => {
-    NewsStore.getnews()
-})
 </script>
 
 <template>
     <div class="cont">
+        <!-- @click="NewsStore.getInfoNews(post.id)" -->
         <b-button
             style="margin-right: 10px"
             v-if="user_role === 'ROLE_ADMIN'"
+            @click = "NewsStore.showEdit(post.id)"
+            :post = post
             >red</b-button
         >
         <div class="news_container">

@@ -5,10 +5,11 @@ export const useAuthStore = defineStore("auth",  {
     state: () => ({
         JWT: null, 
         selectedRole: null,
-        modal: false,
         user: null,
         role: null,
         reg_users: [],
+        news: null,
+        user_role: ''
     }),
     actions: {
         async login(textEmail, textPassword) {
@@ -34,14 +35,10 @@ export const useAuthStore = defineStore("auth",  {
                 }
         
                 const responseData = await response.json()
-                // AuthUser.setAuthUser(responseData)
-                //this.user = responseData.id
-                // console.log(this.users)
 
-                //////////111111111111////////////
                 sessionStorage.setItem('user_id', responseData.id)
                 sessionStorage.setItem('user_role', responseData.roles[0])
-                //////////111111111111////////////
+              
                 this.user = sessionStorage.getItem('user_id')
                 this.role = sessionStorage.getItem('user_role')
 
@@ -54,13 +51,7 @@ export const useAuthStore = defineStore("auth",  {
         
                 this.selectRole(responseData.roles[0])
                 console.log(responseData.roles[0])
-                // if () {
-                //     AuthUser.selectRole()
-                // }
-        
-                // console.log("JWT Token:", jwtToken)
-        
-                // sessionStorage.setItem('jwtToken', 'ваш_токен');
+                
                 sessionStorage.setItem('jwtToken', jwtToken);
                 
                 router.push('/news/fresh-news')
@@ -68,11 +59,11 @@ export const useAuthStore = defineStore("auth",  {
                 console.error("Authentication error:", error)
             }
         },
-        updateData(user) {
-            // Обновление состояния хранилища данными из запроса
-            // Например, сохранение данных в состоянии
-            this.$patch(user); // Предположим, что данные являются объектом
-        },
+        // updateData(user) {  //что это???
+        //     // Обновление состояния хранилища данными из запроса
+        //     // Например, сохранение данных в состоянии
+        //     this.$patch(user); // Предположим, что данные являются объектом
+        // },
         async register(regData) {
             //console.log(regData)
             const userData = {
@@ -95,6 +86,9 @@ export const useAuthStore = defineStore("auth",  {
                 // Обработка ошибок при регистрации
                 throw new Error("Registration failed");
               }
+
+            //   const News = useNewsStore()
+            // this.news = News.getnews()
               //const responseData = await response.json()
               //this.reg_users.push(responseData)
               router.push('/auth/sign-in')
@@ -103,10 +97,10 @@ export const useAuthStore = defineStore("auth",  {
               console.error("Registration error:", error);
             }
           },
-        setAuthUser(responseData){
-            this.JWT = responseData.accessToken
-            // console.log(responseData)
-        },
+        // setAuthUser(responseData){
+        //     this.JWT = responseData.accessToken
+        //     // console.log(responseData)
+        // },
         selectRole(role){
             this.role = role
         },
@@ -115,16 +109,11 @@ export const useAuthStore = defineStore("auth",  {
             sessionStorage.removeItem('user_id')
             sessionStorage.removeItem('user_role')
             sessionStorage.removeItem('jwtToken')
+            //sessionStorage.removeItem('news_for_edit')
         },
-        showModal(){
-            this.modal = true
-        },
-        closeModal(){
-            this.modal = false
-        },
-        hasUser(user_id){
-            return this.users.some((user) => user.id === user_id);
-        }
+        // hasUser(user_id){
+        //     return this.users.some((user) => user.id === user_id)
+        // }
     },
 })
 

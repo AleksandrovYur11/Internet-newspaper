@@ -2,6 +2,11 @@
 import { useAuthStore } from "@/stores/AuthStore"
 const AuthUser = useAuthStore()
 
+import { useNewsStore } from "@/stores/NewsStore"
+const NewsStore = useNewsStore()
+
+import FiltrBlock from "@/components/FiltrBlock.vue"
+
 import {ref,  defineEmits } from 'vue';
 
 const { emit } = defineEmits(['show-modal'])
@@ -29,6 +34,8 @@ const user_role = ref(sessionStorage.getItem('user_role'))
             is-nav
         >
             <!-- добавить активность переключателя -->
+            <filtr-block>
+            </filtr-block>
             <b-navbar-nav>
                 <div
                     v-if="
@@ -37,8 +44,8 @@ const user_role = ref(sessionStorage.getItem('user_role'))
                     "
                     class="d-flex flex-direction-row"
                 >
-                    <span>{{ AuthUser.role }}</span>
-                    <b-button  v-if =  "user_role == 'ROLE_ADMIN'" @click="AuthUser.showModal()"> + </b-button>
+                    <span>{{ user_role }}</span>
+                    <b-button  v-if =  "user_role == 'ROLE_ADMIN'" @click="NewsStore.showModal()"> + </b-button>
                     <b-nav-item
                         to="/auth/sign-in"
                         @click="AuthUser.sbrosRole()"
