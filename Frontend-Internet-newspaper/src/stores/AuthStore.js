@@ -51,13 +51,7 @@ export const useAuthStore = defineStore("auth",  {
         
                 this.selectRole(responseData.roles[0])
                 console.log(responseData.roles[0])
-                // if () {
-                //     AuthUser.selectRole()
-                // }
-        
-                // console.log("JWT Token:", jwtToken)
-        
-                // sessionStorage.setItem('jwtToken', 'ваш_токен');
+                
                 sessionStorage.setItem('jwtToken', jwtToken);
                 
                 router.push('/news/fresh-news')
@@ -65,11 +59,11 @@ export const useAuthStore = defineStore("auth",  {
                 console.error("Authentication error:", error)
             }
         },
-        updateData(user) {  //что это???
-            // Обновление состояния хранилища данными из запроса
-            // Например, сохранение данных в состоянии
-            this.$patch(user); // Предположим, что данные являются объектом
-        },
+        // updateData(user) {  //что это???
+        //     // Обновление состояния хранилища данными из запроса
+        //     // Например, сохранение данных в состоянии
+        //     this.$patch(user); // Предположим, что данные являются объектом
+        // },
         async register(regData) {
             //console.log(regData)
             const userData = {
@@ -103,10 +97,10 @@ export const useAuthStore = defineStore("auth",  {
               console.error("Registration error:", error);
             }
           },
-        setAuthUser(responseData){
-            this.JWT = responseData.accessToken
-            // console.log(responseData)
-        },
+        // setAuthUser(responseData){
+        //     this.JWT = responseData.accessToken
+        //     // console.log(responseData)
+        // },
         selectRole(role){
             this.role = role
         },
@@ -115,10 +109,11 @@ export const useAuthStore = defineStore("auth",  {
             sessionStorage.removeItem('user_id')
             sessionStorage.removeItem('user_role')
             sessionStorage.removeItem('jwtToken')
+            //sessionStorage.removeItem('news_for_edit')
         },
-        hasUser(user_id){
-            return this.users.some((user) => user.id === user_id)
-        }
+        // hasUser(user_id){
+        //     return this.users.some((user) => user.id === user_id)
+        // }
     },
 })
 

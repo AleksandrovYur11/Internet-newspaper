@@ -26,10 +26,12 @@ const user_role = ref(sessionStorage.getItem("user_role"))
 
 <template>
     <div class="cont">
+        <!-- @click="NewsStore.getInfoNews(post.id)" -->
         <b-button
             style="margin-right: 10px"
             v-if="user_role === 'ROLE_ADMIN'"
-            @click="NewsStore.getInfoNews(post.id)"
+            @click = "NewsStore.showEdit(post.id)"
+            :post = post
             >red</b-button
         >
         <div class="news_container">

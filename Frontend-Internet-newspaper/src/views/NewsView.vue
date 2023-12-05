@@ -16,16 +16,12 @@ import EditForm from "@/components/EditForm.vue"
 onBeforeMount(() => {
     NewsStore.getnews()
 })
-
-onMounted(async () => {
-   NewsStore.getnews()
-})
-
+// ldldldlld
 </script>
 
 <template>
-    <edit-form v-if="NewsStore.edit"/>
-    <modal-form v-if="NewsStore.modal" />
+    <edit-form v-if="NewsStore.edit === true"/>
+    <modal-form v-if="NewsStore.modal === true" />
     <main-block>
         <template #container>
             <div class="news_container">

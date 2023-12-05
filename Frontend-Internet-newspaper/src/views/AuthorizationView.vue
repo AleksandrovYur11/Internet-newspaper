@@ -72,6 +72,7 @@ const validation_password = computed(() => {
                     </b-form-valid-feedback>
                 </b-form-group>
                 <!-- type = "submit" -->
+                
                 <b-button
                     @click="AuthUser.login(textEmail, textPassword)"
                     variant="primary"

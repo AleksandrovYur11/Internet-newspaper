@@ -7,8 +7,10 @@ export const useNewsStore = defineStore("news", {
         likes: [],
         edit: false,
         modal: false,
-        news_for_edit: [],
-        role: ''
+        news_for_edit: null,
+        role: '',
+        edit_post_id: null,
+        filtr_news: null
     }),
     actions: {
         async getnews() {
@@ -124,10 +126,6 @@ export const useNewsStore = defineStore("news", {
             }
         },
         async addLike(id_news, user_id) {
-            // const like = {
-            //     post_id: id_news,
-            //     likes_count: news.find(post => post.id === id_news).likes.length || 0,
-            // }
             const jwtToken = sessionStorage.getItem("jwtToken")
             if (!jwtToken) {
                 console.error("Отсутствует JWT-токен!")
@@ -228,12 +226,53 @@ export const useNewsStore = defineStore("news", {
                 const responseData = await response.json()
                 console.log(responseData)
                 this.getnews()
+                this.closeModal()
+            } catch (error) {
+                console.error("Authentication error:", error)
+            }
+        },
+        async deleteNews() {
+            const picture_url_obg = {
+                url: picture
+            }
+            const newsData = {
+                newsTitle: newsTitle,
+                newsText: newsText,
+                picture: picture_url_obg,
+                themes: themes.split(',').map(theme => ({ name: theme.trim() }))
+            }
+            console.log(newsData)
+            const jwtToken = sessionStorage.getItem("jwtToken")
+            if (!jwtToken) {
+                console.error("Отсутствует JWT-токен!")
+                return
+            }
+            try {
+                console.log(jwtToken)
+                const response = await fetch(
+                    `http://localhost:8085/news/create`,
+                    {
+                        method: "POST",
+                        headers: new Headers({
+                            Authorization: "Bearer " + jwtToken,
+                            "Content-Type": "application/json",
+                        }),
+                        body: JSON.stringify(newsData),
+                    }
+                )
+                if (!response.ok) {
+                    alert("Неправильный вход!")
+                    throw new Error("Authentication failed")
+                }
+                const responseData = await response.json()
+                console.log(responseData)
+                this.getnews()
+                this.closeModal()
             } catch (error) {
                 console.error("Authentication error:", error)
             }
         },
         async getInfoNews(news_id) {
-            this.showEdit()
             const jwtToken = sessionStorage.getItem("jwtToken")
             if (!jwtToken) {
                 console.error("Отсутствует JWT-токен!")
@@ -256,10 +295,11 @@ export const useNewsStore = defineStore("news", {
                     throw new Error("Authentication failed")
                 }
                 const responseData = await response.json()
-                // this.news_for_edit.push(responseData)
-                sessionStorage.setItem('news_for_edit', JSON.stringify(responseData))
-                console.log(responseData)
-                this.getnews()
+                this.news_for_edit = responseData
+                //sessionStorage.setItem('news_for_edit', JSON.stringify(responseData))
+                console.log('ssss')
+                console.log(this.news_for_edit)
+                // this.getnews()
             } catch (error) {
                 console.error("Authentication error:", error)
             }
@@ -274,7 +314,6 @@ export const useNewsStore = defineStore("news", {
                 newsText: newsText,
                 picture: picture_url_obj,
                 themes: themes.split(',').map(theme => ({ name: theme.trim() }))
-                //themes: []
             }
             console.log(newsData)
             const jwtToken = sessionStorage.getItem("jwtToken")
@@ -300,6 +339,7 @@ export const useNewsStore = defineStore("news", {
                     throw new Error("Authentication failed")
                 }
                 this.getnews()
+                this.closeEdit()
                 // this.getnews()
                 //const responseData = await response.json()
                 //console.log(responseData)
@@ -307,7 +347,8 @@ export const useNewsStore = defineStore("news", {
                 console.error("Authentication error:", error)
             }
         },
-        showEdit(){
+        showEdit(post_id){
+            this.edit_post_id = post_id
             this.edit = true
         },
         closeEdit() {
@@ -319,5 +360,57 @@ export const useNewsStore = defineStore("news", {
         closeModal(){
             this.modal = false
         },
+        async filterThemes(positive, negative) {
+            // {
+            //     "favoritesThemes" : [
+            //         {
+            //             "name": "Джаонозис"
+            //         }
+            //         ],
+            //     "forbiddenThemes" : [
+            //         {
+            //             "name": "Мустафар"
+            //         }
+            //         ]
+            // }
+            // const positive = positive.split(',').map(theme => ({ name: theme.trim() }))
+            // const negative = negative.split(',').map(theme => ({ name: theme.trim() }))
+            const themes = {
+                favoritesThemes: positive.split(',').map(theme => ({ name: theme.trim() })),
+                forbiddenThemes: negative.split(',').map(theme => ({ name: theme.trim() }))
+            }
+            console.log(themes)
+            const jwtToken = sessionStorage.getItem("jwtToken")
+            // if (!jwtToken) {
+            //     console.error("Отсутствует JWT-токен!")
+            //     return
+            // }
+            try {
+                console.log(jwtToken)
+                const response = await fetch(
+                    `http://localhost:8085/news/user-themes`,
+                    {
+                        method: "POST",
+                        headers: {
+                            'Content-Type': 'application/json'
+                            // Другие необходимые заголовки
+                          },
+                        body: JSON.stringify(themes),
+                    }
+                )
+                if (!response.ok) {
+                    alert("Неправильный вход!")
+                    throw new Error("Authentication failed")
+                }
+                const responseData = await response.json()
+                // this.filtr_news = responseData
+                console.log(responseData)
+
+                this.getnews()
+            } catch (error) {
+                console.error("Authentication error:", error)
+            }
+        },
+
     },
 })

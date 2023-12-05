@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted } from "vue"
+import { ref, computed, onMounted, onBeforeMount } from "vue"
 
 import { useAuthStore } from "@/stores/AuthStore.js"
 const Auth = useAuthStore()
@@ -7,30 +7,46 @@ const Auth = useAuthStore()
 import { useNewsStore } from "@/stores/NewsStore"
 const NewsStore = useNewsStore()
 
-const edit_news = JSON.parse(sessionStorage.getItem('news_for_edit'))
+const { props } = defineProps({
+    post: {
+        type: Object,
+        required: true,
+    },
+})
 
- const newsTitle = ref(edit_news.newsTitle)
- const newsText= ref(edit_news.newsText)
- const picture = ref(edit_news.picture.url)
- const  themes = ref(edit_news.themes.map(theme => theme.name).join(', '))
+// skdjskdjs
+const newsTitle = ref('jj')
+const newsText= ref('kk')
+const picture = ref('ll')
+const  themes = ref('dd')
 
-//  onMounted(()=>{
-// const edit_news = sessionStorage.getItem('news_for_edit')
+onBeforeMount(() => {
+   NewsStore.getInfoNews(NewsStore.edit_post_id)
+   console.log('ooooo')
+   console.log(NewsStore.news_for_edit);
+})
 
-//     newsTitle.value = edit_news.newsTitle
-
-//  })
+onMounted(()=>{
+    if (NewsStore.news_for_edit) {
+    newsTitle.value = NewsStore.news_for_edit.newsTitle;
+    newsText.value = NewsStore.news_for_edit.newsText;
+    picture.value = NewsStore.news_for_edit.picture.url;
+    themes.value = NewsStore.news_for_edit.themes.map(theme => theme.name).join(', ');
+  } else {
+    console.log('No edit news data available');
+  }
+})
 
 </script>
 
 <template>
-    <div
+    <div 
         class="container"
         @click.self="NewsStore.closeEdit()"
     >
     <b-form class="custom-form">
             <div class="header_modal">
-                <h4>Create news</h4>
+                <h4>Edit news</h4>
                 <span
                     class="close"
                     @click="NewsStore.closeEdit()"
@@ -127,9 +143,9 @@ const edit_news = JSON.parse(sessionStorage.getItem('news_for_edit'))
             <div class="footer_modal">
                 <b-button
                     type="submit"
-                    @click="NewsStore.updateNews(newsTitle, newsText, picture, themes, edit_news.id)"
+                    @click="NewsStore.updateNews(newsTitle, newsText, picture, themes, NewsStore.edit_post_id)"
                     class="submit_btn"
-                    >Create</b-button
+                    >Edit</b-button
                 >
             </div>
           </b-form>

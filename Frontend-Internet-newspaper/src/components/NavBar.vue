@@ -5,6 +5,8 @@ const AuthUser = useAuthStore()
 import { useNewsStore } from "@/stores/NewsStore"
 const NewsStore = useNewsStore()
 
+import FiltrBlock from "@/components/FiltrBlock.vue"
+
 import {ref,  defineEmits } from 'vue';
 
 const { emit } = defineEmits(['show-modal'])
@@ -32,6 +34,8 @@ const user_role = ref(sessionStorage.getItem('user_role'))
             is-nav
         >
             <!-- добавить активность переключателя -->
+            <filtr-block>
+            </filtr-block>
             <b-navbar-nav>
                 <div
                     v-if="
