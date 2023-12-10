@@ -8,6 +8,9 @@ const NewsStore = useNewsStore()
 import { useAuthStore } from "@/stores/AuthStore.js"
 const AuthUser = useAuthStore()
 
+import { useCommentsStore } from "@/stores/CommentsStore.js"
+const CommentsStore = useCommentsStore()
+
 const { props } = defineProps({
     post: {
         type: Object,
@@ -20,10 +23,23 @@ const user_role = ref(sessionStorage.getItem("user_role"))
 
 const new_comment = ref("")
 
+import { computed } from "vue"
+
+const filteredComments = computed(() =>
+    CommentsStore.comments.filter((obj) => obj.news_id === post.id)
+)
+
+// const getCommetsByNewsId = (comments, news_id) => {
+//    const com = comments.filter(obj => obj.news_id === news_id)
+//    console.log(com)
+//    return com.comments
+//    //console.log(com.comments)
+//    //return  com
+// }
+
 // const handleCreatePost = async () => {
 //     await NewsStore.sendcomment(post.id, new_comment)
 // }
-
 </script>
 
 <template>
@@ -42,7 +58,7 @@ const new_comment = ref("")
                 "
             ></b-form-textarea>
             <b-button
-                @click="NewsStore.sendcomment(post.id, new_comment)"
+                @click="CommentsStore.sendcomment(post.id, new_comment)"
                 style="border-radius: 50%; width: 50px; height: 50px"
             >
                 <img
@@ -53,9 +69,16 @@ const new_comment = ref("")
         </div>
     </div>
     <!-- class="text-gray-700 py-4 pb-0 rounded" -->
+
+    <!-- v-if = "CommentsStore.showed && CommentsStore.comments.length !== 0" -->
     <div class="comments_content">
+        {{ CommentsStore.comments
+                .filter((obj) => obj.news_id === post.id) // Фильтрация по news_id равному post.id
+                .flatMap((obj) => obj.comments) }}
         <b-card
-            v-for="(item, index) in post.comments"
+            v-for="(item, index) in CommentsStore.comments
+                .filter((obj) => obj.news_id === post.id) // Фильтрация по news_id равному post.id
+                .flatMap((obj) => obj.comments)"
             style="margin-top: 10px"
             :key="index"
         >
@@ -81,7 +104,16 @@ const new_comment = ref("")
                 </span>
             </div>
         </b-card>
+        <!-- </div> -->
     </div>
+    <!-- v-if = "CommentsStore.commentsCount >=3" -->
+    <!-- v-if = "(CommentsStore.comments.filter((obj) => obj.news_id === post.id).flatMap((obj) => obj.comments)).length < CommentsStore.commentsCount" -->
+
+    <a 
+            href="" 
+        @click.prevent="CommentsStore.showComments(post.id)"
+        >Еще</a
+    >
 </template>
 
 <style scoped>

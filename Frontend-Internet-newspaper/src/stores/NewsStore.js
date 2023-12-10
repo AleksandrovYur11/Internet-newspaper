@@ -1,5 +1,6 @@
 import { defineStore } from "pinia"
 import { useAuthStore } from "./AuthStore"
+import { useCommentsStore } from "@/stores/CommentsStore.js"
 
 export const useNewsStore = defineStore("news", {
     state: () => ({
@@ -8,12 +9,20 @@ export const useNewsStore = defineStore("news", {
         edit: false,
         modal: false,
         news_for_edit: null,
-        role: '',
+        role: "",
         edit_post_id: null,
-        filtr_news: null
+        filtr_news: null,
+
+        //with comments
+        newCommets: [],
     }),
     actions: {
+        loadNewComments() {
+            const CommentsStore = useCommentsStore()
+            this.newCommets = CommentsStore.comments
+        },
         async getnews() {
+            this.news = []
             try {
                 const response = await fetch(
                     "http://localhost:8085/news/fresh-news",
@@ -28,51 +37,14 @@ export const useNewsStore = defineStore("news", {
                     throw new Error("Failed to fetch data")
                 }
                 const responseData = await response.json()
-
                 this.news = responseData
+                console.log(responseData)
 
-                console.log("Response data:", responseData)
-
+                //load_comments
+                //this.news.push(this.newCommets)
+                //console.log("Response data:", responseData)
             } catch (error) {
                 console.error("Fetch error:", error)
-            }
-        },
-        async sendcomment(id_news, new_comment) {
-            if (!new_comment.trim()) {
-                console.error("Комментарий пуст!")
-                alert("Комментарий пуст!")
-                return
-            }
-            const textComment = {
-                textComment: new_comment,
-            }
-            const jwtToken = sessionStorage.getItem("jwtToken")
-            if (!jwtToken) {
-                console.error("Отсутствует JWT-токен!")
-                return
-            }
-            try {
-                console.log(jwtToken)
-                const response = await fetch(
-                    `http://localhost:8085/comment/${id_news}`,
-                    {
-                        method: "POST",
-                        headers: new Headers({
-                            Authorization: "Bearer " + jwtToken,
-                            "Content-Type": "application/json",
-                        }),
-                        body: JSON.stringify(textComment),
-                    }
-                )
-                if (!response.ok) {
-                    alert("Неправильный вход!")
-                    throw new Error("Authentication failed")
-                }
-                this.getnews()
-                // const responseData = await response.json()
-                // console.log(responseData)
-            } catch (error) {
-                console.error("Authentication error:", error)
             }
         },
         async deleteComment(id_comment) {
@@ -87,22 +59,22 @@ export const useNewsStore = defineStore("news", {
                 console.log(jwtToken)
             }
             try {
-                if (role == 'ROLE_ADMIN') {
-                   const response = await fetch(
-                    `http://localhost:8085/comment/admin/${id_comment}`,
-                    {
-                        method: "DELETE",
-                        headers: new Headers({
-                            Authorization: "Bearer " + jwtToken,
-                            "Content-Type": "application/json",
-                        }),
+                if (role == "ROLE_ADMIN") {
+                    const response = await fetch(
+                        `http://localhost:8085/comment/admin/${id_comment}`,
+                        {
+                            method: "DELETE",
+                            headers: new Headers({
+                                Authorization: "Bearer " + jwtToken,
+                                "Content-Type": "application/json",
+                            }),
+                        }
+                    )
+                    if (!response.ok) {
+                        alert("Удаление не прошло")
+                        throw new Error("Authentication failed")
                     }
-                )
-                if (!response.ok) {
-                    alert("Удаление не прошло")
-                    throw new Error("Authentication failed")
-                } 
-                } else if (role == 'ROLE_USER') {
+                } else if (role == "ROLE_USER") {
                     const response = await fetch(
                         `http://localhost:8085/comment/user/${id_comment}`,
                         {
@@ -116,7 +88,7 @@ export const useNewsStore = defineStore("news", {
                     if (!response.ok) {
                         alert("Удаление не прошло")
                         throw new Error("Authentication failed")
-                    } 
+                    }
                 }
                 this.getnews()
                 // const responseData = await response.json()
@@ -132,6 +104,7 @@ export const useNewsStore = defineStore("news", {
                 return
             }
             try {
+                //this.getnews()
                 console.log(jwtToken)
                 console.log(this.news)
                 const hasNewsWithCommentByUser = this.news.some((item) => {
@@ -152,7 +125,7 @@ export const useNewsStore = defineStore("news", {
 
                 if (hasNewsWithCommentByUser) {
                     const response = await fetch(
-                        `http://localhost:8085/likes/${id_news}`,
+                        `http://localhost:8085/likes?newsId=${id_news}`,
                         {
                             method: "DELETE",
                             headers: new Headers({
@@ -168,7 +141,7 @@ export const useNewsStore = defineStore("news", {
                     console.log("удалено")
                 } else {
                     const response = await fetch(
-                        `http://localhost:8085/likes/${id_news}`,
+                        `http://localhost:8085/likes/save?newsId=${id_news}`,
                         {
                             method: "POST",
                             headers: new Headers({
@@ -183,7 +156,9 @@ export const useNewsStore = defineStore("news", {
                     }
                     console.log("добавлено")
                 }
+                //!!!!!!!!!!!
                 this.getnews()
+
                 // const responseData = await response.json()
                 // console.log(responseData)
             } catch (error) {
@@ -192,13 +167,15 @@ export const useNewsStore = defineStore("news", {
         },
         async addNews(newsTitle, newsText, picture, themes) {
             const picture_url_obg = {
-                url: picture
+                url: picture,
             }
             const newsData = {
                 newsTitle: newsTitle,
                 newsText: newsText,
                 picture: picture_url_obg,
-                themes: themes.split(',').map(theme => ({ name: theme.trim() }))
+                themes: themes
+                    .split(",")
+                    .map((theme) => ({ name: theme.trim() })),
             }
             console.log(newsData)
             const jwtToken = sessionStorage.getItem("jwtToken")
@@ -209,7 +186,7 @@ export const useNewsStore = defineStore("news", {
             try {
                 console.log(jwtToken)
                 const response = await fetch(
-                    `http://localhost:8085/news/create`,
+                    `http://localhost:8085/news/save`,
                     {
                         method: "POST",
                         headers: new Headers({
@@ -219,7 +196,7 @@ export const useNewsStore = defineStore("news", {
                         body: JSON.stringify(newsData),
                     }
                 )
-                if (!response.ok) {
+                if (!response.created) {
                     alert("Неправильный вход!")
                     throw new Error("Authentication failed")
                 }
@@ -231,17 +208,7 @@ export const useNewsStore = defineStore("news", {
                 console.error("Authentication error:", error)
             }
         },
-        async deleteNews() {
-            const picture_url_obg = {
-                url: picture
-            }
-            const newsData = {
-                newsTitle: newsTitle,
-                newsText: newsText,
-                picture: picture_url_obg,
-                themes: themes.split(',').map(theme => ({ name: theme.trim() }))
-            }
-            console.log(newsData)
+        async deleteNews(news_id) {
             const jwtToken = sessionStorage.getItem("jwtToken")
             if (!jwtToken) {
                 console.error("Отсутствует JWT-токен!")
@@ -250,14 +217,14 @@ export const useNewsStore = defineStore("news", {
             try {
                 console.log(jwtToken)
                 const response = await fetch(
-                    `http://localhost:8085/news/create`,
+                    `http://localhost:8085/news/${news_id}`,
                     {
-                        method: "POST",
+                        method: "DELETE",
                         headers: new Headers({
                             Authorization: "Bearer " + jwtToken,
                             "Content-Type": "application/json",
                         }),
-                        body: JSON.stringify(newsData),
+                        // body: JSON.stringify(newsData),
                     }
                 )
                 if (!response.ok) {
@@ -297,23 +264,25 @@ export const useNewsStore = defineStore("news", {
                 const responseData = await response.json()
                 this.news_for_edit = responseData
                 //sessionStorage.setItem('news_for_edit', JSON.stringify(responseData))
-                console.log('ssss')
+                console.log("ssss")
                 console.log(this.news_for_edit)
                 // this.getnews()
             } catch (error) {
                 console.error("Authentication error:", error)
             }
         },
-        async updateNews(newsTitle, newsText, picture, themes,  news_id) {
+        async updateNews(newsTitle, newsText, picture, themes, news_id) {
             console.log(news_id)
             const picture_url_obj = {
-                url: picture
+                url: picture,
             }
             const newsData = {
                 newsTitle: newsTitle,
                 newsText: newsText,
                 picture: picture_url_obj,
-                themes: themes.split(',').map(theme => ({ name: theme.trim() }))
+                themes: themes
+                    .split(",")
+                    .map((theme) => ({ name: theme.trim() })),
             }
             console.log(newsData)
             const jwtToken = sessionStorage.getItem("jwtToken")
@@ -347,17 +316,17 @@ export const useNewsStore = defineStore("news", {
                 console.error("Authentication error:", error)
             }
         },
-        showEdit(post_id){
+        showEdit(post_id) {
             this.edit_post_id = post_id
             this.edit = true
         },
         closeEdit() {
             this.edit = false
         },
-        showModal(){
+        showModal() {
             this.modal = true
         },
-        closeModal(){
+        closeModal() {
             this.modal = false
         },
         async filterThemes(positive, negative) {
@@ -376,8 +345,12 @@ export const useNewsStore = defineStore("news", {
             // const positive = positive.split(',').map(theme => ({ name: theme.trim() }))
             // const negative = negative.split(',').map(theme => ({ name: theme.trim() }))
             const themes = {
-                favoritesThemes: positive.split(',').map(theme => ({ name: theme.trim() })),
-                forbiddenThemes: negative.split(',').map(theme => ({ name: theme.trim() }))
+                favoritesThemes: positive
+                    .split(",")
+                    .map((theme) => ({ name: theme.trim() })),
+                forbiddenThemes: negative
+                    .split(",")
+                    .map((theme) => ({ name: theme.trim() })),
             }
             console.log(themes)
             const jwtToken = sessionStorage.getItem("jwtToken")
@@ -392,9 +365,9 @@ export const useNewsStore = defineStore("news", {
                     {
                         method: "POST",
                         headers: {
-                            'Content-Type': 'application/json'
+                            "Content-Type": "application/json",
                             // Другие необходимые заголовки
-                          },
+                        },
                         body: JSON.stringify(themes),
                     }
                 )
@@ -411,6 +384,5 @@ export const useNewsStore = defineStore("news", {
                 console.error("Authentication error:", error)
             }
         },
-
     },
 })

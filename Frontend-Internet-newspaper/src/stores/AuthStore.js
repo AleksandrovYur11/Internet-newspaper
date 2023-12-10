@@ -1,6 +1,9 @@
 import { defineStore } from "pinia"
 import router from '@/router/index.js'
 
+import { useNewsStore } from "@/stores/NewsStore"
+
+
 export const useAuthStore = defineStore("auth",  {
     state: () => ({
         JWT: null, 
@@ -109,6 +112,9 @@ export const useAuthStore = defineStore("auth",  {
             sessionStorage.removeItem('user_id')
             sessionStorage.removeItem('user_role')
             sessionStorage.removeItem('jwtToken')
+
+            const NewsStore = useNewsStore()
+            NewsStore.likes = []
             //sessionStorage.removeItem('news_for_edit')
         },
         // hasUser(user_id){
