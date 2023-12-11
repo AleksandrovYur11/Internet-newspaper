@@ -1,6 +1,4 @@
 <script setup>
-import { useCommentsStore } from "@/stores/CommentsStore.js"
-const CommentsStore = useCommentsStore()
 
 const { props } = defineProps({
     comment: {
@@ -12,13 +10,6 @@ const { props } = defineProps({
       required: true
     }
 })
-
-// const { props } = defineProps({
-//     post: {
-//         type: Object,
-//         required: true,
-//     },
-// })
 
 </script>
 
@@ -36,7 +27,7 @@ const { props } = defineProps({
             <div class="com_cont">
                 <p>{{ comment.textComment }}</p>
                 <span
-                    v-if="user_id == comment.user.id || user_role == 'ROLE_ADMIN'"
+                    v-if="user_id == comment.user.id || comment.user_role == 'ROLE_ADMIN'"
                     @click="NewsStore.deleteComment(item.id)"
                     style="cursor: pointer"
                 >

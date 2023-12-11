@@ -6,17 +6,17 @@ export const useCommentsStore = defineStore("comments", {
         comments: [],
         news: null,
         commentsCount: null,
-        showed: false
+        showed: false,
     }),
     actions: {
-        getExistNews(){
+        getExistNews() {
             const NewsStore = useNewsStore()
             return NewsStore
             //this.news.push(existNews)
         },
         getCommetsByNewsId(news_id) {
             // ну типо должно заполняться , но почему то пустое - почему?
-            const com = this.comments.filter(obj => obj.news_id === news_id)
+            const com = this.comments.filter((obj) => obj.news_id === news_id)
             console.log(com)
             return com
         },
@@ -44,10 +44,10 @@ export const useCommentsStore = defineStore("comments", {
             }
         },
         async showComments(news_id, num) {
-            if (num === 1) {
-                this.showed = !this.showed
-            } 
             try {
+                if (num === 1) {
+                    this.showed = !this.showed
+                }
                 const response = await fetch(
                     `http://localhost:8085/comment/show?newsId=${news_id}`,
                     {
@@ -57,39 +57,80 @@ export const useCommentsStore = defineStore("comments", {
                         },
                     }
                 )
+
                 if (!response.ok) {
                     throw new Error("Failed to load comments")
                 }
+
                 const responseData = await response.json()
-                console.log("Response data:", responseData)
 
                 const com_id_news = {
                     news_id: news_id,
-                    comments: responseData
+                    comments: responseData,
                 }
-                
-                //сделай так лучше везде
-               this.comments.push(com_id_news)
 
-               //тут по идеи массив не стирается , а дополняется)))
-               //console.log(com_id_news)
-                //this.comments.push(...com_id_news)
+                // Добавляем новые комментарии к текущим комментариям в хранилище
+                this.comments = [...this.comments, com_id_news]
 
                 console.log(this.comments)
-                // const NewsStore = useNewsStore()
-                // NewsStore.getnews()
 
-                //почему он для всех все открывает((()))
-                this.checkCommentsCount(news_id)
-
+                // Сохраняем состояние хранилища
+                this.$patch({
+                    comments: this.comments,
+                })
             } catch (error) {
                 console.error("Fetch error:", error)
             }
         },
-        returnCommentsById(news_id){
-           const com =  this.comments.filter(obj => obj.news_id === news_id)
-           console.log(com)
-           return com.comments
+        // async showComments(news_id, num) {
+        //     if (num === 1) {
+        //         this.showed = !this.showed
+        //     }
+        //     try {
+        //         const response = await fetch(
+        //             `http://localhost:8085/comment/show?newsId=${news_id}`,
+        //             {
+        //                 method: "GET",
+        //                 headers: {
+        //                     "Content-Type": "application/json",
+        //                 },
+        //             }
+        //         )
+        //         if (!response.ok) {
+        //             throw new Error("Failed to load comments")
+        //         }
+        //         const responseData = await response.json()
+        //         console.log("Response data:", responseData)
+
+        //         const com_id_news = {
+        //             news_id: news_id,
+        //             comments: responseData
+        //         }
+
+        //         //сделай так лучше везде
+        //        this.comments.push(com_id_news)
+
+        //        //тут по идеи массив не стирается , а дополняется)))
+        //        //console.log(com_id_news)
+        //         //this.comments.push(...com_id_news)
+
+        //         console.log(this.comments)
+        //         // const NewsStore = useNewsStore()
+        //         // NewsStore.getnews()
+
+        //         //почему он для всех все открывает((()))
+        //         this.checkCommentsCount(news_id)
+
+        //         this.$persist();
+
+        //     } catch (error) {
+        //         console.error("Fetch error:", error)
+        //     }
+        // },
+        returnCommentsById(news_id) {
+            const com = this.comments.filter((obj) => obj.news_id === news_id)
+            console.log(com)
+            return com.comments
         },
         async sendcomment(id_news, new_comment) {
             if (!new_comment.trim()) {
@@ -124,22 +165,42 @@ export const useCommentsStore = defineStore("comments", {
                 }
 
                 //console.log()
-               // NewsStore.getnews()
-               //const NewsStore = useNewsStore()
+                // NewsStore.getnews()
+                //const NewsStore = useNewsStore()
                 //NewsStore.getnews()
 
-
-               // this.checkCommentsCount(id_news)
+                // this.checkCommentsCount(id_news)
                 //if (this.commentsCount <= 3) {
-                    //this.comments = []
-                    this.showComments(id_news)
+                //this.comments = []
+
+                //!!!!!!!!!!!!!!!!!!!!!!!!!!!//
+                //this.showComments(id_news)
+
                 //}
-                
+
                 const responseData = await response.json()
-                console.log(responseData)
+                // console.log(responseData)
+
+                // !!!!!!!!
+                const updatedComments = this.comments.find(
+                    (item) => item.news_id === id_news
+                )
+                if (updatedComments) {
+                    updatedComments.comments.push(responseData)
+                } else {
+                    this.comments.push({
+                        news_id: id_news,
+                        comments: [responseData],
+                    })
+                }
+
+                // Обновляем состояние хранилища
+                this.$patch({
+                    comments: this.comments,
+                })
             } catch (error) {
                 console.error("Authentication error:", error)
             }
         },
-    }
+    },
 })
