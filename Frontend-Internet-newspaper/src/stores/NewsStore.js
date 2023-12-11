@@ -39,10 +39,6 @@ export const useNewsStore = defineStore("news", {
                 const responseData = await response.json()
                 this.news = responseData
                 console.log(responseData)
-
-                //load_comments
-                //this.news.push(this.newCommets)
-                //console.log("Response data:", responseData)
             } catch (error) {
                 console.error("Fetch error:", error)
             }

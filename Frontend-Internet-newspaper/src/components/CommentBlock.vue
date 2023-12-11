@@ -29,6 +29,8 @@ const filteredComments = computed(() =>
     CommentsStore.comments.filter((obj) => obj.news_id === post.id)
 )
 
+import CommentItem from "@/components/CommentItem.vue"
+
 // const getCommetsByNewsId = (comments, news_id) => {
 //    const com = comments.filter(obj => obj.news_id === news_id)
 //    console.log(com)
@@ -72,65 +74,49 @@ const filteredComments = computed(() =>
 
     <!-- v-if = "CommentsStore.showed && CommentsStore.comments.length !== 0" -->
     <div class="comments_content">
-        {{ CommentsStore.comments
+        <!-- {{
+            CommentsStore.comments
                 .filter((obj) => obj.news_id === post.id) // Фильтрация по news_id равному post.id
-                .flatMap((obj) => obj.comments) }}
-        <b-card
-            v-for="(item, index) in CommentsStore.comments
-                .filter((obj) => obj.news_id === post.id) // Фильтрация по news_id равному post.id
+                .flatMap((obj) => obj.comments)
+        }} -->
+
+        <comment-item
+            v-for="comment in CommentsStore.comments
+                .filter((obj) => obj.news_id === post.id)
                 .flatMap((obj) => obj.comments)"
-            style="margin-top: 10px"
-            :key="index"
+            :key="comment.id"
+            :comment="comment"
+            :post="post"
         >
-            <div class="comment_info">
-                <span class="text-gray-500 uppercase text-xs"
-                    ><b>{{ item.user.name + " " + item.user.surname }}</b></span
-                >
-                <span class="text-gray-500 uppercase text-xs">{{
-                    item.datePublishedComment
-                }}</span>
-            </div>
-            <div class="com_cont">
-                <p>{{ item.textComment }}</p>
-                <span
-                    v-if="user_id == item.user.id || user_role == 'ROLE_ADMIN'"
-                    @click="NewsStore.deleteComment(item.id)"
-                    style="cursor: pointer"
-                >
-                    <img
-                        src="@/assets/urna.svg"
-                        alt="urna"
-                    />
-                </span>
-            </div>
-        </b-card>
+        </comment-item>
         <!-- </div> -->
     </div>
     <!-- v-if = "CommentsStore.commentsCount >=3" -->
     <!-- v-if = "(CommentsStore.comments.filter((obj) => obj.news_id === post.id).flatMap((obj) => obj.comments)).length < CommentsStore.commentsCount" -->
 
-    <a 
-            href="" 
-        @click.prevent="CommentsStore.showComments(post.id)"
+    <a
+        v-if="CommentsStore.commentsCount >= 3"
+        href=""
+        @click.prevent="CommentsStore.showComments(post.id, 2)"
         >Еще</a
     >
 </template>
 
 <style scoped>
-.com_cont {
+/* .com_cont {
     display: flex;
     flex-direction: row;
     align-items: flex-end;
     justify-content: space-between;
-}
+} */
 .footer {
     background-color: #fff;
 }
-.comment_info {
+/* .comment_info {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-}
+} */
 .comments_content {
     display: flex;
     flex-direction: column;

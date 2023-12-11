@@ -43,8 +43,10 @@ export const useCommentsStore = defineStore("comments", {
                 console.error("Authentication error:", error)
             }
         },
-        async showComments(news_id) {
-            console.log(news_id)
+        async showComments(news_id, num) {
+            if (num === 1) {
+                this.showed = !this.showed
+            } 
             try {
                 const response = await fetch(
                     `http://localhost:8085/comment/show?newsId=${news_id}`,
@@ -76,7 +78,6 @@ export const useCommentsStore = defineStore("comments", {
                 console.log(this.comments)
                 // const NewsStore = useNewsStore()
                 // NewsStore.getnews()
-                this.showed = true
 
                 //почему он для всех все открывает((()))
                 this.checkCommentsCount(news_id)
