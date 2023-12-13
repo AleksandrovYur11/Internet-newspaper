@@ -18,9 +18,9 @@ const user_role = ref(sessionStorage.getItem("user_role"))
 
 const new_comment = ref("")
 
-const filteredComments = computed(() =>
-    CommentsStore.comments.filter((obj) => obj.news_id === post.id)
-)
+// const filteredComments = computed(() =>
+//     CommentsStore.comments.filter((obj) => obj.news_id === post.id)
+// )
 </script>
 <!-- @keyup.enter="handleCreatePost" -->
 <template>
@@ -61,11 +61,11 @@ const filteredComments = computed(() =>
     </div>
     <!-- v-if="CommentsStore.commentsCount >= 3 && CommentsStore.comments.filter((obj) => obj.news_id === post.id).flatMap((obj) => obj.comments).length < CommentsStore.commentsCount" -->
 
-    <a
+    <!-- <a
         href=""
         @click.prevent="CommentsStore.showComments(post.id, 2)"
         >Еще</a
-    >
+    > -->
 </template>
 
 <style scoped>

@@ -91,7 +91,8 @@ const user_role = ref(sessionStorage.getItem("user_role"))
                 >
             </div>
             <!-- v-if="showComments" -->
-            <comment-block v-if = "CommentsStore.showed"
+            <!-- v-if = "CommentsStore.showed" -->
+            <comment-block
                 :post="post"
             ></comment-block>
         </div>
