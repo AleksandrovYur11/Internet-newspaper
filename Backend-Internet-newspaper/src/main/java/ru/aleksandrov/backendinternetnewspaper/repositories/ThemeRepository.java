@@ -7,6 +7,5 @@ import ru.aleksandrov.backendinternetnewspaper.model.Theme;
 import java.util.Optional;
 @Repository
 public interface ThemeRepository extends JpaRepository<Theme, Integer> {
-
     Optional<Theme> findThemeByName(String name);
 }

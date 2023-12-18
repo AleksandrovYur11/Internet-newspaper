@@ -21,12 +21,9 @@ public class  Picture {
     private Integer id;
 
     @URL(message = "URL picture must be format URL" )
+    @NotBlank(message = "The URL should not be empty")
     private String url;
 
-    @Lob
-    private byte[] picture;
-
     @OneToMany(mappedBy = "picture")
-//    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
     private List<News> news;
 }

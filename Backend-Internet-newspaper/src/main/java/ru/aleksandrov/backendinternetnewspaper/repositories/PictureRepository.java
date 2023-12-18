@@ -13,10 +13,6 @@ import java.util.Optional;
 public interface PictureRepository extends JpaRepository<Picture, Integer> {
     @Transactional
     Optional<Picture> findPictureById(Integer id);
-
     @Transactional
     Optional<Picture> findByUrl(String url);
-
-    @Transactional
-    Optional<Picture> findByNews(News news);
 }

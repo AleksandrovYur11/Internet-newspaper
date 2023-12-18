@@ -19,7 +19,7 @@ public interface NewsRepository extends JpaRepository<News, Integer> {
     Optional<News> findByNewsTitle(String title);
 
     @Transactional
-    @Query("SELECT n FROM news n WHERE n.timePublishedNewsMsk >= :twentyFourHoursAgo ORDER BY n.timePublishedNewsMsk DESC")
+    @Query("SELECT n FROM news n WHERE n.datePublishedNews >= :twentyFourHoursAgo ORDER BY n.datePublishedNews DESC")
     List<News> findNewsInLastTwentyFourHours(@Param("twentyFourHoursAgo") LocalDateTime twentyFourHoursAgo);
     //------------------------------
 //    @Transactional
@@ -33,7 +33,7 @@ public interface NewsRepository extends JpaRepository<News, Integer> {
     @Query("SELECT n FROM news n " +
             "WHERE (EXISTS (SELECT t1 FROM n.theme t1 WHERE t1 IN :favoritesThemes)) AND " +
             "NOT EXISTS (SELECT t2 FROM n.theme t2 WHERE t2 IN :forbiddenThemes)")
-    List<News> findNewsByUserThemes(
+    List<News> findNewsByThemes(
             @Param("favoritesThemes") Set<Theme> favoritesThemes,
             @Param("forbiddenThemes") Set<Theme> forbiddenThemes);
 //-------------------------------------------
@@ -48,7 +48,7 @@ public interface NewsRepository extends JpaRepository<News, Integer> {
             "WHERE t IN :favoritesThemes " +
             "GROUP BY n " +
             "HAVING COUNT(t) = :themeCount")
-    List<News> findNewsByFavoriteUserThemes(
+    List<News> findNewsByFavoriteThemes(
             @Param("favoritesThemes") Set<Theme> favoritesThemes,
             @Param("themeCount") long themeCount);
     //-----------------------------
@@ -60,8 +60,8 @@ public interface NewsRepository extends JpaRepository<News, Integer> {
 //    List<News> findNewsByForbiddenUserThemes(
 //            @Param("forbiddenThemes") Set<Theme> forbiddenThemes);
     @Transactional
-    @Query("SELECT DISTINCT n FROM news n WHERE n.theme NOT IN :forbiddenThemes")
-    List<News> findNewsByForbiddenUserThemes(
+    @Query("SELECT n FROM news n WHERE n.theme NOT IN :forbiddenThemes")
+    List<News> findNewsByForbiddenThemes(
             @Param("forbiddenThemes") Set<Theme> forbiddenThemes);
     //---------------------------------
 }

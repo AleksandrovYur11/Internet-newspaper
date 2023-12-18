@@ -4,22 +4,17 @@ package ru.aleksandrov.backendinternetnewspaper.services;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.aleksandrov.backendinternetnewspaper.dto.NewsDto;
-import ru.aleksandrov.backendinternetnewspaper.dto.PictureDto;
-import ru.aleksandrov.backendinternetnewspaper.dto.ThemeDto;
+import ru.aleksandrov.backendinternetnewspaper.dto.model.NewsDto;
+import ru.aleksandrov.backendinternetnewspaper.dto.model.PictureDto;
+import ru.aleksandrov.backendinternetnewspaper.dto.model.ThemeDto;
 import ru.aleksandrov.backendinternetnewspaper.model.*;
 import ru.aleksandrov.backendinternetnewspaper.repositories.NewsRepository;
-import ru.aleksandrov.backendinternetnewspaper.repositories.PictureRepository;
-import ru.aleksandrov.backendinternetnewspaper.repositories.ThemeRepository;
 import ru.aleksandrov.backendinternetnewspaper.util.MappingUtil;
 
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,16 +23,16 @@ public class NewsService {
 
     private final NewsRepository newsRepository;
     private final MappingUtil mappingUtil;
-    private final PictureRepository pictureRepository;
-    private final ThemeRepository themeRepository;
+    private final ThemeService themeService;
+    private final PictureService pictureService;
 
     @Autowired
     public NewsService(NewsRepository newsRepository, MappingUtil mappingUtil,
-                       PictureRepository pictureRepository, ThemeRepository themeRepository) {
+                       ThemeService themeService, PictureService pictureService) {
         this.newsRepository = newsRepository;
         this.mappingUtil = mappingUtil;
-        this.pictureRepository = pictureRepository;
-        this.themeRepository = themeRepository;
+        this.themeService = themeService;
+        this.pictureService = pictureService;
     }
 
     public News getNewsById(Integer newsId) {
@@ -48,12 +43,12 @@ public class NewsService {
                 });
     }
 
-    public News saveNews(NewsDto newNewsDto) throws IllegalAccessException {
+    public News saveNews(NewsDto newNewsDto) {
         LocalDateTime moscowTimeNow = LocalDateTime.now(ZoneId.of("Europe/Moscow"));
         News newNews = new News();
         newNews.setNewsTitle(newNewsDto.getNewsTitle());
         newNews.setNewsText(newNewsDto.getNewsText());
-        newNews.setTimePublishedNewsMsk(moscowTimeNow);
+        newNews.setDatePublishedNews(moscowTimeNow);
 //        News savedNews = newsRepository.save(News.builder()
 //                .newsTitle(newNewsDto.getNewsText())
 //                .newsText(newNewsDto.getNewsText())
@@ -102,41 +97,14 @@ public class NewsService {
         log.info("Delete news by id = {}: Success", newsId);
     }
 
-    public void updateNews(Integer newsId, NewsDto updatedNewsDto) throws IllegalAccessException {
+    public void updateNews(Integer newsId, NewsDto updatedNewsDto) {
         News news = getNewsById(newsId);
         news.setNewsTitle(updatedNewsDto.getNewsTitle());
         news.setNewsText(updatedNewsDto.getNewsText());
-//        news.setTimePublishedNewsMsk(moscowTimeNow);
-//        news.setComments(updatedNewsDto.getComments());
-//        news.setLikes(updatedNewsDto.getLikes());
-
-        //---------------------------------
-//        Picture newPicture = mappingUtil.convertToPicture(updatedNewsDto.getPicture());
-//        if (pictureRepository.findByUrl(newPicture.getUrl()).isPresent()) {
-//            news.setPicture(mappingUtil.convertToPicture(updatedNewsDto.getPicture()));
-//        } else {
-//            pictureRepository.save(newPicture);
-//            news.setPicture(newPicture);
-//        }
-//
-//        Set<Theme> themes = updatedNewsDto.getThemes().stream()
-//                .map(mappingUtil::convertToTheme).collect(Collectors.toSet());
-//        Set<Theme> dbThemes = new HashSet<>();
-//        for (Theme theme : themes) {
-//            if (!themeRepository.findThemeByName(theme.getName()).isPresent()) {
-//                themeRepository.save(theme);
-//                dbThemes.add(theme);
-//            } else {
-//                dbThemes.add(themeRepository.findThemeByName(theme.getName()).get());
-//            }
-//        }
-//        news.setTheme(dbThemes);
-
         setPictureAndThemesForNews(news, updatedNewsDto.getPicture(), updatedNewsDto.getThemes());
         newsRepository.save(news);
         log.info("Update news by title = {}: Success", news.getNewsTitle());
     }
-
 
     public NewsDto convertToNewsDto(News news) {
         NewsDto newsDTO = mappingUtil.convertToNewsDto(news);
@@ -147,16 +115,6 @@ public class NewsService {
                     .collect(Collectors.toList()));
         }
 
-//        List<Comment> comments = news.getComments();
-//        if (!(comments == null)){
-//            newsDTO.setComments(comments.stream().map((comment) -> {
-//                        CommentDto commentDto = mappingUtil.convertToCommentDto(comment);
-//                        commentDto.setUser(mappingUtil.convertToUserDto(comment.getAuthorComment()));
-//                        return commentDto;
-//                    })
-//                    .collect(Collectors.toList()));
-//        }
-
         Picture picture = news.getPicture();
         newsDTO.setPicture(mappingUtil.convertToPictureDto(picture));
 
@@ -165,83 +123,45 @@ public class NewsService {
         return newsDTO;
     }
 
-//    public void updateNews(Integer idNews, NewsDto updatedNewsDto) {
-//        LocalDateTime moscowTimeNow = LocalDateTime.now(ZoneId.of("Europe/Moscow"));
-//        newsRepository.findById(idNews).map(
-//                news -> {
-//                    news.setNewsTitle(updatedNewsDto.getNewsText());
-//                    news.setNewsText(updatedNewsDto.getNewsTitle());
-//                    news.setTimePublishedNewsMsk(moscowTimeNow);
-//                    news.setPicture(mappingUtil.convertToPicture(updatedNewsDto.getPicture()));
-//                    news.setTheme(updatedNewsDto.getThemes().stream().map(mappingUtil::convertToTheme)
-//                            .collect(Collectors.toSet()));
-//                    News news1 = newsRepository.save(news);
-//                    return news;
-//                });
+    public List<NewsDto> getNewsByThemes(Set<Theme> favoriteThemes, Set<Theme> forbiddenThemes) {
+        List<NewsDto> newsListDto = new ArrayList<>();
+        Set<Theme> dbFavoriteThemes = new HashSet<>();
+        Set<Theme> dbForbiddenThemes = new HashSet<>();
+
+        if (!favoriteThemes.isEmpty() && !forbiddenThemes.isEmpty()) {
+            dbFavoriteThemes = themeService.getThemesFromDb(favoriteThemes);
+            dbForbiddenThemes = themeService.getThemesFromDb(forbiddenThemes);
+            newsListDto = newsRepository.findNewsByThemes(dbFavoriteThemes, dbForbiddenThemes).stream()
+                    .map(this::convertToNewsDto).collect(Collectors.toList());
+        } else if (!favoriteThemes.isEmpty()) {
+            dbFavoriteThemes = themeService.getThemesFromDb(favoriteThemes);
+            newsListDto = newsRepository.findNewsByFavoriteThemes(dbFavoriteThemes, dbFavoriteThemes.size()).stream()
+                    .map(this::convertToNewsDto).collect(Collectors.toList());
+        } else if (!forbiddenThemes.isEmpty()) {
+            dbForbiddenThemes = themeService.getThemesFromDb(forbiddenThemes);
+            newsListDto = newsRepository.findNewsByForbiddenThemes(dbForbiddenThemes).stream()
+                    .map(this::convertToNewsDto).collect(Collectors.toList());
+        }
+        return newsListDto;
+    }
+
+//    public List<News> getNewsByFavoriteThemes(Set<Theme> favoriteThemes) {
+//        return newsRepository.findNewsByFavoriteThemes(favoriteThemes, favoriteThemes.size());
+//    }
+//
+//    public List<News> getNewsByForbiddenThemes(Set<Theme> forbiddenThemes) {
+//        return newsRepository.findNewsByForbiddenThemes(forbiddenThemes);
 //    }
 
-    public List<News> getNewsByUserThemes(Set<Theme> favoriteThemes, Set<Theme> forbiddenThemes) {
-        return newsRepository.findNewsByUserThemes(favoriteThemes, forbiddenThemes);
-    }
 
-    public List<News> getNewsByFavoriteUserThemes(Set<Theme> favoriteThemes) {
-        return newsRepository.findNewsByFavoriteUserThemes(favoriteThemes, favoriteThemes.size());
-    }
+    private void setPictureAndThemesForNews(News news, PictureDto pictureDto, Set<ThemeDto> themesDto) {
+        Picture picture = mappingUtil.convertToPicture(pictureDto);
+        Picture savedPicture = pictureService.savePicture(picture);
+        news.setPicture(savedPicture);
 
-    public List<News> getNewsByForbiddenUserThemes(Set<Theme> forbiddenThemes) {
-        return newsRepository.findNewsByForbiddenUserThemes(forbiddenThemes);
-    }
-
-
-    private void setPictureAndThemesForNews(News news, PictureDto pictureDto, Set<ThemeDto> themesDto)
-            throws IllegalAccessException {
-
-        if (pictureDto == null && themesDto == null){
-            throw new IllegalAccessException("Please select the url for the image and name theme for the news");
-        }
-        try {
-            Picture newPicture = mappingUtil.convertToPicture(pictureDto);
-            Optional<Picture> optionalPicture = pictureRepository.findByUrl(pictureDto.getUrl());
-            if (optionalPicture.isPresent()) {
-                newPicture = optionalPicture.get();
-                news.setPicture(newPicture);
-            } else {
-                pictureRepository.save(newPicture);
-                news.setPicture(newPicture);
-            }
-        } catch (Exception exception) {
-            throw new IllegalAccessException("Please select the url for the image");
-        }
-
-        try {
-            Set<Theme> themes = themesDto.stream()
-                    .map(mappingUtil::convertToTheme).collect(Collectors.toSet());
-            Set<Theme> dbThemes = new HashSet<>();
-            for (Theme theme : themes) {
-                if (!themeRepository.findThemeByName(theme.getName()).isPresent()) {
-                    themeRepository.save(theme);
-                    dbThemes.add(theme);
-                } else {
-                    dbThemes.add(themeRepository.findThemeByName(theme.getName()).get());
-                }
-            }
-            news.setTheme(dbThemes);
-        } catch (Exception exception) {
-            throw new IllegalAccessException("Please select name theme for the news");
-        }
-//        Set<Theme> themes = themesDto.stream()
-//                .map(mappingUtil::convertToTheme).collect(Collectors.toSet());
-//        Set<Theme> dbThemes = new HashSet<>();
-//        for (Theme theme : themes) {
-//            if (!themeRepository.findThemeByName(theme.getName()).isPresent()) {
-//                themeRepository.save(theme);
-//                dbThemes.add(theme);
-//            } else {
-//                dbThemes.add(themeRepository.findThemeByName(theme.getName()).get());
-//            }
-//        }
-//        news.setTheme(dbThemes);
-//    }
-
+        Set<Theme> themes = themesDto.stream()
+                .map(mappingUtil::convertToTheme).collect(Collectors.toSet());
+        Set<Theme> savedThemes = themeService.saveThemes(themes);
+        news.setTheme(savedThemes);
     }
 }

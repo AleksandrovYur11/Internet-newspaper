@@ -26,14 +26,13 @@ public class RoleService {
     public Role getRoleByName(ERole role) {
         return roleRepository.findByName(role)
                 .orElseThrow(() -> {
-                    log.error("Role - " + role.name() + ": Not Found");
-                    return new EntityNotFoundException("Role - " + role.name() + ": Not Found");
+                    log.error("Role with name = " + role.name() + ": Not Found");
+                    return new EntityNotFoundException("Role with name =with name = " + role.name() + ": Not Found");
                 });
     }
 
     public void setDefaultRole(User user) {
-        Set<Role> role = new HashSet<>();
-        role.add(getRoleByName(ERole.ROLE_USER));
-        user.setRoles(role);
+        Role role = getRoleByName(ERole.ROLE_USER);
+        user.setRole(role);
     }
 }

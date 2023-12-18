@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import ru.aleksandrov.backendinternetnewspaper.model.User;
 import ru.aleksandrov.backendinternetnewspaper.repositories.UserRepository;
 
-
 @Service
 @Slf4j
 public class RegistrationService {
@@ -25,5 +24,4 @@ public class RegistrationService {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
-
 }

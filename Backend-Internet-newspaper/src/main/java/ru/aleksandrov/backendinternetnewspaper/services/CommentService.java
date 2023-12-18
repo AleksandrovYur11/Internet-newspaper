@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
-import ru.aleksandrov.backendinternetnewspaper.dto.CommentDto;
+import ru.aleksandrov.backendinternetnewspaper.dto.model.CommentDto;
 import ru.aleksandrov.backendinternetnewspaper.model.*;
 import ru.aleksandrov.backendinternetnewspaper.repositories.CommentRepository;
 import ru.aleksandrov.backendinternetnewspaper.security.services.UserDetailsImpl;
@@ -73,7 +73,7 @@ public class CommentService {
         return commentRepository.save(newComment);
     }
 
-    public void deleteComment(UserDetailsImpl userDetailsImpl, Integer commentId) {
+    public void deleteUserComment(UserDetailsImpl userDetailsImpl, Integer commentId) {
         int userId = userDetailsImpl.getId();
         if (userId == getCommentById(commentId).getAuthorComment().getId()) {
             commentRepository.deleteCommentByUserIdAndCommentId(userDetailsImpl.getId(), commentId);
@@ -107,7 +107,6 @@ public class CommentService {
 //        newsDTO.setThemes(themes.stream().map(mappingUtil::convertToThemeDto).collect(Collectors.toSet()));
         return commentDto;
     }
-
 
     public Slice<Comment> getThreeComments(Integer newsId, Pageable pageable) {
         return commentRepository.findThreeComments(newsId, pageable);
