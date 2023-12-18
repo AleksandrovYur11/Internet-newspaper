@@ -8,11 +8,7 @@ import ru.aleksandrov.backendinternetnewspaper.model.RefreshToken;
 import java.util.Optional;
 @Repository
 public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Integer> {
-
     Optional<RefreshToken> findByToken(String token);
-
-    @Transactional
-    void deleteByUserId(int id);
 }
 
 

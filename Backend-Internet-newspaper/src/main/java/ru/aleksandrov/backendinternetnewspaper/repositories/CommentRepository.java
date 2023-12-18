@@ -19,24 +19,18 @@ import java.util.Optional;
 public interface CommentRepository extends JpaRepository<Comment, Integer> {
     @Transactional
     Optional<Comment> findById(Long id);
-
     @Transactional
     List<Comment> findAll();
-
     @Transactional
     List<Comment> findByNews(News news);
-
-
     @Transactional
     @Modifying
     @Query("DELETE FROM comments c WHERE c.id = :commentId AND c.authorComment.id = :userId")
     void deleteCommentByUserIdAndCommentId(@Param("userId") Integer userId, @Param("commentId") Integer commentId);
 
     @Transactional
-    @Query("SELECT c FROM comments c WHERE c.news.id = :newsId ORDER BY c.datePublishedComment DESC")
+    @Query("SELECT c FROM comments c WHERE c.news.id = :newsId")
     Slice<Comment> findThreeComments(@Param("newsId") Integer newsId, Pageable pageable);
-
-
     Integer countByNewsId(Integer newsId);
 //    @Transactional
 //    @Query("SELECT c FROM comments c WHERE  EXISTS c.news.id = :newsId ")

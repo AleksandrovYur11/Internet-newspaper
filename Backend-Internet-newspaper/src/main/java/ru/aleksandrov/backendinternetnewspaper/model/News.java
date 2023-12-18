@@ -2,12 +2,15 @@ package ru.aleksandrov.backendinternetnewspaper.model;
 
 import lombok.*;
 import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -32,19 +35,20 @@ public class News {
     private String newsText;
 
 //    @Past(message = "The publication date must be before the present time")
-    @PastOrPresent(message = "The publication date must be before or in now present time")
-    private LocalDateTime timePublishedNewsMsk;
+//    @PastOrPresent(message = "The publication date must be before or in now present time")
+    private LocalDateTime datePublishedNews;
 
     @OneToMany(mappedBy = "news")
-    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Comment> comments;
 
     @ManyToOne
     @JoinColumn(name = "picture_id", referencedColumnName = "id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Picture picture;
 
     @OneToMany(mappedBy = "news")
-    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Like> likes;
 
     @ManyToMany(fetch = FetchType.EAGER)
@@ -52,6 +56,7 @@ public class News {
             joinColumns = @JoinColumn(name = "news_id"),
             inverseJoinColumns = @JoinColumn(name = "theme_id"))
     @NotNull(message = "News must have at least one theme")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<Theme> theme = new HashSet<>();
 
 }

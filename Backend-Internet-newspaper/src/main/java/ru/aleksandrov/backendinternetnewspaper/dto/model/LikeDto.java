@@ -1,4 +1,4 @@
-package ru.aleksandrov.backendinternetnewspaper.dto;
+package ru.aleksandrov.backendinternetnewspaper.dto.model;
 
 import lombok.*;
 
@@ -9,7 +9,7 @@ import javax.validation.Valid;
 @AllArgsConstructor
 @NoArgsConstructor
 public class LikeDto {
-
     private Integer id;
+    @Valid
     private UserDto user;
 }

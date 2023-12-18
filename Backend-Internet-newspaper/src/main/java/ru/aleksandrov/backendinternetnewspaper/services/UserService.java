@@ -7,7 +7,6 @@ import ru.aleksandrov.backendinternetnewspaper.model.User;
 import ru.aleksandrov.backendinternetnewspaper.repositories.UserRepository;
 
 import javax.persistence.EntityNotFoundException;
-import java.util.Optional;
 
 @Service
 @Slf4j

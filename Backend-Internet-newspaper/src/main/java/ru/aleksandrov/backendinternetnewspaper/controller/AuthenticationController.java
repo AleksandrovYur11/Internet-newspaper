@@ -4,21 +4,23 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import ru.aleksandrov.backendinternetnewspaper.model.RefreshToken;
 import ru.aleksandrov.backendinternetnewspaper.model.User;
-import ru.aleksandrov.backendinternetnewspaper.payload.request.SigninRequest;
-import ru.aleksandrov.backendinternetnewspaper.payload.request.RefreshTokenRequest;
-import ru.aleksandrov.backendinternetnewspaper.payload.request.SignupRequest;
-import ru.aleksandrov.backendinternetnewspaper.payload.response.SigninResponse;
-import ru.aleksandrov.backendinternetnewspaper.payload.response.RefreshTokenResponse;
-import ru.aleksandrov.backendinternetnewspaper.repositories.UserRepository;
+import ru.aleksandrov.backendinternetnewspaper.dto.payload.request.SigninRequestDto;
+import ru.aleksandrov.backendinternetnewspaper.dto.payload.request.RefreshTokenRequestDto;
+import ru.aleksandrov.backendinternetnewspaper.dto.payload.request.SignupRequestDto;
+import ru.aleksandrov.backendinternetnewspaper.dto.payload.response.SigninResponseDto;
+import ru.aleksandrov.backendinternetnewspaper.dto.payload.response.RefreshTokenResponseDto;
 import ru.aleksandrov.backendinternetnewspaper.security.JWT.JwtUtils;
 import ru.aleksandrov.backendinternetnewspaper.security.exception.TokenRefreshException;
 import ru.aleksandrov.backendinternetnewspaper.security.services.RefreshTokenService;
@@ -26,6 +28,7 @@ import ru.aleksandrov.backendinternetnewspaper.security.services.UserDetailsImpl
 import ru.aleksandrov.backendinternetnewspaper.services.RegistrationService;
 import ru.aleksandrov.backendinternetnewspaper.services.RoleService;
 import ru.aleksandrov.backendinternetnewspaper.util.MappingUtil;
+import ru.aleksandrov.backendinternetnewspaper.util.UserValidator;
 
 import javax.validation.Valid;
 import java.util.HashMap;
@@ -33,29 +36,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin
 @RestController
 @RequestMapping("/auth")
 @Slf4j
 public class AuthenticationController {
 
+    private final UserValidator userValidator;
     private final RegistrationService registrationService;
-    private final UserRepository userRepository;
     private final MappingUtil mappingUtil;
-
     private final AuthenticationManager authenticationManager;
-
     private final JwtUtils jwtUtils;
-
     private final RefreshTokenService refreshTokenService;
     private final RoleService roleService;
 
     @Autowired
-    public AuthenticationController(RegistrationService registrationService, UserRepository userRepository,
+    public AuthenticationController(UserValidator userValidator, RegistrationService registrationService,
                                     MappingUtil mappingUtil, AuthenticationManager authenticationManager,
                                     JwtUtils jwtUtils, RefreshTokenService refreshTokenService, RoleService roleService) {
+        this.userValidator = userValidator;
         this.registrationService = registrationService;
-        this.userRepository = userRepository;
         this.mappingUtil = mappingUtil;
         this.authenticationManager = authenticationManager;
         this.jwtUtils = jwtUtils;
@@ -64,10 +64,10 @@ public class AuthenticationController {
     }
 
     @PostMapping("/sign-in")
-    public ResponseEntity<SigninResponse> login(@RequestBody @Valid SigninRequest signinRequest) {
+    public ResponseEntity<SigninResponseDto> login(@RequestBody @Valid SigninRequestDto signinRequestDto) {
         Authentication authentication = authenticationManager
-                .authenticate(new UsernamePasswordAuthenticationToken(signinRequest.getEmail(),
-                        signinRequest.getPassword()));
+                .authenticate(new UsernamePasswordAuthenticationToken(signinRequestDto.getEmail(),
+                        signinRequestDto.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
@@ -76,44 +76,52 @@ public class AuthenticationController {
         List<String> roles = userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
 
-        SigninResponse signinResponse = new SigninResponse(accessJwt, refreshToken.getToken(), userDetails.getId(),
-                userDetails.getName(), roles);
-
-        return new ResponseEntity<>(signinResponse, HttpStatus.OK);
+        SigninResponseDto signinResponseDto = SigninResponseDto.builder()
+                .accessToken(accessJwt)
+                .refreshToken(refreshToken.getToken())
+                .id(userDetails.getId())
+                .name(userDetails.getName())
+                .roles(roles)
+                .build();
+        return new ResponseEntity<>(signinResponseDto, HttpStatus.OK);
     }
 
     @PostMapping("/sign-up")
-    public ResponseEntity<?> perfectRegistration(@RequestBody @Valid SignupRequest signupRequest) {
-        if (userRepository.existsByEmail(signupRequest.getEmail())) {
-            Map<String, String> error = new HashMap<>();
-            error.put("email", "User with this email already exists");
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    public ResponseEntity<?> registration(@RequestBody @Valid SignupRequestDto signupRequestDto,
+                                          BindingResult bindingResult) {
+        userValidator.validate(signupRequestDto, bindingResult);
+        if (bindingResult.hasErrors()) {
+            Map<String, String> errors = new HashMap<>();
+            bindingResult.getAllErrors().forEach(error -> {
+                String fieldName = ((FieldError) error).getField();
+                String errorMessage = error.getDefaultMessage();
+                errors.put(fieldName, errorMessage);
+            });
+            return new ResponseEntity<>(errors, HttpStatus.CONFLICT);
         }
-
-        User newUser = mappingUtil.convertToUser(signupRequest);
+        User newUser = mappingUtil.convertToUser(signupRequestDto);
         roleService.setDefaultRole(newUser);
         registrationService.register(newUser);
-
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PostMapping("/refresh-token")
-    public ResponseEntity<?> refreshToken(@Valid @RequestBody RefreshTokenRequest refreshTokenRequest) {
-        String refreshToken = refreshTokenRequest.getRefreshToken();
+    public ResponseEntity<?> createNewAccessToken(@Valid @RequestBody RefreshTokenRequestDto refreshTokenRequestDto) {
+        String refreshToken = refreshTokenRequestDto.getRefreshToken();
         return refreshTokenService.findByToken(refreshToken)
                 .map(refreshTokenService::verifyExpiration)
                 .map(RefreshToken::getUser)
                 .map(user -> {
 //                    Collection<? extends GrantedAuthority> authorities = new ArrayList<>(user.getRoles());
                     String newAccessToken = jwtUtils.generateJwtToken(UserDetailsImpl.build(user));
-                    return ResponseEntity.ok(new RefreshTokenResponse(newAccessToken, refreshToken));
+                    return ResponseEntity.ok(new RefreshTokenResponseDto(newAccessToken, refreshToken));
                 })
-                .orElseThrow(() -> new TokenRefreshException(refreshToken,
-                        "Refresh token is not in database"));
+                .orElseThrow(() -> new TokenRefreshException(refreshToken, "Refresh token is not in database"));
     }
 
     @PostMapping("/sign-out")
-    public ResponseEntity<?> logoutUser(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity<?> logout(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         int userId = userDetails.getId();
         refreshTokenService.deleteRefreshToken(userId);
         return new ResponseEntity<>(HttpStatus.OK);

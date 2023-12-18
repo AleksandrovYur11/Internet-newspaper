@@ -8,25 +8,21 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import ru.aleksandrov.backendinternetnewspaper.model.News;
 import ru.aleksandrov.backendinternetnewspaper.model.User;
-import ru.aleksandrov.backendinternetnewspaper.repositories.UserRepository;
 import ru.aleksandrov.backendinternetnewspaper.security.services.UserDetailsImpl;
 import ru.aleksandrov.backendinternetnewspaper.services.LikesService;
 import ru.aleksandrov.backendinternetnewspaper.services.NewsService;
 import ru.aleksandrov.backendinternetnewspaper.services.UserService;
 
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin
 @RestController
 @RequestMapping("/likes")
 public class LikesController {
-    private final UserRepository userRepository;
     private final NewsService newsService;
     private final LikesService likesService;
     private final UserService userService;
 
     @Autowired
-    public LikesController(UserRepository userRepository, NewsService newsService,
-                           LikesService likesService, UserService userService) {
-        this.userRepository = userRepository;
+    public LikesController(NewsService newsService, LikesService likesService, UserService userService) {
         this.newsService = newsService;
         this.likesService = likesService;
         this.userService = userService;
@@ -51,6 +47,4 @@ public class LikesController {
         likesService.deleteLike(news, user);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
-
-
 }

@@ -1,4 +1,4 @@
-package ru.aleksandrov.backendinternetnewspaper.dto;
+package ru.aleksandrov.backendinternetnewspaper.dto.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,6 +16,6 @@ import javax.validation.constraints.NotBlank;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ThemeDto {
-    @NotBlank(message = "Theme must be not empty")
+    @NotBlank(message = "The theme should not be empty")
     private String name;
 }

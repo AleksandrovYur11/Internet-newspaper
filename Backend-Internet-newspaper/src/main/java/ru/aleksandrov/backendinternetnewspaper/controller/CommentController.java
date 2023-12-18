@@ -4,12 +4,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import ru.aleksandrov.backendinternetnewspaper.dto.CommentDto;
+import ru.aleksandrov.backendinternetnewspaper.dto.model.CommentDto;
 import ru.aleksandrov.backendinternetnewspaper.model.Comment;
 import ru.aleksandrov.backendinternetnewspaper.security.services.UserDetailsImpl;
 import ru.aleksandrov.backendinternetnewspaper.services.CommentService;
@@ -21,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin
 @RestController
 @RequestMapping("/comment")
 public class CommentController {
@@ -39,7 +40,8 @@ public class CommentController {
     @GetMapping("/show")
     public ResponseEntity<List<CommentDto>> getCommentsForNews(@RequestParam("newsId") Integer newsId) {
         Integer loadedCommentsCount = loadedCommentsCountMap.getOrDefault(newsId, 0);
-        Pageable pageable = PageRequest.of(loadedCommentsCount / 3, 3);
+        Pageable pageable = PageRequest.of(loadedCommentsCount / 3, 3,
+                Sort.by(Sort.Direction.DESC, "datePublishedComment"));
         Slice<Comment> commentsSlice = commentService.getThreeComments(newsId, pageable);
         List<CommentDto> commentDto = commentsSlice.getContent().stream()
                 .map(commentService::convertToCommentDto).collect(Collectors.toList());
@@ -58,7 +60,7 @@ public class CommentController {
     @PostMapping("/save")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<CommentDto> saveComment(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl,
-                                                  @RequestParam("newsId") int newsId,
+                                                  @RequestParam("newsId") Integer newsId,
                                                   @RequestBody @Valid CommentDto commentDTO) {
         Comment newComment = mappingUtil.convertToComment(commentDTO);
         Comment savedComment = commentService.saveComment(userDetailsImpl, newComment, newsId);
@@ -70,7 +72,7 @@ public class CommentController {
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<HttpStatus> userDeleteComment(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl,
                                                         @PathVariable("commentId") Integer commentId) {
-        commentService.deleteComment(userDetailsImpl, commentId);
+        commentService.deleteUserComment(userDetailsImpl, commentId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
@@ -80,5 +82,4 @@ public class CommentController {
         commentService.deleteCommentById(commentId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
-
 }

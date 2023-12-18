@@ -2,6 +2,8 @@ package ru.aleksandrov.backendinternetnewspaper.model;
 
 import lombok.*;
 import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
@@ -36,25 +38,28 @@ public class User {
     @Email(message = "Write this line as an email")
     private String email;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinTable(name =  "user_roles",
     joinColumns = @JoinColumn(name = "user_id"),
-    inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private Set<Role> roles = new HashSet<>();
+    inverseJoinColumns = @JoinColumn(name = "role_name"))
+    private Role role;
 
     @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-zA-Z]).{8,}$",
             message = "The password must contain uppercase and lowercase characters, as well as a number from 0 to 9")
-    @Column(name = "password", unique = true)
+    @Column(name = "password")
     private String password;
 
     @OneToMany(mappedBy = "authorComment")
-    @Cascade(org.hibernate.annotations.CascadeType.ALL)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+
     private List<Comment> comments;
 
     @OneToMany(mappedBy = "user")
-    @Cascade(org.hibernate.annotations.CascadeType.ALL)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+
     private List<Like> likes;
 
     @OneToOne(mappedBy = "user")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private RefreshToken refreshToken;
 }

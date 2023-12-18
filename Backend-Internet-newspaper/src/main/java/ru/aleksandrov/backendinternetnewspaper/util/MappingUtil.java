@@ -3,16 +3,15 @@ package ru.aleksandrov.backendinternetnewspaper.util;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.aleksandrov.backendinternetnewspaper.dto.*;
+import ru.aleksandrov.backendinternetnewspaper.dto.model.*;
 import ru.aleksandrov.backendinternetnewspaper.model.*;
-import ru.aleksandrov.backendinternetnewspaper.payload.request.SignupRequest;
+import ru.aleksandrov.backendinternetnewspaper.dto.payload.request.SignupRequestDto;
 
 
 @Service
 public class MappingUtil {
 
     private final ModelMapper modelMapper;
-
 
     @Autowired
     public MappingUtil(ModelMapper modelMapper) {
@@ -39,7 +38,6 @@ public class MappingUtil {
         return modelMapper.map(likeDto, Like.class);
     }
 
-
     public PictureDto convertToPictureDto(Picture picture) {
         return modelMapper.map(picture, PictureDto.class);
     }
@@ -56,8 +54,8 @@ public class MappingUtil {
         return modelMapper.map(user, UserDto.class);
     }
 
-    public User convertToUser(SignupRequest signupRequest) {
-        return modelMapper.map(signupRequest, User.class);
+    public User convertToUser(SignupRequestDto signupRequestDto) {
+        return modelMapper.map(signupRequestDto, User.class);
     }
 
     public ThemeDto convertToThemeDto(Theme theme) {

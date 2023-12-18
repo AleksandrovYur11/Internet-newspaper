@@ -15,7 +15,4 @@ import java.util.Optional;
 public interface LikesRepositories extends JpaRepository<Like, Integer> {
     @Transactional
     Optional<Like> findLikeByNewsAndUser(News news, User user);
-
-    @Transactional
-    List<Like> findLikeByNews(News news);
 }

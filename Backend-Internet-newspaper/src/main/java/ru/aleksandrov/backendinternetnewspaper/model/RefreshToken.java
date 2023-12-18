@@ -14,7 +14,7 @@ import java.time.Instant;
 @NoArgsConstructor
 public class RefreshToken {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @OneToOne
@@ -25,6 +25,7 @@ public class RefreshToken {
     @NotBlank(message = "Refresh token must be not empty")
     private String token;
 
-    @Column(nullable = false)
+    @Column
+    @NotBlank(message = "Refresh token must be not empty")
     private Instant expiryDate;
 }

@@ -19,9 +19,7 @@ import java.util.UUID;
 public class RefreshTokenService {
     @Value("${internet-newspaper.app.jwtRefreshExpirationMs}")
     private Long refreshTokenDurationsMs;
-
     private final RefreshTokenRepository refreshTokenRepository;
-
     private final UserRepository userRepository;
 
     @Autowired
