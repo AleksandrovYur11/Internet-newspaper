@@ -6,7 +6,7 @@ export const useCommentsStore = defineStore("comments", {
         comments: [],
         news: null,
         commentsCount: 0,
-        showed: false,
+        showed: true,
     }),
     actions: {
         async checkCommentsCount(id_news) {
@@ -33,6 +33,13 @@ export const useCommentsStore = defineStore("comments", {
         },
         async showComments(news_id, num) {
             try {
+
+                // this.showed[news_id] = true
+
+                //const showed_post_comments = false
+                //this.showed[news_id] = showed_post_comments
+                //выставить всем false нафиг()
+                //this.showed[news_id] =  !this.showed[news_id]
 
                 const response = await fetch(
                     `http://localhost:8085/comment/show?newsId=${news_id}`,
@@ -134,6 +141,75 @@ export const useCommentsStore = defineStore("comments", {
                 this.$patch({
                     comments: this.comments,
                 })
+            } catch (error) {
+                console.error("Authentication error:", error)
+            }
+        },
+        async deleteComment(id_comment) {
+            const role = sessionStorage.getItem("user_role")
+            const jwtToken = sessionStorage.getItem("jwtToken")
+            
+            if (!jwtToken) {
+                console.error("Отсутствует JWT-токен!")
+                return
+            } else {
+                console.log(jwtToken)
+            }
+            try {
+                if (role == "ROLE_ADMIN") {
+                    const response = await fetch(
+                        `http://localhost:8085/comment/admin/${id_comment}`,
+                        {
+                            method: "DELETE",
+                            headers: new Headers({
+                                Authorization: "Bearer " + jwtToken,
+                                "Content-Type": "application/json",
+                            }),
+                        }
+                    )
+                    
+                    if (!response.ok) {
+                        alert("Удаление не прошло")
+                        throw new Error("Authentication failed")
+                    }
+
+                    if (response.status === 204) {
+                        console.log("Комментарий успешно удален");
+                    }
+
+                
+                } else if (role == "ROLE_USER") {
+                    const response = await fetch(
+                        `http://localhost:8085/comment/user/${id_comment}`,
+                        {
+                            method: "DELETE",
+                            headers: new Headers({
+                                Authorization: "Bearer " + jwtToken,
+                                "Content-Type": "application/json",
+                            }),
+                        }
+                    )
+                    if (!response.ok) {
+                        alert("Удаление не прошло")
+                        throw new Error("Authentication failed")
+                    }
+
+                    if (response.status === 204) {
+                        console.log("Комментарий успешно удален");
+                    }
+                }
+
+                const updatedComments = this.comments.map(com => {
+                    const filtrComments = com.comments.filter(comment => comment.id !== id_comment)
+                    return { news_id: com.news_id, comments: filtrComments }
+                })
+
+                console.log(updatedComments)
+
+                this.$patch({
+                    comments: updatedComments,
+                })
+
             } catch (error) {
                 console.error("Authentication error:", error)
             }

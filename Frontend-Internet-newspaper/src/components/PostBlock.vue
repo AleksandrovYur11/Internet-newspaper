@@ -85,14 +85,13 @@ const user_role = ref(sessionStorage.getItem("user_role"))
                 <a
                     href=""
                     @click.prevent = "CommentsStore.showComments(post.id, 1)"
-                    
                 >
                     Комментарии</a
                 >
             </div>
             <!-- v-if="showComments" -->
             <!-- v-if = "CommentsStore.showed" -->
-            <comment-block
+            <comment-block  v-if = "CommentsStore.showed == true"
                 :post="post"
             ></comment-block>
         </div>

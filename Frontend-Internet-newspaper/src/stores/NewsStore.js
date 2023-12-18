@@ -17,10 +17,6 @@ export const useNewsStore = defineStore("news", {
         newCommets: [],
     }),
     actions: {
-        loadNewComments() {
-            const CommentsStore = useCommentsStore()
-            this.newCommets = CommentsStore.comments
-        },
         async getnews() {
             this.news = []
             try {
@@ -38,59 +34,15 @@ export const useNewsStore = defineStore("news", {
                 }
                 const responseData = await response.json()
                 this.news = responseData
-                console.log(responseData)
+
+                // const CommentsStore = useCommentsStore()
+                // CommentsStore.showComments()
+                
+                this.$patch({
+                    news: this.news,
+                })
             } catch (error) {
                 console.error("Fetch error:", error)
-            }
-        },
-        async deleteComment(id_comment) {
-            const role = sessionStorage.getItem("user_role")
-            const jwtToken = sessionStorage.getItem("jwtToken")
-            console.log(jwtToken)
-
-            if (!jwtToken) {
-                console.error("Отсутствует JWT-токен!")
-                return
-            } else {
-                console.log(jwtToken)
-            }
-            try {
-                if (role == "ROLE_ADMIN") {
-                    const response = await fetch(
-                        `http://localhost:8085/comment/admin/${id_comment}`,
-                        {
-                            method: "DELETE",
-                            headers: new Headers({
-                                Authorization: "Bearer " + jwtToken,
-                                "Content-Type": "application/json",
-                            }),
-                        }
-                    )
-                    if (!response.ok) {
-                        alert("Удаление не прошло")
-                        throw new Error("Authentication failed")
-                    }
-                } else if (role == "ROLE_USER") {
-                    const response = await fetch(
-                        `http://localhost:8085/comment/user/${id_comment}`,
-                        {
-                            method: "DELETE",
-                            headers: new Headers({
-                                Authorization: "Bearer " + jwtToken,
-                                "Content-Type": "application/json",
-                            }),
-                        }
-                    )
-                    if (!response.ok) {
-                        alert("Удаление не прошло")
-                        throw new Error("Authentication failed")
-                    }
-                }
-                this.getnews()
-                // const responseData = await response.json()
-                // console.log(responseData)
-            } catch (error) {
-                console.error("Authentication error:", error)
             }
         },
         async addLike(id_news, user_id) {
@@ -100,26 +52,44 @@ export const useNewsStore = defineStore("news", {
                 return
             }
             try {
-                //this.getnews()
-                console.log(jwtToken)
                 console.log(this.news)
-                const hasNewsWithCommentByUser = this.news.some((item) => {
-                    if (item.likes.length !== 0) {
-                        console.log(
-                            item.likes.some((like) => like.user.id == user_id)
-                        )
-                        console.log(item.likes[0].user.id)
-                        console.log(user_id)
-                        return (
-                            item.id === id_news &&
-                            item.likes.some((like) => like.user.id == user_id)
-                        )
-                    } else {
-                        return false
-                    }
-                })
 
-                if (hasNewsWithCommentByUser) {
+                const likes = []
+
+                this.news.forEach((news) => {
+                    if (news.id === id_news && news.likes && news.likes.length !== 0) {
+                        news.likes.forEach((like) => {
+                        if (like.user.id === user_id) {
+                            likes.push(news[id_news].likes);
+                        }
+                      })
+                    //likes.push(news.likes)
+                    }
+                  })
+                
+
+                console.log(likes);
+
+     
+
+                // const hasNewsWithCommentByUser = this.news.some((item) => {
+                //     if (item.likes.length !== 0) {
+                //         console.log(
+                //             item.likes.some((like) => like.user.id == user_id)
+                //         )
+                //         console.log(item.likes[0].user.id)
+                //         console.log(user_id)
+                //         return (
+                //             item.id === id_news &&
+                //             item.likes.some((like) => like.user.id == user_id)
+                //         )
+                //     } else {
+                //         return false
+                //     }
+                // })
+
+                // hasNewsWithCommentByUser
+                if (likes.length!==0) {
                     const response = await fetch(
                         `http://localhost:8085/likes?newsId=${id_news}`,
                         {
@@ -146,6 +116,7 @@ export const useNewsStore = defineStore("news", {
                             }),
                         }
                     )
+                    // this.likes = 
                     if (!response.ok) {
                         alert("Добавление лайка не прошло!!")
                         throw new Error("Authentication failed")
@@ -154,6 +125,11 @@ export const useNewsStore = defineStore("news", {
                 }
                 //!!!!!!!!!!!
                 this.getnews()
+
+
+                // this.$patch({
+                //     likes: this.likes,
+                // })
 
                 // const responseData = await response.json()
                 // console.log(responseData)

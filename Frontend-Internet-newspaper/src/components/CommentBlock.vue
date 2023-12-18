@@ -13,8 +13,8 @@ const { props } = defineProps({
     },
 })
 
-const user_id = ref(sessionStorage.getItem("user_id"))
-const user_role = ref(sessionStorage.getItem("user_role"))
+// const user_id = ref(sessionStorage.getItem("user_id"))
+// const user_role = ref(sessionStorage.getItem("user_role"))
 
 const new_comment = ref("")
 

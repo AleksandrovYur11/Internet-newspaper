@@ -11,6 +11,14 @@ const { props } = defineProps({
     }
 })
 
+import {ref, computed} from 'vue'
+
+import { useCommentsStore } from "@/stores/CommentsStore.js"
+const CommentsStore = useCommentsStore()
+
+const user_id = ref(sessionStorage.getItem("user_id"))
+const user_role = ref(sessionStorage.getItem("user_role"))
+
 </script>
 
 <template>
@@ -28,7 +36,7 @@ const { props } = defineProps({
                 <p>{{ comment.textComment }}</p>
                 <span
                     v-if="user_id == comment.user.id || comment.user_role == 'ROLE_ADMIN'"
-                    @click="NewsStore.deleteComment(item.id)"
+                    @click="CommentsStore.deleteComment(comment.id)"
                     style="cursor: pointer"
                 >
                     <img
