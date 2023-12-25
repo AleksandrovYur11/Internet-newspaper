@@ -1,7 +1,6 @@
-package ru.aleksandrov.backendinternetnewspaper.model;
+package ru.aleksandrov.backendinternetnewspaper.models;
 
 import lombok.*;
-import org.hibernate.annotations.Cascade;
 import org.hibernate.validator.constraints.URL;
 
 import javax.persistence.*;

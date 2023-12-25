@@ -1,4 +1,4 @@
-package ru.aleksandrov.backendinternetnewspaper.model;
+package ru.aleksandrov.backendinternetnewspaper.models;
 
 import lombok.*;
 
@@ -6,7 +6,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 
-@Entity(name = "comments")
+@Entity(name = "comment")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter

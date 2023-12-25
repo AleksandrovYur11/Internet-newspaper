@@ -2,7 +2,7 @@ package ru.aleksandrov.backendinternetnewspaper.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.aleksandrov.backendinternetnewspaper.model.Picture;
+import ru.aleksandrov.backendinternetnewspaper.models.Picture;
 import ru.aleksandrov.backendinternetnewspaper.repositories.PictureRepository;
 
 import java.util.Optional;

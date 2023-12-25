@@ -1,4 +1,4 @@
-package ru.aleksandrov.backendinternetnewspaper.controller;
+package ru.aleksandrov.backendinternetnewspaper.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -6,8 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import ru.aleksandrov.backendinternetnewspaper.model.News;
-import ru.aleksandrov.backendinternetnewspaper.model.User;
+import ru.aleksandrov.backendinternetnewspaper.models.News;
+import ru.aleksandrov.backendinternetnewspaper.models.User;
 import ru.aleksandrov.backendinternetnewspaper.security.services.UserDetailsImpl;
 import ru.aleksandrov.backendinternetnewspaper.services.LikesService;
 import ru.aleksandrov.backendinternetnewspaper.services.NewsService;

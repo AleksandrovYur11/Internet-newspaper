@@ -6,10 +6,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import ru.aleksandrov.backendinternetnewspaper.dto.model.CommentDto;
-import ru.aleksandrov.backendinternetnewspaper.model.*;
+import ru.aleksandrov.backendinternetnewspaper.models.*;
 import ru.aleksandrov.backendinternetnewspaper.repositories.CommentRepository;
 import ru.aleksandrov.backendinternetnewspaper.security.services.UserDetailsImpl;
-import ru.aleksandrov.backendinternetnewspaper.util.MappingUtil;
+import ru.aleksandrov.backendinternetnewspaper.utils.MappingUtil;
 
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;

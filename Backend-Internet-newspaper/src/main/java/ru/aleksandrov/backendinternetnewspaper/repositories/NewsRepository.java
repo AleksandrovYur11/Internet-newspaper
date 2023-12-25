@@ -5,8 +5,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import ru.aleksandrov.backendinternetnewspaper.model.News;
-import ru.aleksandrov.backendinternetnewspaper.model.Theme;
+import ru.aleksandrov.backendinternetnewspaper.models.News;
+import ru.aleksandrov.backendinternetnewspaper.models.Theme;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,7 +19,11 @@ public interface NewsRepository extends JpaRepository<News, Integer> {
     Optional<News> findByNewsTitle(String title);
 
     @Transactional
-    @Query("SELECT n FROM news n WHERE n.datePublishedNews >= :twentyFourHoursAgo ORDER BY n.datePublishedNews DESC")
+    Optional<News> findById(Integer newsId);
+
+    @Transactional
+    @Query(value = "SELECT n FROM news n WHERE n.date_published_news >= :twentyFourHoursAgo ORDER BY n.date_published_news DESC",
+            nativeQuery = true)
     List<News> findNewsInLastTwentyFourHours(@Param("twentyFourHoursAgo") LocalDateTime twentyFourHoursAgo);
     //------------------------------
 //    @Transactional
@@ -38,19 +42,17 @@ public interface NewsRepository extends JpaRepository<News, Integer> {
             @Param("forbiddenThemes") Set<Theme> forbiddenThemes);
 //-------------------------------------------
 
-//        @Transactional
-//    @Query("SELECT n FROM news n " +
-//            "WHERE (EXISTS (SELECT t1 FROM n.theme t1 WHERE t1 IN :favoritesThemes))")
-//    List<News> findNewsByFavoriteUserThemes(
+//    @Transactional
+//    @Query("SELECT n FROM news n JOIN n.theme t " +
+//            "WHERE t IN :favoritesThemes ")
+//    List<News> findNewsByFavoriteThemes(
 //            @Param("favoritesThemes") Set<Theme> favoritesThemes);
     @Transactional
-    @Query("SELECT n FROM news n JOIN n.theme t " +
-            "WHERE t IN :favoritesThemes " +
-            "GROUP BY n " +
-            "HAVING COUNT(t) = :themeCount")
-    List<News> findNewsByFavoriteThemes(
-            @Param("favoritesThemes") Set<Theme> favoritesThemes,
-            @Param("themeCount") long themeCount);
+    @Query("SELECT n FROM news n WHERE n.theme IN :favoritesThemes")
+    List<News> findNewsByFavoriteThemes(@Param("favoritesThemes") Set<Theme> favoritesThemes);
+
+
+
     //-----------------------------
 
     //    @Transactional

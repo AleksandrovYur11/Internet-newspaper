@@ -1,11 +1,11 @@
-package ru.aleksandrov.backendinternetnewspaper.model;
+package ru.aleksandrov.backendinternetnewspaper.models;
 
 import lombok.*;
 
 import javax.persistence.*;
 
 @Entity
-@Table(name = "likes", schema = "public")
+@Table(name = "like", schema = "public")
 @Builder
 @Setter
 @Getter

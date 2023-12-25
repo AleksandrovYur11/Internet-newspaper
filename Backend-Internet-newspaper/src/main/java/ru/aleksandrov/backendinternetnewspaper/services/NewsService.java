@@ -7,9 +7,9 @@ import org.springframework.stereotype.Service;
 import ru.aleksandrov.backendinternetnewspaper.dto.model.NewsDto;
 import ru.aleksandrov.backendinternetnewspaper.dto.model.PictureDto;
 import ru.aleksandrov.backendinternetnewspaper.dto.model.ThemeDto;
-import ru.aleksandrov.backendinternetnewspaper.model.*;
+import ru.aleksandrov.backendinternetnewspaper.models.*;
 import ru.aleksandrov.backendinternetnewspaper.repositories.NewsRepository;
-import ru.aleksandrov.backendinternetnewspaper.util.MappingUtil;
+import ru.aleksandrov.backendinternetnewspaper.utils.MappingUtil;
 
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
@@ -135,7 +135,7 @@ public class NewsService {
                     .map(this::convertToNewsDto).collect(Collectors.toList());
         } else if (!favoriteThemes.isEmpty()) {
             dbFavoriteThemes = themeService.getThemesFromDb(favoriteThemes);
-            newsListDto = newsRepository.findNewsByFavoriteThemes(dbFavoriteThemes, dbFavoriteThemes.size()).stream()
+            newsListDto = newsRepository.findNewsByFavoriteThemes(dbFavoriteThemes).stream()
                     .map(this::convertToNewsDto).collect(Collectors.toList());
         } else if (!forbiddenThemes.isEmpty()) {
             dbForbiddenThemes = themeService.getThemesFromDb(forbiddenThemes);
