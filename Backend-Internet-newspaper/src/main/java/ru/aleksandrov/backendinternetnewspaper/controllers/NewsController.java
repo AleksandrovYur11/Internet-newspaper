@@ -1,4 +1,4 @@
-package ru.aleksandrov.backendinternetnewspaper.controller;
+package ru.aleksandrov.backendinternetnewspaper.controllers;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,10 +7,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.aleksandrov.backendinternetnewspaper.dto.model.NewsDto;
-import ru.aleksandrov.backendinternetnewspaper.model.*;
+import ru.aleksandrov.backendinternetnewspaper.models.*;
 import ru.aleksandrov.backendinternetnewspaper.dto.payload.request.NewsRequestDto;
 import ru.aleksandrov.backendinternetnewspaper.services.NewsService;
-import ru.aleksandrov.backendinternetnewspaper.util.MappingUtil;
+import ru.aleksandrov.backendinternetnewspaper.utils.MappingUtil;
 
 import javax.validation.Valid;
 import java.time.LocalDateTime;

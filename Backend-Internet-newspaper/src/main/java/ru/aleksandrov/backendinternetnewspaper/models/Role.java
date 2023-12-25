@@ -1,13 +1,11 @@
-package ru.aleksandrov.backendinternetnewspaper.model;
+package ru.aleksandrov.backendinternetnewspaper.models;
 
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-@Entity(name = "roles")
+@Entity(name = "role")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -17,4 +15,11 @@ public class Role {
     @Id
     @Enumerated(EnumType.STRING)
     private ERole name;
+
+    @OneToMany(mappedBy = "role")
+    private List<User> user;
+
+    public Role(ERole name) {
+        this.name = name;
+    }
 }

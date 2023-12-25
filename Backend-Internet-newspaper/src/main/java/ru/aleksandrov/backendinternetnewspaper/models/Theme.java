@@ -1,11 +1,11 @@
-package ru.aleksandrov.backendinternetnewspaper.model;
+package ru.aleksandrov.backendinternetnewspaper.models;
 
 import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 
-@Entity(name = "Theme")
+@Entity(name = "theme")
 @Getter
 @Setter
 @Builder

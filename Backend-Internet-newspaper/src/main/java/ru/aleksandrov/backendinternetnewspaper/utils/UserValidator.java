@@ -1,10 +1,10 @@
-package ru.aleksandrov.backendinternetnewspaper.util;
+package ru.aleksandrov.backendinternetnewspaper.utils;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
-import ru.aleksandrov.backendinternetnewspaper.model.User;
+import ru.aleksandrov.backendinternetnewspaper.models.User;
 import ru.aleksandrov.backendinternetnewspaper.dto.payload.request.SignupRequestDto;
 import ru.aleksandrov.backendinternetnewspaper.repositories.UserRepository;
 

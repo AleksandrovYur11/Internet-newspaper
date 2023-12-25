@@ -4,14 +4,12 @@ package ru.aleksandrov.backendinternetnewspaper.services;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.aleksandrov.backendinternetnewspaper.model.ERole;
-import ru.aleksandrov.backendinternetnewspaper.model.Role;
-import ru.aleksandrov.backendinternetnewspaper.model.User;
+import ru.aleksandrov.backendinternetnewspaper.models.ERole;
+import ru.aleksandrov.backendinternetnewspaper.models.Role;
+import ru.aleksandrov.backendinternetnewspaper.models.User;
 import ru.aleksandrov.backendinternetnewspaper.repositories.RoleRepository;
 
 import javax.persistence.EntityNotFoundException;
-import java.util.HashSet;
-import java.util.Set;
 
 @Service
 @Slf4j

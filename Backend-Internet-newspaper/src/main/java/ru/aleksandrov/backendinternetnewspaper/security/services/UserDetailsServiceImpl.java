@@ -5,7 +5,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import ru.aleksandrov.backendinternetnewspaper.model.User;
+import ru.aleksandrov.backendinternetnewspaper.models.User;
 import ru.aleksandrov.backendinternetnewspaper.repositories.UserRepository;
 
 @Service

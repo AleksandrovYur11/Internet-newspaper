@@ -1,4 +1,4 @@
-package ru.aleksandrov.backendinternetnewspaper.controller;
+package ru.aleksandrov.backendinternetnewspaper.controllers;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,8 +14,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
-import ru.aleksandrov.backendinternetnewspaper.model.RefreshToken;
-import ru.aleksandrov.backendinternetnewspaper.model.User;
+import ru.aleksandrov.backendinternetnewspaper.models.RefreshToken;
+import ru.aleksandrov.backendinternetnewspaper.models.User;
 import ru.aleksandrov.backendinternetnewspaper.dto.payload.request.SigninRequestDto;
 import ru.aleksandrov.backendinternetnewspaper.dto.payload.request.RefreshTokenRequestDto;
 import ru.aleksandrov.backendinternetnewspaper.dto.payload.request.SignupRequestDto;
@@ -27,8 +27,8 @@ import ru.aleksandrov.backendinternetnewspaper.security.services.RefreshTokenSer
 import ru.aleksandrov.backendinternetnewspaper.security.services.UserDetailsImpl;
 import ru.aleksandrov.backendinternetnewspaper.services.RegistrationService;
 import ru.aleksandrov.backendinternetnewspaper.services.RoleService;
-import ru.aleksandrov.backendinternetnewspaper.util.MappingUtil;
-import ru.aleksandrov.backendinternetnewspaper.util.UserValidator;
+import ru.aleksandrov.backendinternetnewspaper.utils.MappingUtil;
+import ru.aleksandrov.backendinternetnewspaper.utils.UserValidator;
 
 import javax.validation.Valid;
 import java.util.HashMap;
