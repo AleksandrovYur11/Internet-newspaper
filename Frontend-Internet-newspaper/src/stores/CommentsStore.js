@@ -33,7 +33,6 @@ export const useCommentsStore = defineStore("comments", {
         },
         async showComments(news_id, num) {
             try {
-
                 // this.showed[news_id] = true
 
                 //const showed_post_comments = false
@@ -50,6 +49,7 @@ export const useCommentsStore = defineStore("comments", {
                         },
                     }
                 )
+
                 if (!response.ok) {
                     throw new Error("Failed to load comments")
                 }
@@ -72,14 +72,13 @@ export const useCommentsStore = defineStore("comments", {
                     }
                 }
 
-                if (com_by_id.length !== 0 ) {
-                    this.checkCommentsCount(news_id)
-                        .then((commentsCount) => {
-                            console.log(commentsCount)
-                            if (com_by_id.length < commentsCount) {
-                                this.comments = [...this.comments, com_id_news]
-                            }
-                        })
+                if (com_by_id.length !== 0) {
+                    this.checkCommentsCount(news_id).then((commentsCount) => {
+                        console.log(commentsCount)
+                        if (com_by_id.length < commentsCount) {
+                            this.comments = [...this.comments, com_id_news]
+                        }
+                    })
                 } else {
                     this.comments = [...this.comments, com_id_news]
                 }
@@ -92,6 +91,69 @@ export const useCommentsStore = defineStore("comments", {
                 console.error("Fetch error:", error)
             }
         },
+        ///////////////////////////////////////////
+        async updateAccessToken() {
+            const refreshToken = {
+                refreshToken: sessionStorage.getItem("jwtRefreshToken"),
+            }
+
+            console.log(refreshToken)
+
+            try {
+                const response = await fetch(
+                    "http://localhost:8085/auth/refresh-token",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(refreshToken),
+                    }
+                )
+
+                if (!response.ok) {
+                    alert("Неправильный запрос!")
+                    throw new Error("Authentication failed")
+                }
+
+                const responseData = await response.json()
+
+                // sessionStorage.setItem('jwtToken', responseData.accessToken)
+                // console.log(responseData.accessToken)
+
+                console.log("Before setting token:", responseData.accessToken)
+                sessionStorage.setItem("jwtToken", responseData.accessToken)
+                console.log(
+                    "After setting token:",
+                    sessionStorage.getItem("jwtToken")
+                )
+
+                return 
+
+                //sessionStorage.setItem('user_role', responseData.roles[0])
+
+                //this.user = sessionStorage.getItem('user_id')
+                //this.role = sessionStorage.getItem('user_role')
+
+                // console.log(this.user)
+                // console.log(this.role)
+
+                // const jwtToken = responseData.accessToken
+                // const jwtRefreshToken = responseData.jwtRefreshToken
+                // sessionStorage.setItem('jwtRefreshToken', jwtRefreshToken)
+
+                // //const name = responseData.name
+                // console.log(responseData)
+
+                // this.selectRole(responseData.roles[0])
+                // console.log(responseData.roles[0])
+
+                // sessionStorage.setItem('jwtToken', jwtToken)
+            } catch (error) {
+                console.error("not refresh error:", error)
+            }
+        },
+        //////////////////////////////////////////
         async sendcomment(id_news, new_comment) {
             if (!new_comment.trim()) {
                 console.error("Комментарий пуст!")
@@ -119,10 +181,28 @@ export const useCommentsStore = defineStore("comments", {
                         body: JSON.stringify(textComment),
                     }
                 )
+                // const resp = response.json()
+                // if (resp.message === "Full authentication is required to access this resource") {
+                //     console.log(resp)
+                //     console.error("Access token() error:", error)
+                // }
+
                 if (!response.ok) {
-                    alert("Неправильный вход!")
-                    throw new Error("Authentication failed")
+                    if (response.status === 401) {
+                        // alert("Access token истек")
+                        // await this.updateAccessToken()
+                        await this.updateAccessToken()
+                        //console.log(newAccessToken)
+                        //sessionStorage.setItem("jwtToken", newAccessToken)
+                        return this.sendcomment(id_news, new_comment)
+                    } else {
+                        throw new Error("Ошибка при запросе") // Обрабатываем другие ошибки
+                    }
                 }
+                //омжет быть можно брать сразу из сессион сторедж)))
+                //const jwtRefreshToken = sessionStorage.getItem('jwtRefreshToken')
+
+                //метод для получения акссессс токена через рефреш
 
                 const responseData = await response.json()
 
@@ -148,7 +228,7 @@ export const useCommentsStore = defineStore("comments", {
         async deleteComment(id_comment) {
             const role = sessionStorage.getItem("user_role")
             const jwtToken = sessionStorage.getItem("jwtToken")
-            
+
             if (!jwtToken) {
                 console.error("Отсутствует JWT-токен!")
                 return
@@ -167,17 +247,15 @@ export const useCommentsStore = defineStore("comments", {
                             }),
                         }
                     )
-                    
+
                     if (!response.ok) {
                         alert("Удаление не прошло")
                         throw new Error("Authentication failed")
                     }
 
                     if (response.status === 204) {
-                        console.log("Комментарий успешно удален");
+                        console.log("Комментарий успешно удален")
                     }
-
-                
                 } else if (role == "ROLE_USER") {
                     const response = await fetch(
                         `http://localhost:8085/comment/user/${id_comment}`,
@@ -195,12 +273,14 @@ export const useCommentsStore = defineStore("comments", {
                     }
 
                     if (response.status === 204) {
-                        console.log("Комментарий успешно удален");
+                        console.log("Комментарий успешно удален")
                     }
                 }
 
-                const updatedComments = this.comments.map(com => {
-                    const filtrComments = com.comments.filter(comment => comment.id !== id_comment)
+                const updatedComments = this.comments.map((com) => {
+                    const filtrComments = com.comments.filter(
+                        (comment) => comment.id !== id_comment
+                    )
                     return { news_id: com.news_id, comments: filtrComments }
                 })
 
@@ -209,7 +289,6 @@ export const useCommentsStore = defineStore("comments", {
                 this.$patch({
                     comments: updatedComments,
                 })
-
             } catch (error) {
                 console.error("Authentication error:", error)
             }

@@ -47,8 +47,13 @@ export const useAuthStore = defineStore("auth",  {
 
                 console.log(this.user)
                 console.log(this.role)
+
+                //console.log()
                 
                 const jwtToken = responseData.accessToken
+                const jwtRefreshToken = responseData.refreshToken
+                sessionStorage.setItem('jwtRefreshToken', jwtRefreshToken)
+
                 //const name = responseData.name
                 console.log(responseData)
         
@@ -120,6 +125,56 @@ export const useAuthStore = defineStore("auth",  {
         // hasUser(user_id){
         //     return this.users.some((user) => user.id === user_id)
         // }
+
+      //   async updateAccessToken() {
+      //     const refreshToken = {
+      //       jwtRefreshToken: sessionStorage.getItem('jwtRefreshToken'),
+      //     }
+
+      //     console.log(refreshToken)
+
+      //     try {
+      //         const response = await fetch("http://localhost:8085/auth/refresh-token", {
+      //             method: "POST",
+      //             headers: {
+      //                 "Content-Type": "application/json",
+      //             },
+      //             body: JSON.stringify(refreshToken),
+      //         })
+      
+      //         if (!response.ok) {
+      //             alert('Неправильный запрос!')
+      //             throw new Error("Authentication failed")
+      //         }
+      
+      //         const responseData = await response.json()
+              
+      //         sessionStorage.setItem('jwtToken', responseData.accessToken)
+      //         console.log(responseData.accessToken)
+
+      //         //sessionStorage.setItem('user_role', responseData.roles[0])
+            
+      //         //this.user = sessionStorage.getItem('user_id')
+      //         //this.role = sessionStorage.getItem('user_role')
+
+      //         // console.log(this.user)
+      //         // console.log(this.role)
+              
+      //         // const jwtToken = responseData.accessToken
+      //         // const jwtRefreshToken = responseData.jwtRefreshToken
+      //         // sessionStorage.setItem('jwtRefreshToken', jwtRefreshToken)
+
+      //         // //const name = responseData.name
+      //         // console.log(responseData)
+      
+      //         // this.selectRole(responseData.roles[0])
+      //         // console.log(responseData.roles[0])
+              
+      //         // sessionStorage.setItem('jwtToken', jwtToken)
+      //     } catch (error) {
+      //         console.error("not refresh error:", error)
+      //     }
+      // },
     },
 })
 
