@@ -22,8 +22,7 @@ public interface NewsRepository extends JpaRepository<News, Integer> {
     Optional<News> findById(Integer newsId);
 
     @Transactional
-    @Query(value = "SELECT n FROM news n WHERE n.date_published_news >= :twentyFourHoursAgo ORDER BY n.date_published_news DESC",
-            nativeQuery = true)
+    @Query(value = "SELECT n FROM news n WHERE n.datePublishedNews >= :twentyFourHoursAgo ORDER BY n.datePublishedNews DESC")
     List<News> findNewsInLastTwentyFourHours(@Param("twentyFourHoursAgo") LocalDateTime twentyFourHoursAgo);
     //------------------------------
 //    @Transactional

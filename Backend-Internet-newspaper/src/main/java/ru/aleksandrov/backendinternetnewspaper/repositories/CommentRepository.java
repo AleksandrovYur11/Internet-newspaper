@@ -20,18 +20,21 @@ public interface CommentRepository extends JpaRepository<Comment, Integer> {
 
     @Transactional
     List<Comment> findAll();
+
     @Transactional
     List<Comment> findByNews(News news);
+
     @Transactional
     @Modifying
     @Query(value = "DELETE FROM comment c WHERE c.id = :commentId AND c.author_id = :userId", nativeQuery = true)
     void deleteCommentByUserIdAndCommentId(@Param("userId") Integer userId, @Param("commentId") Integer commentId);
 
     @Transactional
-    @Query(value = "SELECT * FROM comment c WHERE c.news_id = :newsId LIMIT 3", nativeQuery = true)
+    @Query(value = "SELECT c FROM comment c WHERE c.news.id = :newsId")
     Slice<Comment> findThreeComments(@Param("newsId") Integer newsId, Pageable pageable);
+
     Integer countByNewsId(Integer newsId);
 //    @Transactional
 //    @Query("SELECT c FROM comments c WHERE  EXISTS c.news.id = :newsId ")
-//    Boolean existsComments(@Param("newsId") Integer newsId, Pageable pageable);
+//    Boolean findThreeComments(@Param("newsId") Integer newsId, Pageable pageable);
 }
