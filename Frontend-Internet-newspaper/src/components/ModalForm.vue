@@ -124,11 +124,6 @@ const NewsStore = useNewsStore()
                     class="submit_btn"
                     >Create</b-button
                 >
-                <b-button
-                    type="submit"
-                    class="submit_btn"
-                    >Create</b-button
-                >
             </div>
           </b-form>
         </div>

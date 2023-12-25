@@ -15,9 +15,12 @@ const AuthUser = useAuthStore()
 import { useNewsStore } from "@/stores/NewsStore"
 const NewsStore = useNewsStore()
 
+import {useCommentsStore} from "@/stores/CommentsStore.js"
+const CommentsStore = useCommentsStore()
+
 import CommentBlock from "@/components/CommentBlock.vue"
 
-const showComments = ref(false)
+//const showComments = ref(true)
 
 const user_id = ref(sessionStorage.getItem("user_id"))
 const user_role = ref(sessionStorage.getItem("user_role"))
@@ -78,15 +81,17 @@ const user_role = ref(sessionStorage.getItem("user_role"))
                     >
                     <!-- <span style="font-weight: bold">1200</span> -->
                 </div>
+                <!-- @click.prevent="showComments = !showComments" -->
                 <a
                     href=""
-                    @click.prevent="showComments = !showComments"
+                    @click.prevent = "CommentsStore.showComments(post.id, 1)"
                 >
                     Комментарии</a
                 >
             </div>
-            <comment-block
-                v-if="showComments"
+            <!-- v-if="showComments" -->
+            <!-- v-if = "CommentsStore.showed" -->
+            <comment-block  v-if = "CommentsStore.showed == true"
                 :post="post"
             ></comment-block>
         </div>

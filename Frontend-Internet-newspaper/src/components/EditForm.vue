@@ -15,36 +15,37 @@ const { props } = defineProps({
 })
 
 // skdjskdjs
-const newsTitle = ref('jj')
-const newsText= ref('kk')
-const picture = ref('ll')
-const  themes = ref('dd')
+const newsTitle = ref("jj")
+const newsText = ref("kk")
+const picture = ref("ll")
+const themes = ref("dd")
 
 onBeforeMount(() => {
-   NewsStore.getInfoNews(NewsStore.edit_post_id)
-   console.log('ooooo')
-   console.log(NewsStore.news_for_edit);
+    NewsStore.getInfoNews(NewsStore.edit_post_id)
+    console.log("ooooo")
+    console.log(NewsStore.news_for_edit)
 })
 
-onMounted(()=>{
+onMounted(() => {
     if (NewsStore.news_for_edit) {
-    newsTitle.value = NewsStore.news_for_edit.newsTitle;
-    newsText.value = NewsStore.news_for_edit.newsText;
-    picture.value = NewsStore.news_for_edit.picture.url;
-    themes.value = NewsStore.news_for_edit.themes.map(theme => theme.name).join(', ');
-  } else {
-    console.log('No edit news data available');
-  }
+        newsTitle.value = NewsStore.news_for_edit.newsTitle
+        newsText.value = NewsStore.news_for_edit.newsText
+        picture.value = NewsStore.news_for_edit.picture.url
+        themes.value = NewsStore.news_for_edit.themes
+            .map((theme) => theme.name)
+            .join(", ")
+    } else {
+        console.log("No edit news data available")
+    }
 })
-
 </script>
 
 <template>
-    <div 
+    <div
         class="container"
         @click.self="NewsStore.closeEdit()"
     >
-    <b-form class="custom-form">
+        <b-form class="custom-form">
             <div class="header_modal">
                 <h4>Edit news</h4>
                 <span
@@ -53,109 +54,121 @@ onMounted(()=>{
                     >&times;</span
                 >
             </div>
-            
-                <b-form-group
-                    class="mb-1"
-                    id="title_group"
-                    label="Title:"
-                    label-for="postTitle"
-                >
-                    <b-form-input
-                        id="postTitle"
-                        v-model="newsTitle"
-                        type="text"
-                        :state="validation_title"
-                        required
-                    ></b-form-input>
-                    <b-form-invalid-feedback :state="validation_title">
-                        Your user ID must be 5-12 characters long.
-                    </b-form-invalid-feedback>
-                    <b-form-valid-feedback :state="validation_title">
-                        Looks Good.
-                    </b-form-valid-feedback>
-                </b-form-group>
 
-                <b-form-group
-                    class="mb-1"
-                    id="themes_group"
-                    label="Themes:"
-                    label-for="microThemes"
-                >
-                    <b-form-input
-                        id="microThemes"
-                        v-model="themes"
-                        type="text"
-                        placeholder="Меркурий, Венера, Земля..."
-                        :state="validation_themes"
-                        required
-                    ></b-form-input>
-                    <b-form-invalid-feedback :state="validation_themes">
-                        Your user ID must be 5-12 characters long.
-                    </b-form-invalid-feedback>
-                    <b-form-valid-feedback :state="validation_themes">
-                        Looks Good.
-                    </b-form-valid-feedback>
-                </b-form-group>
+            <b-form-group
+                class="mb-1"
+                id="title_group"
+                label="Title:"
+                label-for="postTitle"
+            >
+                <b-form-input
+                    id="postTitle"
+                    v-model="newsTitle"
+                    type="text"
+                    :state="validation_title"
+                    required
+                ></b-form-input>
+                <b-form-invalid-feedback :state="validation_title">
+                    Your user ID must be 5-12 characters long.
+                </b-form-invalid-feedback>
+                <b-form-valid-feedback :state="validation_title">
+                    Looks Good.
+                </b-form-valid-feedback>
+            </b-form-group>
 
-                <b-form-group
-                    class="mb-1"
-                    id="text_group"
-                    label="Text:"
-                    label-for="postText"
-                >
-                    <!-- сделать ограничение и скролл + кол-во символов) -->
-                    <b-form-textarea
-                        id="postText"
-                        v-model="newsText"
-                        type="text"
-                        placeholder="...название этот вид получил из-за очень непривлекательной внешности. - это не факт, это википедия"
-                        :state="validation_text"
-                        required
-                    ></b-form-textarea>
-                    <b-form-invalid-feedback :state="validation_text">
-                        Your user ID must be 5-12 characters long.
-                    </b-form-invalid-feedback>
-                    <b-form-valid-feedback :state="validation_text">
-                        Looks Good.
-                    </b-form-valid-feedback>
-                </b-form-group>
-                <b-form-group
-                    class="mb-1"
-                    id="image_group"
-                    label="Image URL:"
-                    label-for="imageUpload"
-                >
-                    <b-form-input
-                        id="imageUpload"
-                        v-model="picture"
-                        type="text"
-                        placeholder="https://dikoed.ru/upload/iblock/361/16025-morskoy-chert-s-golovoy.jpg"
-                        :state="validation_image"
-                        required
-                    ></b-form-input>
-                    <b-form-invalid-feedback :state="validation_image">
-                        Your user ID must be 5-12 characters long.
-                    </b-form-invalid-feedback>
-                    <b-form-valid-feedback :state="validation_image">
-                        Looks Good.
-                    </b-form-valid-feedback>
-                </b-form-group>
+            <b-form-group
+                class="mb-1"
+                id="themes_group"
+                label="Themes:"
+                label-for="microThemes"
+            >
+                <b-form-input
+                    id="microThemes"
+                    v-model="themes"
+                    type="text"
+                    placeholder="Меркурий, Венера, Земля..."
+                    :state="validation_themes"
+                    required
+                ></b-form-input>
+                <b-form-invalid-feedback :state="validation_themes">
+                    Your user ID must be 5-12 characters long.
+                </b-form-invalid-feedback>
+                <b-form-valid-feedback :state="validation_themes">
+                    Looks Good.
+                </b-form-valid-feedback>
+            </b-form-group>
+
+            <b-form-group
+                class="mb-1"
+                id="text_group"
+                label="Text:"
+                label-for="postText"
+            >
+                <!-- сделать ограничение и скролл + кол-во символов) -->
+                <b-form-textarea
+                    id="postText"
+                    v-model="newsText"
+                    type="text"
+                    placeholder="...название этот вид получил из-за очень непривлекательной внешности. - это не факт, это википедия"
+                    :state="validation_text"
+                    required
+                ></b-form-textarea>
+                <b-form-invalid-feedback :state="validation_text">
+                    Your user ID must be 5-12 characters long.
+                </b-form-invalid-feedback>
+                <b-form-valid-feedback :state="validation_text">
+                    Looks Good.
+                </b-form-valid-feedback>
+            </b-form-group>
+            <b-form-group
+                class="mb-1"
+                id="image_group"
+                label="Image URL:"
+                label-for="imageUpload"
+            >
+                <b-form-input
+                    id="imageUpload"
+                    v-model="picture"
+                    type="text"
+                    placeholder="https://dikoed.ru/upload/iblock/361/16025-morskoy-chert-s-golovoy.jpg"
+                    :state="validation_image"
+                    required
+                ></b-form-input>
+                <b-form-invalid-feedback :state="validation_image">
+                    Your user ID must be 5-12 characters long.
+                </b-form-invalid-feedback>
+                <b-form-valid-feedback :state="validation_image">
+                    Looks Good.
+                </b-form-valid-feedback>
+            </b-form-group>
             <div class="footer_modal">
                 <b-button
                     type="submit"
-                    @click="NewsStore.updateNews(newsTitle, newsText, picture, themes, NewsStore.edit_post_id)"
+                    @click="
+                        NewsStore.updateNews(
+                            newsTitle,
+                            newsText,
+                            picture,
+                            themes,
+                            NewsStore.edit_post_id
+                        )
+                    "
                     class="submit_btn"
                     >Edit</b-button
                 >
+                <b-button
+                    type="submit"
+                    @click="NewsStore.deleteNews(NewsStore.edit_post_id)"
+                    class="submit_btn"
+                >
+                    Delete
+                </b-button>
             </div>
-          </b-form>
-        </div>
-    
+        </b-form>
+    </div>
 </template>
 
 <style scoped>
-
-
 .custom-form {
     color: #007bff; /* Белый цвет текста */
     background-color: #ffffff;
@@ -178,12 +191,12 @@ h4 {
 
 .footer_modal {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
 }
 .submit_btn {
-    bottom: 20px;
+    /* bottom: 20px;
     position: absolute;
-    width: 25%;
+    width: 25%; */
 }
 
 .header_modal {
