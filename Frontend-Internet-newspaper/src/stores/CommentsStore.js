@@ -1,5 +1,10 @@
 import { defineStore } from "pinia"
 import { useNewsStore } from "@/stores/NewsStore.js"
+import router from '@/router/index.js'
+
+import { useCommentsStore } from "@/stores/CommentsStore.js"
+
+
 
 export const useCommentsStore = defineStore("comments", {
     state: () => ({
@@ -92,13 +97,39 @@ export const useCommentsStore = defineStore("comments", {
             }
         },
         ///////////////////////////////////////////
-        async updateAccessToken() {
-            const refreshToken = {
-                refreshToken: sessionStorage.getItem("jwtRefreshToken"),
+        // async updateAccessToken() {
+        //     const refreshToken = {
+        //         refreshToken: sessionStorage.getItem("jwtRefreshToken"),
+        //     }
+        //     try {
+        //         const response = await fetch(
+        //             "http://localhost:8085/auth/refresh-token",
+        //             {
+        //                 method: "POST",
+        //                 headers: {
+        //                     "Content-Type": "application/json",
+        //                 },
+        //                 body: JSON.stringify(refreshToken),
+        //             }
+        //         )
+        //         const responseData = await response.json()
+        //         if (responseData.refreshToken === `Failed for [${refreshToken.refreshToken}]: Refresh token was expired. Please make a new signin request`) {
+        //             console.log('ubgbgkbkgk')
+        //             router.push('/auth/sign-in')
+        //             sessionStorage.removeItem("jwtToken")
+        //             sessionStorage.removeItem("jwtRefreshToken", responseData.accessToken)
+        //             throw new Error("refresh ---- failed")
+        //         }
+ 
+        //         sessionStorage.setItem("jwtToken", responseData.accessToken)
+        //     } catch (error) {
+        //         console.error("not refresh error:", error)
+        //     }
+        // },
+        async deleteToken() {
+            const accessToken = {
+                accessToken: sessionStorage.getItem("jwtToken"),
             }
-
-            console.log(refreshToken)
-
             try {
                 const response = await fetch(
                     "http://localhost:8085/auth/refresh-token",
@@ -110,45 +141,15 @@ export const useCommentsStore = defineStore("comments", {
                         body: JSON.stringify(refreshToken),
                     }
                 )
-
-                if (!response.ok) {
-                    alert("Неправильный запрос!")
-                    throw new Error("Authentication failed")
-                }
-
                 const responseData = await response.json()
-
-                // sessionStorage.setItem('jwtToken', responseData.accessToken)
-                // console.log(responseData.accessToken)
-
-                console.log("Before setting token:", responseData.accessToken)
+                if (responseData.refreshToken === `Failed for [${refreshToken.refreshToken}]: Refresh token was expired. Please make a new signin request`) {
+                    console.log('ubgbgkbkgk')
+                    router.push('/auth/sign-in')
+                    sessionStorage.removeItem("jwtToken")
+                    sessionStorage.removeItem("jwtRefreshToken", responseData.accessToken)
+                    throw new Error("refresh ---- failed")
+                }
                 sessionStorage.setItem("jwtToken", responseData.accessToken)
-                console.log(
-                    "After setting token:",
-                    sessionStorage.getItem("jwtToken")
-                )
-
-                return 
-
-                //sessionStorage.setItem('user_role', responseData.roles[0])
-
-                //this.user = sessionStorage.getItem('user_id')
-                //this.role = sessionStorage.getItem('user_role')
-
-                // console.log(this.user)
-                // console.log(this.role)
-
-                // const jwtToken = responseData.accessToken
-                // const jwtRefreshToken = responseData.jwtRefreshToken
-                // sessionStorage.setItem('jwtRefreshToken', jwtRefreshToken)
-
-                // //const name = responseData.name
-                // console.log(responseData)
-
-                // this.selectRole(responseData.roles[0])
-                // console.log(responseData.roles[0])
-
-                // sessionStorage.setItem('jwtToken', jwtToken)
             } catch (error) {
                 console.error("not refresh error:", error)
             }
@@ -169,7 +170,6 @@ export const useCommentsStore = defineStore("comments", {
                 return
             }
             try {
-                console.log(jwtToken)
                 const response = await fetch(
                     `http://localhost:8085/comment/save?newsId=${id_news}`,
                     {
@@ -181,31 +181,15 @@ export const useCommentsStore = defineStore("comments", {
                         body: JSON.stringify(textComment),
                     }
                 )
-                // const resp = response.json()
-                // if (resp.message === "Full authentication is required to access this resource") {
-                //     console.log(resp)
-                //     console.error("Access token() error:", error)
-                // }
-
                 if (!response.ok) {
                     if (response.status === 401) {
-                        // alert("Access token истек")
-                        // await this.updateAccessToken()
                         await this.updateAccessToken()
-                        //console.log(newAccessToken)
-                        //sessionStorage.setItem("jwtToken", newAccessToken)
                         return this.sendcomment(id_news, new_comment)
                     } else {
-                        throw new Error("Ошибка при запросе") // Обрабатываем другие ошибки
+                        throw new Error("Ошибка при запросе") 
                     }
                 }
-                //омжет быть можно брать сразу из сессион сторедж)))
-                //const jwtRefreshToken = sessionStorage.getItem('jwtRefreshToken')
-
-                //метод для получения акссессс токена через рефреш
-
                 const responseData = await response.json()
-
                 const updatedComments = this.comments.find(
                     (item) => item.news_id === id_news
                 )
@@ -217,7 +201,6 @@ export const useCommentsStore = defineStore("comments", {
                         comments: [responseData],
                     })
                 }
-
                 this.$patch({
                     comments: this.comments,
                 })
@@ -225,6 +208,7 @@ export const useCommentsStore = defineStore("comments", {
                 console.error("Authentication error:", error)
             }
         },
+
         async deleteComment(id_comment) {
             const role = sessionStorage.getItem("user_role")
             const jwtToken = sessionStorage.getItem("jwtToken")

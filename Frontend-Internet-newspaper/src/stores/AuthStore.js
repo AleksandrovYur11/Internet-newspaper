@@ -3,6 +3,7 @@ import router from '@/router/index.js'
 
 import { useNewsStore } from "@/stores/NewsStore"
 
+import router from '@/router/index.js'
 
 export const useAuthStore = defineStore("auth",  {
     state: () => ({
@@ -15,6 +16,36 @@ export const useAuthStore = defineStore("auth",  {
         user_role: ''
     }),
     actions: {
+      async updateAccessToken() {
+        const refreshToken = {
+            refreshToken: sessionStorage.getItem("jwtRefreshToken"),
+        }
+        try {
+            const response = await fetch(
+                "http://localhost:8085/auth/refresh-token",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(refreshToken),
+                }
+            )
+            const responseData = await response.json()
+            if (responseData.refreshToken === `Failed for [${refreshToken.refreshToken}]: Refresh token was expired. Please make a new signin request`) {
+                router.push('/auth/sign-in')
+                sessionStorage.removeItem("jwtToken")
+                sessionStorage.removeItem("jwtRefreshToken", responseData.accessToken)
+                throw new Error("refresh ---- failed")
+            }
+
+            sessionStorage.setItem("jwtToken", responseData.accessToken)
+        } catch (error) {
+            console.error("not refresh error:", error)
+        }
+    },
+      ///////////////////////////////////////////////////////////////
+
         async login(textEmail, textPassword) {
             const loginData = {
                 email: textEmail,
