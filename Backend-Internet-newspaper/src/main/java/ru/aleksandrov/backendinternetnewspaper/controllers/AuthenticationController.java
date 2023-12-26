@@ -121,9 +121,8 @@ public class AuthenticationController {
 
     @PostMapping("/sign-out")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<?> logout(@AuthenticationPrincipal UserDetailsImpl userDetails) {
-        int userId = userDetails.getId();
-        refreshTokenService.deleteRefreshToken(userId);
+    public ResponseEntity<?> logout(String refreshToken) {
+        refreshTokenService.deleteRefreshToken(refreshToken);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }
