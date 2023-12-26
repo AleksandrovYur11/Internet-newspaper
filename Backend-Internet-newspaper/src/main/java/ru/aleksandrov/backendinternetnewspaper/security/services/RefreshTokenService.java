@@ -49,11 +49,19 @@ public class RefreshTokenService {
         return token;
     }
 
-    public void deleteRefreshToken(Integer refreshTokenId) {
-        if (refreshTokenRepository.existsById(refreshTokenId)) {
-            refreshTokenRepository.deleteById(refreshTokenId);
-        } else {
-            throw new EntityNotFoundException("Refresh token with id = " + refreshTokenId + ": Not Found");
-        }
+    public void deleteRefreshToken(String refreshToken) {
+        RefreshToken deleteRefreshToken = refreshTokenRepository.findByToken(refreshToken)
+                .orElseThrow(() -> {
+                    log.error("Refresh token with string = " + refreshToken + ": Not Found");
+                    return new EntityNotFoundException("Refresh token with string = " + refreshToken + ": Not Found");
+                });
+        refreshTokenRepository.deleteByToken(deleteRefreshToken);
+
+//
+//        if (refreshTokenRepository.exists(refreshTokenId)) {
+//            refreshTokenRepository.deleteById(refreshTokenId);
+//        } else {
+//            throw new EntityNotFoundException("Refresh token with id = " + refreshTokenId + ": Not Found");
+//        }
     }
 }
