@@ -55,7 +55,7 @@ public class RefreshTokenService {
                     log.error("Refresh token with string = " + refreshToken + ": Not Found");
                     return new EntityNotFoundException("Refresh token with string = " + refreshToken + ": Not Found");
                 });
-        refreshTokenRepository.deleteByToken(deleteRefreshToken);
+        refreshTokenRepository.deleteByToken(deleteRefreshToken.getToken());
 
 //
 //        if (refreshTokenRepository.exists(refreshTokenId)) {
