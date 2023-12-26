@@ -120,8 +120,9 @@ public class AuthenticationController {
     }
 
     @PostMapping("/sign-out")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<?> logout(String refreshToken) {
+//    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity<?> logout(@Valid @RequestBody RefreshTokenRequestDto refreshTokenRequestDto) {
+        String refreshToken = refreshTokenRequestDto.getRefreshToken();
         refreshTokenService.deleteRefreshToken(refreshToken);
         return new ResponseEntity<>(HttpStatus.OK);
     }
