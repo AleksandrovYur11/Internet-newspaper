@@ -3,7 +3,6 @@ import router from '@/router/index.js'
 
 import { useNewsStore } from "@/stores/NewsStore"
 
-import router from '@/router/index.js'
 
 export const useAuthStore = defineStore("auth",  {
     state: () => ({
@@ -32,18 +31,68 @@ export const useAuthStore = defineStore("auth",  {
                 }
             )
             const responseData = await response.json()
-            if (responseData.refreshToken === `Failed for [${refreshToken.refreshToken}]: Refresh token was expired. Please make a new signin request`) {
-                router.push('/auth/sign-in')
-                sessionStorage.removeItem("jwtToken")
-                sessionStorage.removeItem("jwtRefreshToken", responseData.accessToken)
-                throw new Error("refresh ---- failed")
+            if (
+                responseData.refreshToken ===
+                `Failed for [${refreshToken.refreshToken}]: Refresh token was expired. Please make a new signin request`
+            ) {
+                console.log("ubgbgkbkgk")
+                try {
+                    const result = await this.deleteToken() // использование await для вызова асинхронного метода
+                    console.log(result); // обработка результата, который вернул асинхронный метод deleteToken
+                    if (result === true) {
+                        router.push("/auth/sign-in")
+                        sessionStorage.removeItem("jwtToken")
+                        sessionStorage.removeItem(
+                            "jwtRefreshToken",
+                            responseData.accessToken
+                        )
+                        throw new Error("refresh ---- failed")
+                    } else {
+                        throw new Error("не фортануло")
+                    }
+                  } catch (error) {
+                    console.error(error); // обработка ошибок, если таковые возникнут в deleteToken
+                  }
+            } else {
             }
-
             sessionStorage.setItem("jwtToken", responseData.accessToken)
+/////////////////////костыль//////////////////////
+            return true
         } catch (error) {
             console.error("not refresh error:", error)
         }
     },
+    async deleteToken() {
+      const refreshToken = {
+          refreshToken: sessionStorage.getItem("jwtRefreshToken"),
+      }
+      console.log(refreshToken)
+      console.log(JSON.stringify(refreshToken))
+      
+      try {
+          const response = await fetch(
+              "http://localhost:8085/auth/sign-out",
+              {
+                  method: "POST",
+                  headers: {
+                      "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify(refreshToken),
+              }
+          )
+
+          console.log(response)
+
+          if (response.ok) {
+              return true
+          } else {
+              throw new Error("refresh не дошел")
+          }
+      } catch (error) {
+          console.error("not refresh error:", error)
+          return false
+      }
+  },
       ///////////////////////////////////////////////////////////////
 
         async login(textEmail, textPassword) {

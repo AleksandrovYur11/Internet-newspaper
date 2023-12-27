@@ -1,10 +1,7 @@
 import { defineStore } from "pinia"
 import { useNewsStore } from "@/stores/NewsStore.js"
-import router from '@/router/index.js'
-
-import { useCommentsStore } from "@/stores/CommentsStore.js"
-
-
+import { useAuthStore } from "@/stores/AuthStore.js"
+import router from "@/router/index.js"
 
 export const useCommentsStore = defineStore("comments", {
     state: () => ({
@@ -14,6 +11,10 @@ export const useCommentsStore = defineStore("comments", {
         showed: true,
     }),
     actions: {
+        async getAuthStoreMethods() {
+            const AuthStore = useAuthStore()
+            await AuthStore.updateAccessToken()
+        },       
         async checkCommentsCount(id_news) {
             try {
                 const response = await fetch(
@@ -113,47 +114,65 @@ export const useCommentsStore = defineStore("comments", {
         //             }
         //         )
         //         const responseData = await response.json()
-        //         if (responseData.refreshToken === `Failed for [${refreshToken.refreshToken}]: Refresh token was expired. Please make a new signin request`) {
-        //             console.log('ubgbgkbkgk')
-        //             router.push('/auth/sign-in')
-        //             sessionStorage.removeItem("jwtToken")
-        //             sessionStorage.removeItem("jwtRefreshToken", responseData.accessToken)
-        //             throw new Error("refresh ---- failed")
+        //         if (
+        //             responseData.refreshToken ===
+        //             `Failed for [${refreshToken.refreshToken}]: Refresh token was expired. Please make a new signin request`
+        //         ) {
+        //             console.log("ubgbgkbkgk")
+        //             try {
+        //                 const result = await this.deleteToken() // использование await для вызова асинхронного метода
+        //                 console.log(result); // обработка результата, который вернул асинхронный метод deleteToken
+        //                 if (result === true) {
+        //                     router.push("/auth/sign-in")
+        //                     sessionStorage.removeItem("jwtToken")
+        //                     sessionStorage.removeItem(
+        //                         "jwtRefreshToken",
+        //                         responseData.accessToken
+        //                     )
+        //                     throw new Error("refresh ---- failed")
+        //                 } else {
+        //                     throw new Error("не фортануло")
+        //                 }
+        //               } catch (error) {
+        //                 console.error(error); // обработка ошибок, если таковые возникнут в deleteToken
+        //               }
         //         }
- 
+
         //         sessionStorage.setItem("jwtToken", responseData.accessToken)
         //     } catch (error) {
         //         console.error("not refresh error:", error)
         //     }
         // },
-        async deleteToken() {
-            const accessToken = {
-                accessToken: sessionStorage.getItem("jwtToken"),
-            }
-            try {
-                const response = await fetch(
-                    "http://localhost:8085/auth/refresh-token",
-                    {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify(refreshToken),
-                    }
-                )
-                const responseData = await response.json()
-                if (responseData.refreshToken === `Failed for [${refreshToken.refreshToken}]: Refresh token was expired. Please make a new signin request`) {
-                    console.log('ubgbgkbkgk')
-                    router.push('/auth/sign-in')
-                    sessionStorage.removeItem("jwtToken")
-                    sessionStorage.removeItem("jwtRefreshToken", responseData.accessToken)
-                    throw new Error("refresh ---- failed")
-                }
-                sessionStorage.setItem("jwtToken", responseData.accessToken)
-            } catch (error) {
-                console.error("not refresh error:", error)
-            }
-        },
+        // async deleteToken() {
+        //     const refreshToken = {
+        //         refreshToken: sessionStorage.getItem("jwtRefreshToken"),
+        //     }
+        //     console.log(refreshToken)
+        //     console.log(JSON.stringify(refreshToken))
+            
+        //     try {
+        //         const response = await fetch(
+        //             "http://localhost:8085/auth/sign-out",
+        //             {
+        //                 method: "POST",
+        //                 headers: {
+        //                     "Content-Type": "application/json",
+        //                 },
+        //                 body: JSON.stringify(refreshToken),
+        //             }
+        //         )
+
+        //         console.log(response)
+
+        //         if (response.ok) {
+        //             return true
+        //         } else {
+        //             throw new Error("refresh не дошел")
+        //         }
+        //     } catch (error) {
+        //         console.error("not refresh error:", error)
+        //     }
+        // },
         //////////////////////////////////////////
         async sendcomment(id_news, new_comment) {
             if (!new_comment.trim()) {
@@ -181,13 +200,22 @@ export const useCommentsStore = defineStore("comments", {
                         body: JSON.stringify(textComment),
                     }
                 )
+                console.log('1')
                 if (!response.ok) {
                     if (response.status === 401) {
-                        await this.updateAccessToken()
-                        return this.sendcomment(id_news, new_comment)
+                        // await this.updateAccessToken()
+
+
+                        //дождаться пока приджет ответ и только потмо вызывать 
+                        if (this.getAuthStoreMethods()) {
+                            return this.sendcomment(id_news, new_comment) 
+                        }
                     } else {
-                        throw new Error("Ошибка при запросе") 
+                        console.log('какой то другой статус')
                     }
+                    // } else {
+                    //     throw new Error("Ошибка при запросе")
+                    // }
                 }
                 const responseData = await response.json()
                 const updatedComments = this.comments.find(
