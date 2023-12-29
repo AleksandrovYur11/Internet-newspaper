@@ -62,44 +62,23 @@ export const useCommentsStore = defineStore("comments", {
                     showed: false,
                 }
 
-                const commentsCount = await this.checkCommentsCount(news_id)
-                console.log(commentsCount)
+                const commentsCount = await this.checkCommentsCount(news_id) // кол-во комментариев для поста в бд
 
-                if (this.comments.length !== 0) {
-                    const is_exists = this.comments.some(
-                        (item) => item.news_id === news_id
-                    ) // проверяем на существование комментариев для поста
+                const isExistsComment = this.comments.find( // проверяем существование выведенных комментариев для поста
+                    (item) => item.news_id === news_id 
+                )
 
-                    if (is_exists) {
-                        this.comments.forEach((comment_item) => {
-                            console.log(comment_item.news_id)
-                            console.log(news_id)
-
-                            if (comment_item.news_id === news_id) {
-                                if (
-                                    comment_item.comments.length < commentsCount
-                                ) {
-                                    comment_item.comments.push(
-                                        ...com_id_news.comments
-                                    )
-                                }
-                            }
-                        })
-                    } else {
-                        this.comments = [...this.comments, com_id_news]
-                        console.log("добавлен коммент для другого поста")
+                if (isExistsComment) {
+                    if (isExistsComment.comments.length < commentsCount) {
+                        isExistsComment.comments.push(...com_id_news.comments)
                     }
                 } else {
-                    this.comments = [...this.comments, com_id_news]
-                    console.log("0")
-                    console.log(this.comments)
+                    this.comments.push(com_id_news)
                 }
 
                 this.$patch({
                     comments: this.comments,
                 })
-
-                console.log(this.comments)
 
                 // // меняем отображение блока комментариев
                 // this.comments[0].showed = !this.comments[0].showed
