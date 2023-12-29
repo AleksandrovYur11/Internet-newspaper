@@ -20,7 +20,6 @@ const CommentsStore = useCommentsStore()
 
 import CommentBlock from "@/components/CommentBlock.vue"
 
-//const showComments = ref(true)
 
 const user_id = ref(sessionStorage.getItem("user_id"))
 const user_role = ref(sessionStorage.getItem("user_role"))
@@ -29,7 +28,6 @@ const user_role = ref(sessionStorage.getItem("user_role"))
 
 <template>
     <div class="cont">
-        <!-- @click="NewsStore.getInfoNews(post.id)" -->
         <b-button
             style="margin-right: 10px"
             v-if="user_role === 'ROLE_ADMIN'"
@@ -79,9 +77,7 @@ const user_role = ref(sessionStorage.getItem("user_role"))
                     <span
                         ><b>{{ post.likes.length || 0 }}</b></span
                     >
-                    <!-- <span style="font-weight: bold">1200</span> -->
                 </div>
-                <!-- @click.prevent="showComments = !showComments" -->
                 <a
                     href=""
                     @click.prevent = "CommentsStore.showComments(post.id, 1)"
@@ -89,9 +85,7 @@ const user_role = ref(sessionStorage.getItem("user_role"))
                     Комментарии</a
                 >
             </div>
-            <!-- v-if="showComments" -->
-            <!-- v-if = "CommentsStore.showed" -->
-            <comment-block  v-if = "CommentsStore.showed == true"
+            <comment-block
                 :post="post"
             ></comment-block>
         </div>

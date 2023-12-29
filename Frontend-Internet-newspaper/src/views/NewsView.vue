@@ -16,7 +16,6 @@ import EditForm from "@/components/EditForm.vue"
 onBeforeMount(() => {
     NewsStore.getnews()
 })
-// ldldldlld
 </script>
 
 <template>

@@ -8,13 +8,15 @@ export const useCommentsStore = defineStore("comments", {
         comments: [],
         news: null,
         commentsCount: 0,
-        showed: true,
+        showed: false,
     }),
     actions: {
         async getAuthStoreMethods() {
             const AuthStore = useAuthStore()
-            await AuthStore.updateAccessToken()
-        },       
+            const result = await AuthStore.updateAccessToken()
+            console.log(result)
+            return result
+        },
         async checkCommentsCount(id_news) {
             try {
                 const response = await fetch(
@@ -27,25 +29,18 @@ export const useCommentsStore = defineStore("comments", {
                     }
                 )
                 if (!response.ok) {
-                    alert("Неправильный вход!")
-                    throw new Error("Authentication failed")
+                    throw new Error("Колличество комментариев не получено")
                 }
+
                 const responseData = await response.json()
                 this.commentsCount = responseData.countComment
                 return responseData.countComment
             } catch (error) {
-                console.error("Authentication error:", error)
+                console.error("Request error:", error)
             }
         },
         async showComments(news_id, num) {
             try {
-                // this.showed[news_id] = true
-
-                //const showed_post_comments = false
-                //this.showed[news_id] = showed_post_comments
-                //выставить всем false нафиг()
-                //this.showed[news_id] =  !this.showed[news_id]
-
                 const response = await fetch(
                     `http://localhost:8085/comment/show?newsId=${news_id}`,
                     {
@@ -55,125 +50,66 @@ export const useCommentsStore = defineStore("comments", {
                         },
                     }
                 )
-
                 if (!response.ok) {
                     throw new Error("Failed to load comments")
                 }
-
                 const responseData = await response.json()
+                console.log(responseData)
 
                 const com_id_news = {
                     news_id: news_id,
                     comments: responseData,
+                    showed: false,
                 }
-                const com_by_id = []
 
-                for (const key in this.comments) {
-                    if (this.comments.hasOwnProperty(key)) {
-                        const obj = this.comments[key]
+                const commentsCount = await this.checkCommentsCount(news_id)
+                console.log(commentsCount)
 
-                        if (obj.news_id === news_id) {
-                            com_by_id.push(...obj.comments)
-                        }
+                if (this.comments.length !== 0) {
+                    const is_exists = this.comments.some(
+                        (item) => item.news_id === news_id
+                    ) // проверяем на существование комментариев для поста
+
+                    if (is_exists) {
+                        this.comments.forEach((comment_item) => {
+                            console.log(comment_item.news_id)
+                            console.log(news_id)
+
+                            if (comment_item.news_id === news_id) {
+                                if (
+                                    comment_item.comments.length < commentsCount
+                                ) {
+                                    comment_item.comments.push(
+                                        ...com_id_news.comments
+                                    )
+                                }
+                            }
+                        })
+                    } else {
+                        this.comments = [...this.comments, com_id_news]
+                        console.log("добавлен коммент для другого поста")
                     }
-                }
-
-                if (com_by_id.length !== 0) {
-                    this.checkCommentsCount(news_id).then((commentsCount) => {
-                        console.log(commentsCount)
-                        if (com_by_id.length < commentsCount) {
-                            this.comments = [...this.comments, com_id_news]
-                        }
-                    })
                 } else {
                     this.comments = [...this.comments, com_id_news]
+                    console.log("0")
+                    console.log(this.comments)
                 }
 
-                // Сохраняем состояние хранилища
                 this.$patch({
                     comments: this.comments,
                 })
+
+                console.log(this.comments)
+
+                // // меняем отображение блока комментариев
+                // this.comments[0].showed = !this.comments[0].showed
+
+                //console.log(this.comments)
+                // return this.comments[0].showed
             } catch (error) {
                 console.error("Fetch error:", error)
             }
         },
-        ///////////////////////////////////////////
-        // async updateAccessToken() {
-        //     const refreshToken = {
-        //         refreshToken: sessionStorage.getItem("jwtRefreshToken"),
-        //     }
-        //     try {
-        //         const response = await fetch(
-        //             "http://localhost:8085/auth/refresh-token",
-        //             {
-        //                 method: "POST",
-        //                 headers: {
-        //                     "Content-Type": "application/json",
-        //                 },
-        //                 body: JSON.stringify(refreshToken),
-        //             }
-        //         )
-        //         const responseData = await response.json()
-        //         if (
-        //             responseData.refreshToken ===
-        //             `Failed for [${refreshToken.refreshToken}]: Refresh token was expired. Please make a new signin request`
-        //         ) {
-        //             console.log("ubgbgkbkgk")
-        //             try {
-        //                 const result = await this.deleteToken() // использование await для вызова асинхронного метода
-        //                 console.log(result); // обработка результата, который вернул асинхронный метод deleteToken
-        //                 if (result === true) {
-        //                     router.push("/auth/sign-in")
-        //                     sessionStorage.removeItem("jwtToken")
-        //                     sessionStorage.removeItem(
-        //                         "jwtRefreshToken",
-        //                         responseData.accessToken
-        //                     )
-        //                     throw new Error("refresh ---- failed")
-        //                 } else {
-        //                     throw new Error("не фортануло")
-        //                 }
-        //               } catch (error) {
-        //                 console.error(error); // обработка ошибок, если таковые возникнут в deleteToken
-        //               }
-        //         }
-
-        //         sessionStorage.setItem("jwtToken", responseData.accessToken)
-        //     } catch (error) {
-        //         console.error("not refresh error:", error)
-        //     }
-        // },
-        // async deleteToken() {
-        //     const refreshToken = {
-        //         refreshToken: sessionStorage.getItem("jwtRefreshToken"),
-        //     }
-        //     console.log(refreshToken)
-        //     console.log(JSON.stringify(refreshToken))
-            
-        //     try {
-        //         const response = await fetch(
-        //             "http://localhost:8085/auth/sign-out",
-        //             {
-        //                 method: "POST",
-        //                 headers: {
-        //                     "Content-Type": "application/json",
-        //                 },
-        //                 body: JSON.stringify(refreshToken),
-        //             }
-        //         )
-
-        //         console.log(response)
-
-        //         if (response.ok) {
-        //             return true
-        //         } else {
-        //             throw new Error("refresh не дошел")
-        //         }
-        //     } catch (error) {
-        //         console.error("not refresh error:", error)
-        //     }
-        // },
-        //////////////////////////////////////////
         async sendcomment(id_news, new_comment) {
             if (!new_comment.trim()) {
                 console.error("Комментарий пуст!")
@@ -200,23 +136,25 @@ export const useCommentsStore = defineStore("comments", {
                         body: JSON.stringify(textComment),
                     }
                 )
-                console.log('1')
+                console.log("1")
+                console.log(response)
                 if (!response.ok) {
                     if (response.status === 401) {
-                        // await this.updateAccessToken()
+                        //дождаться пока приджет ответ и только потмо вызывать
+                        const result = await this.getAuthStoreMethods()
+                        console.log(result)
 
-
-                        //дождаться пока приджет ответ и только потмо вызывать 
-                        if (this.getAuthStoreMethods()) {
-                            return this.sendcomment(id_news, new_comment) 
+                        if (result) {
+                            return this.sendcomment(id_news, new_comment)
+                        } else {
+                            console.log("false в update access")
                         }
                     } else {
-                        console.log('какой то другой статус')
+                        console.log("какой то другой статус")
                     }
-                    // } else {
-                    //     throw new Error("Ошибка при запросе")
-                    // }
                 }
+
+                ////////////////
                 const responseData = await response.json()
                 const updatedComments = this.comments.find(
                     (item) => item.news_id === id_news
@@ -233,7 +171,7 @@ export const useCommentsStore = defineStore("comments", {
                     comments: this.comments,
                 })
             } catch (error) {
-                console.error("Authentication error:", error)
+                // console.error("Authentication error:", error)
             }
         },
 

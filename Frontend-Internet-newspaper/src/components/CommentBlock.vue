@@ -27,7 +27,6 @@ const new_comment = ref("")
     <div class="footer">
         <div class="comment_area">
             <b-form-textarea
-                id="textarea-small"
                 size="sm"
                 placeholder="Ваш комментарий..."
                 v-model="new_comment"
@@ -59,6 +58,10 @@ const new_comment = ref("")
         >
         </comment-item>
     </div>
+
+    <!-- :key="comment.id" -->
+
+
     <!-- v-if="CommentsStore.commentsCount >= 3 && CommentsStore.comments.filter((obj) => obj.news_id === post.id).flatMap((obj) => obj.comments).length < CommentsStore.commentsCount" -->
 
     <!-- <a
