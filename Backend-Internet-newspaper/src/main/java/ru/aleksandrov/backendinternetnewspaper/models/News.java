@@ -26,7 +26,7 @@ public class News {
     @NotBlank(message = "Tile news must be not empty")
     private String newsTitle;
 
-    @Lob
+//    @Lob
     @Column(columnDefinition = "TEXT")
     @NotBlank(message = "Text news must be not empty")
     private String newsText;
