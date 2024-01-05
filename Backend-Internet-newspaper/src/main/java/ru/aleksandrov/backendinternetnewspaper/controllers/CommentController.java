@@ -37,15 +37,21 @@ public class CommentController {
         this.mappingUtil = mappingUtil;
     }
 
+//    @GetMapping("/show")
+//    public ResponseEntity<List<CommentDto>> getCommentsForNews(@RequestParam("newsId") Integer newsId) {
+//        Integer loadedCommentsCount = loadedCommentsCountMap.getOrDefault(newsId, 0);
+//        Pageable pageable = PageRequest.of(loadedCommentsCount / 3, 3,
+//                Sort.by(Sort.Direction.DESC, "datePublishedComment"));
+//        Slice<Comment> commentsSlice = commentService.getThreeComments(newsId, pageable);
+//        List<CommentDto> commentDto = commentsSlice.getContent().stream()
+//                .map(commentService::convertToCommentDto).collect(Collectors.toList());
+//        loadedCommentsCountMap.put(newsId, loadedCommentsCount + commentDto.size());
+//        return new ResponseEntity<>(commentDto, HttpStatus.OK);
+//    }
+
     @GetMapping("/show")
     public ResponseEntity<List<CommentDto>> getCommentsForNews(@RequestParam("newsId") Integer newsId) {
-        Integer loadedCommentsCount = loadedCommentsCountMap.getOrDefault(newsId, 0);
-        Pageable pageable = PageRequest.of(loadedCommentsCount / 3, 3,
-                Sort.by(Sort.Direction.DESC, "datePublishedComment"));
-        Slice<Comment> commentsSlice = commentService.getThreeComments(newsId, pageable);
-        List<CommentDto> commentDto = commentsSlice.getContent().stream()
-                .map(commentService::convertToCommentDto).collect(Collectors.toList());
-        loadedCommentsCountMap.put(newsId, loadedCommentsCount + commentDto.size());
+        List<CommentDto> commentDto = commentService.getThreeComments(newsId);
         return new ResponseEntity<>(commentDto, HttpStatus.OK);
     }
 
@@ -68,7 +74,7 @@ public class CommentController {
         return new ResponseEntity<>(savedCommentDto, HttpStatus.CREATED);
     }
 
-    @DeleteMapping("/user/{commentId}")
+    @DeleteMapping("/user/{commentId}")  
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<HttpStatus> userDeleteComment(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl,
                                                         @PathVariable("commentId") Integer commentId) {

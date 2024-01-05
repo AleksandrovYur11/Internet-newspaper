@@ -16,6 +16,7 @@ public class SignupRequestDto {
     @Size(min = 2, message = "The surname should have a minimum length of 2 characters")
     private String surname;
     @Email(message = "Please enter a valid email address")
+
     private String email;
     @Pattern(regexp = "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$",
             message = "The password must contain at least 8 characters, including both uppercase and lowercase letters, " +

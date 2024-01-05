@@ -2,8 +2,10 @@ package ru.aleksandrov.backendinternetnewspaper.services;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.aleksandrov.backendinternetnewspaper.dto.model.CommentDto;
 import ru.aleksandrov.backendinternetnewspaper.models.*;
@@ -14,7 +16,10 @@ import ru.aleksandrov.backendinternetnewspaper.utils.MappingUtil;
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -25,14 +30,16 @@ public class CommentService {
     private final NewsService newsService;
     private final MappingUtil mappingUtil;
 
+    private final Map<Integer, Integer> loadedCommentsCountMap = new HashMap<>();
+
     @Autowired
-    public CommentService(UserService userService, CommentRepository commentRepository,
-                          NewsService newsService, MappingUtil mappingUtil) {
+    public CommentService(UserService userService, CommentRepository commentRepository, NewsService newsService, MappingUtil mappingUtil) {
         this.userService = userService;
         this.commentRepository = commentRepository;
         this.newsService = newsService;
         this.mappingUtil = mappingUtil;
     }
+
 
     public List<Comment> findAll() {
         return commentRepository.findAll();
@@ -108,12 +115,22 @@ public class CommentService {
         return commentDto;
     }
 
-    public Slice<Comment> getThreeComments(Integer newsId, Pageable pageable) {
-        return commentRepository.findThreeComments(newsId, pageable);
+    public List<CommentDto> getThreeComments(Integer newsId) {
+        Integer loadedCommentsCount = loadedCommentsCountMap.getOrDefault(newsId, 0);
+        Pageable pageable = PageRequest.of(loadedCommentsCount / 3, 3,
+                Sort.by(Sort.Direction.DESC, "datePublishedComment"));
+        Slice<Comment> commentsSlice = commentRepository.findThreeComments(newsId, pageable);
+        List<CommentDto> commentDto = commentsSlice.getContent().stream()
+                .map(this::convertToCommentDto).collect(Collectors.toList());
+        loadedCommentsCountMap.put(newsId, loadedCommentsCount + commentDto.size());
+        return commentDto;
+    }
+
+    public void clearLoadedCommentsCountMap() {
+        loadedCommentsCountMap.clear();
     }
 
     public Integer getCountComments(Integer newsId) {
         return commentRepository.countByNewsId(newsId);
     }
-
 }

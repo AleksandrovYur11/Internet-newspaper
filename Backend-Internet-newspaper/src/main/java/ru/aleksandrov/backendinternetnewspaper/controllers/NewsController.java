@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.aleksandrov.backendinternetnewspaper.dto.model.NewsDto;
 import ru.aleksandrov.backendinternetnewspaper.models.*;
 import ru.aleksandrov.backendinternetnewspaper.dto.payload.request.NewsRequestDto;
+import ru.aleksandrov.backendinternetnewspaper.services.CommentService;
 import ru.aleksandrov.backendinternetnewspaper.services.NewsService;
 import ru.aleksandrov.backendinternetnewspaper.utils.MappingUtil;
 
@@ -28,12 +29,15 @@ public class NewsController {
 
     private final NewsService newsService;
     private final MappingUtil mappingUtil;
+    private final CommentService commentService;
 
     @Autowired
-    public NewsController(NewsService newsService, MappingUtil mappingUtil) {
+    public NewsController(NewsService newsService, MappingUtil mappingUtil, CommentService commentService) {
         this.newsService = newsService;
         this.mappingUtil = mappingUtil;
+        this.commentService = commentService;
     }
+
 
 //    @GetMapping("/news/{id}")
 //    public ResponseEntity<News> showNews(@PathVariable Long id) {
@@ -55,6 +59,7 @@ public class NewsController {
                 .minus(24, ChronoUnit.HOURS).toLocalDateTime();
         List<NewsDto> newsListDto = newsService.getNewsInLastTwentyFourHours(twentyFourHoursAgo).stream()
                 .map(newsService::convertToNewsDto).collect(Collectors.toList());
+        commentService.clearLoadedCommentsCountMap();
         log.info("Get news that is 24 hours old: Success");
         return new ResponseEntity<>(newsListDto, HttpStatus.OK);
     }
