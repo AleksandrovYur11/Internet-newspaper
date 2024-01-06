@@ -1,10 +1,6 @@
 package ru.aleksandrov.backendinternetnewspaper.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,7 +16,6 @@ import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @CrossOrigin
 @RestController
@@ -29,7 +24,6 @@ public class CommentController {
 
     private final CommentService commentService;
     private final MappingUtil mappingUtil;
-    private final Map<Integer, Integer> loadedCommentsCountMap = new HashMap<>();
 
     @Autowired
     public CommentController(CommentService commentService, MappingUtil mappingUtil) {
@@ -70,6 +64,7 @@ public class CommentController {
                                                   @RequestBody @Valid CommentDto commentDTO) {
         Comment newComment = mappingUtil.convertToComment(commentDTO);
         Comment savedComment = commentService.saveComment(userDetailsImpl, newComment, newsId);
+//        commentService.loadedCommentsCountMap++;
         CommentDto savedCommentDto = commentService.convertToCommentDto(savedComment);
         return new ResponseEntity<>(savedCommentDto, HttpStatus.CREATED);
     }
