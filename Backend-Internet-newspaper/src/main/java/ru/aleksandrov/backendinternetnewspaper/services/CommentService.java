@@ -76,8 +76,11 @@ public class CommentService {
         newComment.setNews(newsService.getNewsById(newsId));
         newComment.setTextComment(comment.getTextComment());
         newComment.setDatePublishedComment(moscowTimeNow);
+//        loadedCommentsCountMap.put(newsId, newComment.getId());
         log.info("Save new comment from user (email) = " + userDetailsImpl.getEmail());
-        return commentRepository.save(newComment);
+        Comment savedComment = commentRepository.save(newComment);
+        loadedCommentsCountMap.put(newsId, loadedCommentsCountMap.getOrDefault(newsId, 0) + 1);
+        return savedComment;
     }
 
     public void deleteUserComment(UserDetailsImpl userDetailsImpl, Integer commentId) {
@@ -116,9 +119,16 @@ public class CommentService {
     }
 
     public List<CommentDto> getThreeComments(Integer newsId) {
+
+//        Integer loadedCommentsCount = loadedCommentsCountMap.getOrDefault(newsId, 0);
+//        Pageable pageable = PageRequest.of(loadedCommentsCount / 3, 3,
+//                Sort.by(Sort.Direction.DESC, "datePublishedComment"));
+//Работает
         Integer loadedCommentsCount = loadedCommentsCountMap.getOrDefault(newsId, 0);
-        Pageable pageable = PageRequest.of(loadedCommentsCount / 3, 3,
+        Pageable pageable = PageRequest.of(loadedCommentsCount , 1,
                 Sort.by(Sort.Direction.DESC, "datePublishedComment"));
+// Работает
+
         Slice<Comment> commentsSlice = commentRepository.findThreeComments(newsId, pageable);
         List<CommentDto> commentDto = commentsSlice.getContent().stream()
                 .map(this::convertToCommentDto).collect(Collectors.toList());
