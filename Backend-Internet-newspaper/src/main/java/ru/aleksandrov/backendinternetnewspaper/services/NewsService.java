@@ -125,20 +125,16 @@ public class NewsService {
 
     public List<NewsDto> getNewsByThemes(Set<Theme> favoriteThemes, Set<Theme> forbiddenThemes) {
         List<NewsDto> newsListDto = new ArrayList<>();
-        Set<Theme> dbFavoriteThemes = new HashSet<>();
-        Set<Theme> dbForbiddenThemes = new HashSet<>();
+        Set<Theme> dbFavoriteThemes = themeService.getThemesFromDb(favoriteThemes);
+        Set<Theme> dbForbiddenThemes = themeService.getThemesFromDb(forbiddenThemes);
 
-        if (!favoriteThemes.isEmpty() && !forbiddenThemes.isEmpty()) {
-            dbFavoriteThemes = themeService.getThemesFromDb(favoriteThemes);
-            dbForbiddenThemes = themeService.getThemesFromDb(forbiddenThemes);
+        if (!dbFavoriteThemes.isEmpty() && !dbForbiddenThemes.isEmpty()) {
             newsListDto = newsRepository.findNewsByThemes(dbFavoriteThemes, dbForbiddenThemes).stream()
                     .map(this::convertToNewsDto).collect(Collectors.toList());
-        } else if (!favoriteThemes.isEmpty()) {
-            dbFavoriteThemes = themeService.getThemesFromDb(favoriteThemes);
+        } else if (!dbFavoriteThemes.isEmpty()) {
             newsListDto = newsRepository.findNewsByFavoriteThemes(dbFavoriteThemes).stream()
                     .map(this::convertToNewsDto).collect(Collectors.toList());
-        } else if (!forbiddenThemes.isEmpty()) {
-            dbForbiddenThemes = themeService.getThemesFromDb(forbiddenThemes);
+        } else if (!dbForbiddenThemes.isEmpty()) {
             newsListDto = newsRepository.findNewsByForbiddenThemes(dbForbiddenThemes).stream()
                     .map(this::convertToNewsDto).collect(Collectors.toList());
         }
