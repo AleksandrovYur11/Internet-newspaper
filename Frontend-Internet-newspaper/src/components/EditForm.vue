@@ -7,6 +7,9 @@ const Auth = useAuthStore()
 import { useNewsStore } from "@/stores/NewsStore"
 const NewsStore = useNewsStore()
 
+import { useFormsStore } from "@/stores/FormsStore.js"
+const FormStore = useFormsStore()
+
 const { props } = defineProps({
     post: {
         type: Object,
@@ -14,43 +17,39 @@ const { props } = defineProps({
     },
 })
 
-// skdjskdjs
-const newsTitle = ref("jj")
-const newsText = ref("kk")
-const picture = ref("ll")
-const themes = ref("dd")
+const newsTitle = ref("")
+const newsText = ref("")
+const picture = ref("")
+const themes = ref("")
 
-onBeforeMount(() => {
-    NewsStore.getInfoNews(NewsStore.edit_post_id)
-    console.log("ooooo")
-    console.log(NewsStore.news_for_edit)
-})
-
-onMounted(() => {
-    if (NewsStore.news_for_edit) {
-        newsTitle.value = NewsStore.news_for_edit.newsTitle
-        newsText.value = NewsStore.news_for_edit.newsText
-        picture.value = NewsStore.news_for_edit.picture.url
-        themes.value = NewsStore.news_for_edit.themes
+onBeforeMount(async () => {
+    await FormStore.getInfoNews(FormStore.edit_post_id)
+    console.log(FormStore.news_for_edit)
+    if (FormStore.news_for_edit) {
+        newsTitle.value = FormStore.news_for_edit.newsTitle
+        newsText.value = FormStore.news_for_edit.newsText
+        picture.value = FormStore.news_for_edit.picture.url
+        themes.value = FormStore.news_for_edit.themes
             .map((theme) => theme.name)
             .join(", ")
     } else {
         console.log("No edit news data available")
     }
 })
+
 </script>
 
 <template>
     <div
         class="container"
-        @click.self="NewsStore.closeEdit()"
+        @click.self="FormStore.closeEdit()"
     >
         <b-form class="custom-form">
             <div class="header_modal">
                 <h4>Edit news</h4>
                 <span
                     class="close"
-                    @click="NewsStore.closeEdit()"
+                    @click="FormStore.closeEdit()"
                     >&times;</span
                 >
             </div>
@@ -145,12 +144,12 @@ onMounted(() => {
                 <b-button
                     type="submit"
                     @click="
-                        NewsStore.updateNews(
+                        FormStore.updateNews(
                             newsTitle,
                             newsText,
                             picture,
                             themes,
-                            NewsStore.edit_post_id
+                            FormStore.edit_post_id
                         )
                     "
                     class="submit_btn"
@@ -158,7 +157,7 @@ onMounted(() => {
                 >
                 <b-button
                     type="submit"
-                    @click="NewsStore.deleteNews(NewsStore.edit_post_id)"
+                    @click="FormStore.deleteNews(FormStore.edit_post_id)"
                     class="submit_btn"
                 >
                     Delete
@@ -193,11 +192,11 @@ h4 {
     display: flex;
     justify-content: space-between;
 }
-.submit_btn {
+/* .submit_btn {
     /* bottom: 20px;
     position: absolute;
     width: 25%; */
-}
+
 
 .header_modal {
     display: flex;
