@@ -57,10 +57,8 @@ export const useNewsStore = defineStore("news", {
 
                 this.news.forEach((news) => {
                     if (news.id === id_news && news.likes && news.likes.length !== 0) {
-                        console.log('111')
                         news.likes.forEach((like) => {
                         if (like.user.id === Number(user_id)) {
-                            console.log('222')
                             likes.push(news[id_news])
                         }
                       })

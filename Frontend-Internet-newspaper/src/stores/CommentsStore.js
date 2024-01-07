@@ -13,9 +13,7 @@ export const useCommentsStore = defineStore("comments", {
     actions: {
         async getAuthStoreMethods() {
             const AuthStore = useAuthStore()
-            const result = await AuthStore.updateAccessToken()
-            console.log(result)
-            return result
+            return await AuthStore.updateAccessToken()
         },
         async checkCommentsCount(id_news) {
             try {
@@ -40,53 +38,52 @@ export const useCommentsStore = defineStore("comments", {
             }
         },
         async showComments(news_id, num) {
-            try {
-                const response = await fetch(
-                    `http://localhost:8085/comment/show?newsId=${news_id}`,
-                    {
-                        method: "GET",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
+            for (let i = 0; i < 3; i++) {
+                try {
+                    const response = await fetch(
+                        `http://localhost:8085/comment/show?newsId=${news_id}`,
+                        {
+                            method: "GET",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                        }
+                    )
+                    if (!response.ok) {
+                        throw new Error("Failed to load comments")
                     }
-                )
-                if (!response.ok) {
-                    throw new Error("Failed to load comments")
-                }
-                const responseData = await response.json()
-                console.log(responseData)
+                    const responseData = await response.json()
+                    console.log(responseData)
 
-                const com_id_news = {
-                    news_id: news_id,
-                    comments: responseData,
-                    showed: false,
-                }
-
-                const commentsCount = await this.checkCommentsCount(news_id) // кол-во комментариев для поста в бд
-
-                const isExistsComment = this.comments.find( // проверяем существование выведенных комментариев для поста
-                    (item) => item.news_id === news_id 
-                )
-
-                if (isExistsComment) {
-                    if (isExistsComment.comments.length < commentsCount) {
-                        isExistsComment.comments.push(...com_id_news.comments)
+                    const com_id_news = {
+                        news_id: news_id,
+                        comments: responseData,
+                        showed: false,
                     }
-                } else {
-                    this.comments.push(com_id_news)
+
+                    const commentsCount = await this.checkCommentsCount(news_id) // кол-во комментариев для поста в бд
+
+                    const isExistsComment = this.comments.find(
+                        // проверяем существование выведенных комментариев для поста
+                        (item) => item.news_id === news_id
+                    )
+
+                    if (isExistsComment) {
+                        if (isExistsComment.comments.length < commentsCount) {
+                            isExistsComment.comments.push(
+                                ...com_id_news.comments
+                            )
+                        }
+                    } else {
+                        this.comments.push(com_id_news)
+                    }
+
+                    this.$patch({
+                        comments: this.comments,
+                    })
+                } catch (error) {
+                    console.error("Fetch error:", error)
                 }
-
-                this.$patch({
-                    comments: this.comments,
-                })
-
-                // // меняем отображение блока комментариев
-                // this.comments[0].showed = !this.comments[0].showed
-
-                //console.log(this.comments)
-                // return this.comments[0].showed
-            } catch (error) {
-                console.error("Fetch error:", error)
             }
         },
         async sendcomment(id_news, new_comment) {
@@ -115,14 +112,9 @@ export const useCommentsStore = defineStore("comments", {
                         body: JSON.stringify(textComment),
                     }
                 )
-                console.log("1")
-                console.log(response)
                 if (!response.ok) {
                     if (response.status === 401) {
-                        //дождаться пока приджет ответ и только потмо вызывать
                         const result = await this.getAuthStoreMethods()
-                        console.log(result)
-
                         if (result) {
                             return this.sendcomment(id_news, new_comment)
                         } else {
@@ -153,7 +145,6 @@ export const useCommentsStore = defineStore("comments", {
                 // console.error("Authentication error:", error)
             }
         },
-
         async deleteComment(id_comment) {
             const role = sessionStorage.getItem("user_role")
             const jwtToken = sessionStorage.getItem("jwtToken")
