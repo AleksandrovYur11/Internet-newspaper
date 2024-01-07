@@ -14,10 +14,20 @@ export const useCommentsStore = defineStore("comments", {
         toggle: false,
     }),
     actions: {
+        closeComments(post_id) {
+            this.commentsCountInfo
+                .filter((item) => item.post_id === post_id)
+                .map((item) => item.toggleShow = false)
+        },
         getCommentsInfo(post_id) {
             return this.commentsCountInfo
                 .filter((item) => item.post_id === post_id)
                 .map((item) => item.show)[0]
+        },
+        checkCommentsToggle(post_id){
+            return  this.commentsCountInfo
+                .filter((item) => item.post_id === post_id)
+                .map((item) => item.toggleShow)[0]
         },
         async getAuthStoreMethods() {
             const AuthStore = useAuthStore()
@@ -54,6 +64,7 @@ export const useCommentsStore = defineStore("comments", {
                 commentsCount: commentsCount,
                 existsComments: 0,
                 show: false,
+                toggleShow: false
             }
 
             for (let i = 0; i < 3; i++) {
@@ -119,6 +130,9 @@ export const useCommentsStore = defineStore("comments", {
             if (foundObject) {
                 foundObject.show =
                     foundObject.existsComments < foundObject.commentsCount
+
+                // для возможности скрыть комментарии
+                foundObject.toggleShow = true
                 // делайте что-то с найденным объектом
             }
 
@@ -127,8 +141,18 @@ export const useCommentsStore = defineStore("comments", {
                 commentsCountInfo: this.commentsCountInfo,
             })
 
-            this.toggle = true
+            //this.toggle = true
         },
+        // closeComments(post_id) {
+        //     const isExistsComment = this.comments.find(
+        //         (item) => item.news_id === post_id
+        //     )
+
+        //     if (isExistsComment) {
+        //         this.comments.filter()
+        //     }
+                
+        // },
         async sendcomment(id_news, new_comment) {
             if (!new_comment.trim()) {
                 console.error("Комментарий пуст!")

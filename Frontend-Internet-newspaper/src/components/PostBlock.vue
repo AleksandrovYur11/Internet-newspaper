@@ -15,7 +15,7 @@ const AuthUser = useAuthStore()
 import { useNewsStore } from "@/stores/NewsStore"
 const NewsStore = useNewsStore()
 
-import {useCommentsStore} from "@/stores/CommentsStore.js"
+import { useCommentsStore } from "@/stores/CommentsStore.js"
 const CommentsStore = useCommentsStore()
 
 import { useFormsStore } from "@/stores/FormsStore.js"
@@ -23,10 +23,8 @@ const FormStore = useFormsStore()
 
 import CommentBlock from "@/components/CommentBlock.vue"
 
-
 const user_id = ref(sessionStorage.getItem("user_id"))
 const user_role = ref(sessionStorage.getItem("user_role"))
-
 </script>
 
 <template>
@@ -34,8 +32,8 @@ const user_role = ref(sessionStorage.getItem("user_role"))
         <b-button
             style="margin-right: 10px"
             v-if="user_role === 'ROLE_ADMIN'"
-            @click = "FormStore.showEdit(post.id)"
-            :post = post
+            @click="FormStore.showEdit(post.id)"
+            :post="post"
             >red</b-button
         >
         <div class="news_container">
@@ -81,15 +79,28 @@ const user_role = ref(sessionStorage.getItem("user_role"))
                         ><b>{{ post.likes.length || 0 }}</b></span
                     >
                 </div>
+                {{ CommentsStore.checkCommentsToggle(post.id) }}
                 <a
                     href=""
-                    @click.prevent = "CommentsStore.showComments(post.id, 1)"
+                    @click.prevent="CommentsStore.showComments(post.id, 1)"
+                    v-if="
+                        !CommentsStore.checkCommentsToggle(post.id) ||
+                        CommentsStore.checkCommentsToggle(post.id) === undefined
+                    "
                 >
                     Комментарии</a
+                >
+                <a
+                    href=""
+                    v-else
+                    @click.prevent="CommentsStore.closeComments(post.id)"
+                >
+                    Скрыть</a
                 >
             </div>
             <comment-block
                 :post="post"
+                v-if="CommentsStore.checkCommentsToggle(post.id)"
             ></comment-block>
         </div>
     </div>
