@@ -58,6 +58,7 @@ export const useAuthStore = defineStore("auth",  {
                 router.push("/auth/sign-in")
                 sessionStorage.removeItem("jwtToken")
                 sessionStorage.removeItem("jwtRefreshToken")
+                alert('Ваша сессия истекла, требуется войти заново')
                return true
           } else {
               throw new Error("refresh не дошел")

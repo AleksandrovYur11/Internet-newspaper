@@ -175,7 +175,7 @@ export const useCommentsStore = defineStore("comments", {
 
                     if (response.status === 204) {
                         console.log("Комментарий успешно удален")
-                    }
+                    } 
                 } else if (role == "ROLE_USER") {
                     const response = await fetch(
                         `http://localhost:8085/comment/user/${id_comment}`,
@@ -188,7 +188,18 @@ export const useCommentsStore = defineStore("comments", {
                         }
                     )
                     if (!response.ok) {
-                        alert("Удаление не прошло")
+                        if (response.status === 401) {
+                            const result = await this.getAuthStoreMethods()
+                            if (result) {
+                                return this.deleteComment(id_comment)
+                            } else {
+                                console.log("false в update access")
+                            }
+                        } else {
+                            console.log("какой то другой статус")
+                        }
+
+                        //alert("Удаление не прошло")
                         throw new Error("Authentication failed")
                     }
 

@@ -18,6 +18,9 @@ const NewsStore = useNewsStore()
 import {useCommentsStore} from "@/stores/CommentsStore.js"
 const CommentsStore = useCommentsStore()
 
+import { useFormsStore } from "@/stores/FormsStore.js"
+const FormStore = useFormsStore()
+
 import CommentBlock from "@/components/CommentBlock.vue"
 
 
@@ -31,7 +34,7 @@ const user_role = ref(sessionStorage.getItem("user_role"))
         <b-button
             style="margin-right: 10px"
             v-if="user_role === 'ROLE_ADMIN'"
-            @click = "NewsStore.showEdit(post.id)"
+            @click = "FormStore.showEdit(post.id)"
             :post = post
             >red</b-button
         >

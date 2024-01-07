@@ -1,5 +1,6 @@
 import { defineStore } from "pinia"
 import { useNewsStore } from "@/stores/NewsStore.js"
+import { useAuthStore } from "@/stores/AuthStore.js"
 
 export const useFormsStore = defineStore("forms", {
     state: () => ({
@@ -10,11 +11,13 @@ export const useFormsStore = defineStore("forms", {
         edit_post_id: null,
     }),
     actions: {
+        async getAuthStoreMethods() {
+            const AuthStore = useAuthStore()
+            return await AuthStore.updateAccessToken()
+        },
         async getnews() {
             const NewsStore = useNewsStore()
             return await NewsStore.getnews()
-            // console.log(result)
-            // return result
         },
         async deleteNews(news_id) {
             const jwtToken = sessionStorage.getItem("jwtToken")
@@ -36,7 +39,17 @@ export const useFormsStore = defineStore("forms", {
                 )
                 console.log(response)
                 if (!response.ok) {
-                    alert("Неправильный вход!")
+                    if (response.status === 401) {
+                        const result = await this.getAuthStoreMethods()
+                        if (result) {
+                            return this.deleteNews(news_id)
+                        } else {
+                            console.log("false в update access")
+                        }
+                    } else {
+                        console.log("какой то другой статус")
+                    }
+                    //alert("Неправильный вход!")
                     throw new Error("Authentication failed")
                 }
                 this.closeEdit()
@@ -63,8 +76,19 @@ export const useFormsStore = defineStore("forms", {
                         }),
                     }
                 )
+                console.log(response)
                 if (!response.ok) {
-                    alert("Неправильный вход!")
+                    if (response.status === 401) {
+                        const result = await this.getAuthStoreMethods()
+                        if (result) {
+                            return this.getInfoNews(news_id)
+                        } else {
+                            console.log("false в update access")
+                        }
+                    } else {
+                        console.log("какой то другой статус")
+                    }
+                    //alert("Неправильный вход!")
                     throw new Error("Authentication failed")
                 }
                 const responseData = await response.json()
@@ -106,7 +130,17 @@ export const useFormsStore = defineStore("forms", {
                     }
                 )
                 if (!response.ok) {
-                    alert("Неправильный вход!")
+                    if (response.status === 401) {
+                        const result = await this.getAuthStoreMethods()
+                        if (result) {
+                            return this.updateNews(newsTitle, newsText, picture, themes, news_id)
+                        } else {
+                            console.log("false в update access")
+                        }
+                    } else {
+                        console.log("какой то другой статус")
+                    }
+                    //alert("Неправильный вход!")
                     throw new Error("Authentication failed")
                 }
                 this.closeEdit()
@@ -125,12 +159,12 @@ export const useFormsStore = defineStore("forms", {
             this.edit = false
             this.getnews()
         },
-        showModal() {
-            this.modal = true
-        },
-        closeModal() {
-            this.modal = false
-            this.getnews()
-        },
+        // showModal() {
+        //     this.modal = true
+        // },
+        // closeModal() {
+        //     this.modal = false
+        //     this.getnews()
+        // },
     },
 })
