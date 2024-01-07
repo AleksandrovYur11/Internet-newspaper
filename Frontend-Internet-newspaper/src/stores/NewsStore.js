@@ -52,43 +52,21 @@ export const useNewsStore = defineStore("news", {
                 return
             }
             try {
-                console.log(this.news)
-
+               
                 const likes = []
 
                 this.news.forEach((news) => {
                     if (news.id === id_news && news.likes && news.likes.length !== 0) {
+                        console.log('111')
                         news.likes.forEach((like) => {
-                        if (like.user.id === user_id) {
-                            likes.push(news[id_news].likes);
+                        if (like.user.id === Number(user_id)) {
+                            console.log('222')
+                            likes.push(news[id_news])
                         }
                       })
-                    //likes.push(news.likes)
                     }
                   })
-                
 
-                console.log(likes);
-
-     
-
-                // const hasNewsWithCommentByUser = this.news.some((item) => {
-                //     if (item.likes.length !== 0) {
-                //         console.log(
-                //             item.likes.some((like) => like.user.id == user_id)
-                //         )
-                //         console.log(item.likes[0].user.id)
-                //         console.log(user_id)
-                //         return (
-                //             item.id === id_news &&
-                //             item.likes.some((like) => like.user.id == user_id)
-                //         )
-                //     } else {
-                //         return false
-                //     }
-                // })
-
-                // hasNewsWithCommentByUser
                 if (likes.length!==0) {
                     const response = await fetch(
                         `http://localhost:8085/likes?newsId=${id_news}`,
@@ -116,7 +94,7 @@ export const useNewsStore = defineStore("news", {
                             }),
                         }
                     )
-                    // this.likes = 
+                  
                     if (!response.ok) {
                         alert("Добавление лайка не прошло!!")
                         throw new Error("Authentication failed")
@@ -126,13 +104,6 @@ export const useNewsStore = defineStore("news", {
                 //!!!!!!!!!!!
                 this.getnews()
 
-
-                // this.$patch({
-                //     likes: this.likes,
-                // })
-
-                // const responseData = await response.json()
-                // console.log(responseData)
             } catch (error) {
                 console.error("Authentication error:", error)
             }
@@ -302,20 +273,6 @@ export const useNewsStore = defineStore("news", {
             this.modal = false
         },
         async filterThemes(positive, negative) {
-            // {
-            //     "favoritesThemes" : [
-            //         {
-            //             "name": "Джаонозис"
-            //         }
-            //         ],
-            //     "forbiddenThemes" : [
-            //         {
-            //             "name": "Мустафар"
-            //         }
-            //         ]
-            // }
-            // const positive = positive.split(',').map(theme => ({ name: theme.trim() }))
-            // const negative = negative.split(',').map(theme => ({ name: theme.trim() }))
             const themes = {
                 favoritesThemes: positive
                     .split(",")
@@ -324,14 +281,9 @@ export const useNewsStore = defineStore("news", {
                     .split(",")
                     .map((theme) => ({ name: theme.trim() })),
             }
-            console.log(themes)
-            const jwtToken = sessionStorage.getItem("jwtToken")
-            // if (!jwtToken) {
-            //     console.error("Отсутствует JWT-токен!")
-            //     return
-            // }
+        
             try {
-                console.log(jwtToken)
+              
                 const response = await fetch(
                     `http://localhost:8085/news/user-themes`,
                     {
@@ -351,7 +303,10 @@ export const useNewsStore = defineStore("news", {
                 // this.filtr_news = responseData
                 console.log(responseData)
 
-                this.getnews()
+                this.$patch({
+                    news: responseData,
+                })
+
             } catch (error) {
                 console.error("Authentication error:", error)
             }
