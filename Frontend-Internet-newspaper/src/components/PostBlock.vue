@@ -79,7 +79,7 @@ const user_role = ref(sessionStorage.getItem("user_role"))
                         ><b>{{ post.likes.length || 0 }}</b></span
                     >
                 </div>
-                {{ CommentsStore.checkCommentsToggle(post.id) }}
+                <!-- {{ CommentsStore.checkCommentsToggle(post.id) }} -->
                 <a
                     href=""
                     @click.prevent="CommentsStore.showComments(post.id, 1)"
