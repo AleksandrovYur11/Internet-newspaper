@@ -35,14 +35,17 @@ export const useAuthStore = defineStore("auth",  {
                 responseData.refreshToken ===
                 `Failed for [${refreshToken.refreshToken}]: Refresh token was expired. Please make a new signin request`
             ) {
-                    return await this.deleteToken(refreshToken) // использование await для вызова асинхронного метода
+                    return await this.deleteToken() // использование await для вызова асинхронного метода
             }
             sessionStorage.setItem("jwtToken", responseData.accessToken)
         } catch (error) {
             return false
         }
     },
-    async deleteToken(refreshToken) {
+    async deleteToken() {
+        const refreshToken = {
+            refreshToken: sessionStorage.getItem("jwtRefreshToken"),
+        }
       try {
           const response = await fetch(
               "http://localhost:8085/auth/sign-out",
@@ -67,6 +70,7 @@ export const useAuthStore = defineStore("auth",  {
           return false
       }
   },
+
         async login(textEmail, textPassword) {
             const loginData = {
                 email: textEmail,

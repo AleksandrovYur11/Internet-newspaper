@@ -48,7 +48,7 @@ const user_role = ref(sessionStorage.getItem('user_role'))
                     <b-button  v-if =  "user_role == 'ROLE_ADMIN'" @click="NewsStore.showModal()"> + </b-button>
                     <b-nav-item
                         to="/auth/sign-in"
-                        @click="AuthUser.sbrosRole()"
+                        @click="AuthUser.deleteToken()"
                         >Sign Out</b-nav-item
                     >
                 </div>
