@@ -9,8 +9,16 @@ export const useCommentsStore = defineStore("comments", {
         news: null,
         commentsCount: 0,
         showed: false,
+
+        commentsCountInfo: [],
+        toggle: false,
     }),
     actions: {
+        getCommentsInfo(post_id) {
+            return this.commentsCountInfo
+                .filter((item) => item.post_id === post_id)
+                .map((item) => item.show)[0]
+        },
         async getAuthStoreMethods() {
             const AuthStore = useAuthStore()
             return await AuthStore.updateAccessToken()
@@ -38,6 +46,16 @@ export const useCommentsStore = defineStore("comments", {
             }
         },
         async showComments(news_id, num) {
+            const commentsCount = await this.checkCommentsCount(news_id) // кол-во комментариев для поста в бд
+
+            // информация о комментариях поста для тоглов
+            const commentInfo = {
+                post_id: news_id,
+                commentsCount: commentsCount,
+                existsComments: 0,
+                show: false,
+            }
+
             for (let i = 0; i < 3; i++) {
                 try {
                     const response = await fetch(
@@ -61,8 +79,6 @@ export const useCommentsStore = defineStore("comments", {
                         showed: false,
                     }
 
-                    const commentsCount = await this.checkCommentsCount(news_id) // кол-во комментариев для поста в бд
-
                     const isExistsComment = this.comments.find(
                         // проверяем существование выведенных комментариев для поста
                         (item) => item.news_id === news_id
@@ -74,8 +90,11 @@ export const useCommentsStore = defineStore("comments", {
                                 ...com_id_news.comments
                             )
                         }
+                        commentInfo.existsComments =
+                            isExistsComment.comments.length
                     } else {
                         this.comments.push(com_id_news)
+                        commentInfo.existsComments = 3
                     }
 
                     this.$patch({
@@ -85,6 +104,30 @@ export const useCommentsStore = defineStore("comments", {
                     console.error("Fetch error:", error)
                 }
             }
+            // для comments count
+            const index = this.commentsCountInfo.findIndex(
+                (item) => item.news_id === commentInfo.news_id
+            )
+            index !== -1
+                ? (this.commentsCountInfo[index] = commentInfo)
+                : this.commentsCountInfo.push(commentInfo)
+
+            const foundObject = this.commentsCountInfo.find(
+                (item) => item.post_id == news_id
+            )
+
+            if (foundObject) {
+                foundObject.show =
+                    foundObject.existsComments < foundObject.commentsCount
+                // делайте что-то с найденным объектом
+            }
+
+            console.log(this.commentsCountInfo)
+            this.$patch({
+                commentsCountInfo: this.commentsCountInfo,
+            })
+
+            this.toggle = true
         },
         async sendcomment(id_news, new_comment) {
             if (!new_comment.trim()) {
@@ -175,7 +218,7 @@ export const useCommentsStore = defineStore("comments", {
 
                     if (response.status === 204) {
                         console.log("Комментарий успешно удален")
-                    } 
+                    }
                 } else if (role == "ROLE_USER") {
                     const response = await fetch(
                         `http://localhost:8085/comment/user/${id_comment}`,

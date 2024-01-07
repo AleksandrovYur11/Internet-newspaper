@@ -13,16 +13,10 @@ const { props } = defineProps({
     },
 })
 
-// const user_id = ref(sessionStorage.getItem("user_id"))
-// const user_role = ref(sessionStorage.getItem("user_role"))
-
 const new_comment = ref("")
 
-// const filteredComments = computed(() =>
-//     CommentsStore.comments.filter((obj) => obj.news_id === post.id)
-// )
 </script>
-<!-- @keyup.enter="handleCreatePost" -->
+
 <template>
     <div class="footer">
         <div class="comment_area">
@@ -58,17 +52,12 @@ const new_comment = ref("")
         >
         </comment-item>
     </div>
-
-    <!-- :key="comment.id" -->
-
-
-    <!-- v-if="CommentsStore.commentsCount >= 3 && CommentsStore.comments.filter((obj) => obj.news_id === post.id).flatMap((obj) => obj.comments).length < CommentsStore.commentsCount" -->
-
-    <!-- <a
+    <a
+        v-if="CommentsStore.getCommentsInfo(post.id)"
         href=""
         @click.prevent="CommentsStore.showComments(post.id, 2)"
-        >Еще</a
-    > -->
+        >Еще
+    </a>
 </template>
 
 <style scoped>
