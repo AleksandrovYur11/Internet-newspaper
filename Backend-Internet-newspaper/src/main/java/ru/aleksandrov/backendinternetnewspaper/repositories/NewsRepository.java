@@ -41,28 +41,27 @@ public interface NewsRepository extends JpaRepository<News, Integer> {
             @Param("forbiddenThemes") Set<Theme> forbiddenThemes);
 //-------------------------------------------
 
-//    @Transactional
-//    @Query("SELECT n FROM news n JOIN n.theme t " +
-//            "WHERE t IN :favoritesThemes ")
-//    List<News> findNewsByFavoriteThemes(
-//            @Param("favoritesThemes") Set<Theme> favoritesThemes);
     @Transactional
-    @Query("SELECT n FROM news n WHERE n.theme IN :favoritesThemes")
-    List<News> findNewsByFavoriteThemes(@Param("favoritesThemes") Set<Theme> favoritesThemes);
-
+    @Query("SELECT n FROM news n JOIN n.theme t " +
+            "WHERE t IN :favoritesThemes ")
+    List<News> findNewsByFavoriteThemes(
+            @Param("favoritesThemes") Set<Theme> favoritesThemes);
+//    @Transactional
+//    @Query("SELECT n FROM news n WHERE n.theme IN :favoritesThemes")
+//    List<News> findNewsByFavoriteThemes(@Param("favoritesThemes") Set<Theme> favoritesThemes);
 
 
     //-----------------------------
 
-    //    @Transactional
-//    @Query("SELECT n FROM news n " +
-//            "WHERE (EXISTS (SELECT t1 FROM n.theme t1)) AND " +
-//            "NOT EXISTS (SELECT t2 FROM n.theme t2 WHERE t2 IN :forbiddenThemes)")
-//    List<News> findNewsByForbiddenUserThemes(
-//            @Param("forbiddenThemes") Set<Theme> forbiddenThemes);
-    @Transactional
-    @Query("SELECT n FROM news n WHERE n.theme NOT IN :forbiddenThemes")
+        @Transactional
+    @Query("SELECT n FROM news n " +
+            "WHERE (EXISTS (SELECT t1 FROM n.theme t1)) AND " +
+            "NOT EXISTS (SELECT t2 FROM n.theme t2 WHERE t2 IN :forbiddenThemes)")
     List<News> findNewsByForbiddenThemes(
             @Param("forbiddenThemes") Set<Theme> forbiddenThemes);
+//    @Transactional
+//    @Query("SELECT n FROM news n WHERE n.theme NOT IN :forbiddenThemes")
+//    List<News> findNewsByForbiddenThemes(
+//            @Param("forbiddenThemes") Set<Theme> forbiddenThemes);
     //---------------------------------
 }
