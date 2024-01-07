@@ -7,6 +7,13 @@ const negative = ref("")
 import {useNewsStore} from '@/stores/NewsStore.js'
 const NewsStore = useNewsStore()
 
+const clearThemes =()=>{
+  positive.value = ""
+  negative.value = ""
+
+  NewsStore.getnews()
+}
+
 
 </script>
 
@@ -34,6 +41,7 @@ const NewsStore = useNewsStore()
           ></b-form-input>
         </b-form-group>
         <b-button variant="primary" size="sm" @click="NewsStore.filterThemes(positive, negative)">Filter</b-button>
+        <b-button variant="danger" size="sm" @click="clearThemes()">Clear</b-button>
       </b-dropdown-form>
     </b-dropdown>
 </template>
