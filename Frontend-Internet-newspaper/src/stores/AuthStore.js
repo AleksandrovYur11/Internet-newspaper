@@ -1,75 +1,77 @@
 import { defineStore } from "pinia"
-import router from '@/router/index.js'
+import router from "@/router/index.js"
 
 import { useNewsStore } from "@/stores/NewsStore"
 
-
-export const useAuthStore = defineStore("auth",  {
+export const useAuthStore = defineStore("auth", {
     state: () => ({
-        JWT: null, 
+        JWT: null,
         selectedRole: null,
         user: null,
         role: null,
         reg_users: [],
         news: null,
-        user_role: ''
+        user_role: "",
     }),
     actions: {
-      async updateAccessToken() {
-        const refreshToken = {
-            refreshToken: sessionStorage.getItem("jwtRefreshToken"),
-        }
-        try {
-            const response = await fetch(
-                "http://localhost:8085/auth/refresh-token",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(refreshToken),
-                }
-            )
-            const responseData = await response.json()
-            if (
-                responseData.refreshToken ===
-                `Failed for [${refreshToken.refreshToken}]: Refresh token was expired. Please make a new signin request`
-            ) {
-                    return await this.deleteToken() // использование await для вызова асинхронного метода
+        async updateAccessToken() {
+            const refreshToken = {
+                refreshToken: sessionStorage.getItem("jwtRefreshToken"),
             }
-            sessionStorage.setItem("jwtToken", responseData.accessToken)
-        } catch (error) {
-            return false
-        }
-    },
-    async deleteToken() {
-        const refreshToken = {
-            refreshToken: sessionStorage.getItem("jwtRefreshToken"),
-        }
-      try {
-          const response = await fetch(
-              "http://localhost:8085/auth/sign-out",
-              {
-                  method: "POST",
-                  headers: {
-                      "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify(refreshToken),
-              }
-          )
-          if (response.ok) {
-                router.push("/auth/sign-in")
-                sessionStorage.removeItem("jwtToken")
-                sessionStorage.removeItem("jwtRefreshToken")
-                alert('Ваша сессия истекла, требуется войти заново')
-               return true
-          } else {
-              throw new Error("refresh не дошел")
-          }
-      } catch (error) {
-          return false
-      }
-  },
+            try {
+                const response = await fetch(
+                    "http://localhost:8085/auth/refresh-token",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(refreshToken),
+                    }
+                )
+                const responseData = await response.json()
+                if (
+                    responseData.refreshToken ===
+                    `Failed for [${refreshToken.refreshToken}]: Refresh token was expired. Please make a new signin request`
+                ) {
+                    return await this.deleteToken() // использование await для вызова асинхронного метода
+                }
+                sessionStorage.setItem("jwtToken", responseData.accessToken)
+            } catch (error) {
+                return false
+            }
+        },
+        async deleteToken() {
+            const refreshToken = {
+                refreshToken: sessionStorage.getItem("jwtRefreshToken"),
+            }
+            try {
+                const response = await fetch(
+                    "http://localhost:8085/auth/sign-out",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(refreshToken),
+                    }
+                )
+                console.log(response)
+                if (response.ok) {
+                    router.push("/auth/sign-in")
+                    sessionStorage.removeItem("jwtToken")
+                    sessionStorage.removeItem("jwtRefreshToken")
+                    sessionStorage.removeItem("user_role")
+                    sessionStorage.removeItem("user_id")
+                    alert("Ваша сессия истекла, требуется войти заново")
+                    return true
+                } else {
+                    throw new Error("refresh не дошел")
+                }
+            } catch (error) {
+                return false
+            }
+        },
 
         async login(textEmail, textPassword) {
             const loginData = {
@@ -78,103 +80,84 @@ export const useAuthStore = defineStore("auth",  {
             }
             console.log(loginData)
             try {
-                const response = await fetch("http://localhost:8085/auth/sign-in", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(loginData),
-                })
-        
+                const response = await fetch(
+                    "http://localhost:8085/auth/sign-in",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(loginData),
+                    }
+                )
+
+                console.log(response)
                 if (!response.ok) {
-                    alert('Неправильный вход!')
-                    textEmail = null
-                    textPassword = null
+                    alert("Неверный вход!")
                     throw new Error("Authentication failed")
                 }
-        
+
                 const responseData = await response.json()
 
-                sessionStorage.setItem('user_id', responseData.id)
-                sessionStorage.setItem('user_role', responseData.roles[0])
-              
-                this.user = sessionStorage.getItem('user_id')
-                this.role = sessionStorage.getItem('user_role')
+                sessionStorage.setItem("user_id", responseData.id)
+                sessionStorage.setItem("user_role", responseData.roles[0])
+
+                this.user = sessionStorage.getItem("user_id")
+                this.role = sessionStorage.getItem("user_role")
 
                 console.log(this.user)
                 console.log(this.role)
 
                 //console.log()
-                
+
                 const jwtToken = responseData.accessToken
                 const jwtRefreshToken = responseData.refreshToken
-                sessionStorage.setItem('jwtRefreshToken', jwtRefreshToken)
+                sessionStorage.setItem("jwtRefreshToken", jwtRefreshToken)
 
                 //const name = responseData.name
                 console.log(responseData)
-        
-                this.selectRole(responseData.roles[0])
+
+                this.role = responseData.roles[0]
                 console.log(responseData.roles[0])
-                
-                sessionStorage.setItem('jwtToken', jwtToken);
-                
-                router.push('/news/fresh-news')
+
+                sessionStorage.setItem("jwtToken", jwtToken)
+
+                router.push("/news/fresh-news")
             } catch (error) {
                 console.error("Authentication error:", error)
             }
         },
         async register(regData) {
-            //console.log(regData)
             const userData = {
-              name: regData.textName,
-              surname: regData.textSurname,
-              email: regData.textEmail, 
-              password: regData.textPassword, 
-            };
-            console.log(userData)
-            try {
-              const response = await fetch("http://localhost:8085/auth/sign-up", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify(userData),
-              });
-          
-              if (!response.ok) {
-                // Обработка ошибок при регистрации
-                throw new Error("Registration failed");
-              }
-
-            //   const News = useNewsStore()
-            // this.news = News.getnews()
-              //const responseData = await response.json()
-              //this.reg_users.push(responseData)
-              router.push('/auth/sign-in')
-              
-            } catch (error) {
-              console.error("Registration error:", error);
+                name: regData.textName,
+                surname: regData.textSurname,
+                email: regData.textEmail,
+                password: regData.textPassword,
             }
-          },
-        // setAuthUser(responseData){
-        //     this.JWT = responseData.accessToken
-        //     // console.log(responseData)
-        // },
-        selectRole(role){
-            this.role = role
-        },
-        sbrosRole(){
-            this.role = null
-            sessionStorage.removeItem('user_id')
-            sessionStorage.removeItem('user_role')
-            sessionStorage.removeItem('jwtToken')
+            try {
+                const response = await fetch(
+                    "http://localhost:8085/auth/sign-up",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(userData),
+                    }
+                )
+                console.log(response)
+                if (!response.ok) {
+                    if (response.status === 409) {
+                        alert('Пользователь с данным email уже существует!')
+                    }
+                    throw new Error("Registration failed")
+                }
 
-            const NewsStore = useNewsStore()
-            NewsStore.likes = []
-            //sessionStorage.removeItem('news_for_edit')
+                router.push("/auth/sign-in")
+                alert('Вы успешно зарегестрированы!')
+            } catch (error) {
+                console.error("Registration error:", error)
+            }
         },
     },
 })
-
-    
-        

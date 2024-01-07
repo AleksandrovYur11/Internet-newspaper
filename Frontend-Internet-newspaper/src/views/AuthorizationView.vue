@@ -46,7 +46,6 @@ const signInValidation = () => {
         <template #header> </template>
         <template #container>
             <b-form
-                @submit.prevent="login"
                 class="custom-form"
             >
                 <h4>Sign In</h4>
