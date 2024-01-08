@@ -5,11 +5,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -23,7 +21,6 @@ public class NewsDto {
     private String newsTitle;
     @NotBlank(message = "The text of the news should not be empty")
     private String newsText;
-    //    @PastOrPresent(message = "The publication date must be before or in now present time")
     private LocalDateTime datePublishedNews;
     @Valid
     private List<LikeDto> likes;

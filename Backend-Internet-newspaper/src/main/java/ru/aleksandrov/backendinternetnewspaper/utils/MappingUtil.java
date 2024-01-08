@@ -69,5 +69,4 @@ public class MappingUtil {
     public News convertToNews(NewsDto newsDto) {
         return modelMapper.map(newsDto, News.class);
     }
-
 }

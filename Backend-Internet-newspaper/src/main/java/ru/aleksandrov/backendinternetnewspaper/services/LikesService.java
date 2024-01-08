@@ -1,6 +1,5 @@
 package ru.aleksandrov.backendinternetnewspaper.services;
 
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,7 +26,8 @@ public class LikesService {
         like.setNews(news);
         like.setUser(user);
         likesRepositories.save(like);
-        log.info("Save new like from user (email) = " + user.getEmail() + " for news (title) = " + news.getNewsTitle() + ": Success");
+        log.info("Save new like from user (email) = " + user.getEmail() + " for news (title) = "
+                + news.getNewsTitle() + ": Success");
     }
 
     public void deleteLike(News news, User user) {

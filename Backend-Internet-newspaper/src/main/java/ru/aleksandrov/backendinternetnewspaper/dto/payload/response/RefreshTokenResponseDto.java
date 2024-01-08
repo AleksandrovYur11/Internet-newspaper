@@ -1,7 +1,6 @@
 package ru.aleksandrov.backendinternetnewspaper.dto.payload.response;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 

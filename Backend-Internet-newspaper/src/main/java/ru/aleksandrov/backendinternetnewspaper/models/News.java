@@ -8,7 +8,6 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -26,13 +25,10 @@ public class News {
     @NotBlank(message = "Tile news must be not empty")
     private String newsTitle;
 
-//    @Lob
     @Column(columnDefinition = "TEXT")
     @NotBlank(message = "Text news must be not empty")
     private String newsText;
 
-//    @Past(message = "The publication date must be before the present time")
-//    @PastOrPresent(message = "The publication date must be before or in now present time")
     private LocalDateTime datePublishedNews;
 
     @OneToMany(mappedBy = "news")
@@ -54,8 +50,7 @@ public class News {
             inverseJoinColumns = @JoinColumn(name = "theme_id"))
     @NotNull(message = "News must have at least one theme")
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private Set<Theme> theme = new HashSet<>();
-
+    private Set<Theme> theme;
 }
 
 
