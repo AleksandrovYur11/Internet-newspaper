@@ -10,10 +10,16 @@ const NewsStore = useNewsStore()
 const clearThemes =()=>{
   positive.value = ""
   negative.value = ""
-
   NewsStore.getnews()
 }
 
+const filterThemes = ()=>{
+  if (positive.value.length===0 && negative.value.length === 0) {
+    alert('Укажите темы')
+  } else {
+    NewsStore.filterThemes(positive.value, negative.value)
+  }
+}
 
 </script>
 
@@ -40,7 +46,7 @@ const clearThemes =()=>{
             @click.stop
           ></b-form-input>
         </b-form-group>
-        <b-button variant="primary" size="sm" @click="NewsStore.filterThemes(positive, negative)">Filter</b-button>
+        <b-button variant="primary" size="sm" @click="filterThemes()">Filter</b-button>
         <b-button variant="danger" size="sm" @click="clearThemes()">Clear</b-button>
       </b-dropdown-form>
     </b-dropdown>
