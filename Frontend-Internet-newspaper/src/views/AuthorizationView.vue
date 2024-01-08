@@ -5,28 +5,47 @@ import { ref, computed } from "vue"
 import { useAuthStore } from "@/stores/AuthStore"
 const AuthUser = useAuthStore()
 
-//написать валидацию для почты и пароля потом! + не давать вводить пароль некоторые символы
 const textEmail = ref(null)
 const validation_email = computed(() => {
-    if (textEmail.value)
-        return textEmail.value.length > 4 && textEmail.value.length < 30
+    if (textEmail.value) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+        return emailRegex.test(textEmail.value)
+    }
 })
 
 const textPassword = ref(null)
 const validation_password = computed(() => {
-    if (textPassword.value)
-        return textPassword.value.length > 4 && textPassword.value.length < 30
+    if (textPassword.value) {
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/
+        return passwordRegex.test(textPassword.value)
+    }
 })
+
+const isInputValid = computed(() => {
+    console.log(validation_email.value && validation_password.value)
+    return validation_email.value && validation_password.value
+})
+
+const signInValidation = () => {
+    console.log(textEmail.value)
+    if (!textEmail.value || !textPassword.value) {
+        alert("Заполните все поля!")
+    } else if (!isInputValid.value) {
+        alert("Проверьте правильность ввода!")
+    } else {
+        AuthUser.login(textEmail.value, textPassword.value)
+        textEmail.value = null
+        textPassword.value = null
+    }
+}
 
 </script>
 
 <template>
     <main-block>
         <template #header> </template>
-        <!-- @submit.stop.prevent -->
         <template #container>
             <b-form
-                @submit.prevent="login"
                 class="custom-form"
             >
                 <h4>Sign In</h4>
@@ -45,10 +64,10 @@ const validation_password = computed(() => {
                         required
                     ></b-form-input>
                     <b-form-invalid-feedback :state="validation_email">
-                        Your user ID must be 5-12 characters long.
+                        Проверьте правильность email
                     </b-form-invalid-feedback>
                     <b-form-valid-feedback :state="validation_email">
-                        Looks Good.
+                        Выглядит хорошо!
                     </b-form-valid-feedback>
                 </b-form-group>
                 <b-form-group
@@ -65,16 +84,14 @@ const validation_password = computed(() => {
                         :state="validation_password"
                     ></b-form-input>
                     <b-form-invalid-feedback :state="validation_password">
-                        Your user ID must be 5-12 characters long.
+                        Больше символов...
                     </b-form-invalid-feedback>
                     <b-form-valid-feedback :state="validation_password">
-                        Looks Good.
+                        Выглядит отлично!
                     </b-form-valid-feedback>
                 </b-form-group>
-                <!-- type = "submit" -->
-                
                 <b-button
-                    @click="AuthUser.login(textEmail, textPassword)"
+                    @click="signInValidation()"
                     variant="primary"
                     class="submit_btn"
                     >Submit</b-button

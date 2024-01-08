@@ -13,14 +13,16 @@ const NewsStore = useNewsStore()
 
 import EditForm from "@/components/EditForm.vue"
 
+import { useFormsStore } from "@/stores/FormsStore.js"
+const FormStore = useFormsStore()
+
 onBeforeMount(() => {
     NewsStore.getnews()
 })
-// ldldldlld
 </script>
 
 <template>
-    <edit-form v-if="NewsStore.edit === true"/>
+    <edit-form v-if="FormStore.edit"/>
     <modal-form v-if="NewsStore.modal === true" />
     <main-block>
         <template #container>
