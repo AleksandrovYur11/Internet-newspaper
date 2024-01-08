@@ -103,13 +103,15 @@ export const useNewsStore = defineStore("news", {
                     throw new Error("Authentication failed")
                 }
 
-                const updatedNewsIndex = this.news.findIndex( // обновление 
+                const updatedNewsIndex = this.news.findIndex(
+                    // обновление
                     (news) => news.id === id_news
                 )
-                if (existLike) { 
+                if (existLike) {
                     this.news[updatedNewsIndex].likes = this.news[ // удаление
                         updatedNewsIndex
-                    ].likes.filter((like) => like.user.id !== Number(user_id))
+                    ].likes
+                        .filter((like) => like.user.id !== Number(user_id))
                 } else {
                     const newLike = { user: { id: Number(user_id) } } // добавление
                     this.news[updatedNewsIndex].likes.push(newLike)

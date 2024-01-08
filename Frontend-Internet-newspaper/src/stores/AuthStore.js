@@ -72,7 +72,6 @@ export const useAuthStore = defineStore("auth", {
                 return false
             }
         },
-
         async login(textEmail, textPassword) {
             const loginData = {
                 email: textEmail,

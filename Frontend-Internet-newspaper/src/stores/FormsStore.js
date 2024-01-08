@@ -159,12 +159,47 @@ export const useFormsStore = defineStore("forms", {
             this.edit = false
             this.getnews()
         },
-        // showModal() {
-        //     this.modal = true
-        // },
-        // closeModal() {
-        //     this.modal = false
-        //     this.getnews()
-        // },
+        formsValidation(newsTitle, newsText, picture, themes, formType, news_id) {
+            const urlRegex = /\.(jpeg|jpg|gif|png|bmp|svg)$/i
+            const maxTextLength = 255
+            console.log(themes)
+            const themeInvalidLength = themes
+                .split(",")
+                .some((theme) => theme.trim().length > maxTextLength)
+            if (
+                newsTitle.length === 0 ||
+                newsText.length === 0 ||
+                picture.length === 0 ||
+                themes.length === 0
+            ) {
+                alert("Заполните все поля!")
+            } else if (newsTitle.length > maxTextLength) {
+                alert("Название не должно превышать 255 символов")
+            } else if (themeInvalidLength) {
+                alert("Одна тема не должна превышать 255 символов")
+            } else if (!urlRegex.test(picture)) {
+                console.log(picture)
+                console.log(urlRegex.test(picture))
+                alert("Некорректный URL картинки")
+            } else {
+                console.log(formType)
+                if (formType === 'modal') {
+                    const NewsStore = useNewsStore()
+                    NewsStore.addNews(
+                    newsTitle,
+                    newsText,
+                    picture,
+                    themes
+                ) 
+                } else if (formType === 'edit') {
+                   this.updateNews(newsTitle, newsText, picture, themes, news_id) 
+                }
+            }
+            //     //return true
+            //      // newsTitle.value = ""
+            //     // newsText.value = ""
+            //     // picture.value = ""
+            //     // themes.value = ""
+        },
     },
 })
