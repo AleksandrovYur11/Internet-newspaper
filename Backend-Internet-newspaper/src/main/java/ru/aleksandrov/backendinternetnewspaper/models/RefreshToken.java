@@ -5,7 +5,6 @@ import lombok.*;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.time.Instant;
-import java.time.LocalDateTime;
 
 @Entity(name = "RefreshToken")
 @Getter
@@ -28,4 +27,7 @@ public class RefreshToken {
 
     @Column
     private Instant expiryDate;
+    public RefreshToken(String token) {
+        this.token = token;
+    }
 }

@@ -19,14 +19,6 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public User getUserByEmail(String email) {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> {
-                    log.error("User with email = " + email + ": Not Found");
-                    return new EntityNotFoundException("User with email = " + email + ": Not Found");
-                });
-    }
-
     public User getUserById(Integer userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> {

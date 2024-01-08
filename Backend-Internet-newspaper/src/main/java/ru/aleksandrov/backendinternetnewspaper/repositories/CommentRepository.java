@@ -34,7 +34,4 @@ public interface CommentRepository extends JpaRepository<Comment, Integer> {
     Slice<Comment> findThreeComments(@Param("newsId") Integer newsId, Pageable pageable);
 
     Integer countByNewsId(Integer newsId);
-//    @Transactional
-//    @Query("SELECT c FROM comments c WHERE  EXISTS c.news.id = :newsId ")
-//    Boolean findThreeComments(@Param("newsId") Integer newsId, Pageable pageable);
 }
