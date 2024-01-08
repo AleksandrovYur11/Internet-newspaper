@@ -2,6 +2,8 @@ import { defineStore } from "pinia"
 import { useAuthStore } from "./AuthStore"
 import { useCommentsStore } from "@/stores/CommentsStore.js"
 
+import router from "@/router/index.js"
+
 export const useNewsStore = defineStore("news", {
     state: () => ({
         news: null,
@@ -40,7 +42,7 @@ export const useNewsStore = defineStore("news", {
 
                 // const CommentsStore = useCommentsStore()
                 // CommentsStore.showComments()
-                
+
                 this.$patch({
                     news: this.news,
                 })
@@ -48,27 +50,99 @@ export const useNewsStore = defineStore("news", {
                 console.error("Fetch error:", error)
             }
         },
-        async addLike(id_news, user_id) {
+        async addLike0(id_news, user_id) {
             const jwtToken = sessionStorage.getItem("jwtToken")
             if (!jwtToken) {
-                console.error("Отсутствует JWT-токен!")
+                router.push("/auth/sign-in")
+                alert("Войдите или зарегестрируйтесь")
                 return
             }
             try {
-               
+                const existNews = this.news.find((news) => news.id === id_news)
+
+                const existLike = existNews.likes.some(
+                    (like) => like.user.id === Number(user_id)
+                )
+
+                let response
+                if (existLike) {
+                    response = await fetch(
+                        `http://localhost:8085/likes?newsId=${id_news}`,
+                        {
+                            method: "DELETE",
+                            headers: new Headers({
+                                Authorization: "Bearer " + jwtToken,
+                                "Content-Type": "application/json",
+                            }),
+                        }
+                    )
+                } else {
+                    response = await fetch(
+                        `http://localhost:8085/likes/save?newsId=${id_news}`,
+                        {
+                            method: "POST",
+                            headers: new Headers({
+                                Authorization: "Bearer " + jwtToken,
+                                "Content-Type": "application/json",
+                            }),
+                        }
+                    )
+                }
+
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        const result = await this.getAuthStoreMethods()
+                        if (result) {
+                            return this.addLike(id_news, user_id)
+                        } else {
+                            console.log("false в update access")
+                        }
+                    } else {
+                        console.log("какой то другой статус")
+                    }
+                    throw new Error("Authentication failed")
+                }
+
+                const updatedNewsIndex = this.news.findIndex( // обновление 
+                    (news) => news.id === id_news
+                )
+                if (existLike) { 
+                    this.news[updatedNewsIndex].likes = this.news[ // удаление
+                        updatedNewsIndex
+                    ].likes.filter((like) => like.user.id !== Number(user_id))
+                } else {
+                    const newLike = { user: { id: Number(user_id) } } // добавление
+                    this.news[updatedNewsIndex].likes.push(newLike)
+                }
+            } catch (error) {
+                console.error("Ошибка лайка:", error)
+            }
+        },
+        async addLike(id_news, user_id) {
+            const jwtToken = sessionStorage.getItem("jwtToken")
+            if (!jwtToken) {
+                router.push("/auth/sign-in")
+                alert("Войдите или зарегестрируйтесь")
+                return
+            }
+            try {
                 const likes = []
 
                 this.news.forEach((news) => {
-                    if (news.id === id_news && news.likes && news.likes.length !== 0) {
+                    if (
+                        news.id === id_news &&
+                        news.likes &&
+                        news.likes.length !== 0
+                    ) {
                         news.likes.forEach((like) => {
-                        if (like.user.id === Number(user_id)) {
-                            likes.push(news[id_news])
-                        }
-                      })
+                            if (like.user.id === Number(user_id)) {
+                                likes.push(news[id_news])
+                            }
+                        })
                     }
-                  })
+                })
 
-                if (likes.length!==0) {
+                if (likes.length !== 0) {
                     const response = await fetch(
                         `http://localhost:8085/likes?newsId=${id_news}`,
                         {
@@ -105,7 +179,7 @@ export const useNewsStore = defineStore("news", {
                             }),
                         }
                     )
-                  
+
                     if (!response.ok) {
                         if (response.status === 401) {
                             const result = await this.getAuthStoreMethods()
@@ -124,7 +198,6 @@ export const useNewsStore = defineStore("news", {
                 }
                 //!!!!!!!!!!!
                 this.getnews()
-
             } catch (error) {
                 console.error("Authentication error:", error)
             }
@@ -164,7 +237,12 @@ export const useNewsStore = defineStore("news", {
                     if (response.status === 401) {
                         const result = await this.getAuthStoreMethods()
                         if (result) {
-                            return this.addNews(newsTitle, newsText, picture, themes)
+                            return this.addNews(
+                                newsTitle,
+                                newsText,
+                                picture,
+                                themes
+                            )
                         } else {
                             console.log("false в update access")
                         }
@@ -197,9 +275,7 @@ export const useNewsStore = defineStore("news", {
                     .split(",")
                     .map((theme) => ({ name: theme.trim() })),
             }
-        
             try {
-              
                 const response = await fetch(
                     `http://localhost:8085/news/user-themes`,
                     {
@@ -222,7 +298,6 @@ export const useNewsStore = defineStore("news", {
                 this.$patch({
                     news: responseData,
                 })
-
             } catch (error) {
                 console.error("Authentication error:", error)
             }
