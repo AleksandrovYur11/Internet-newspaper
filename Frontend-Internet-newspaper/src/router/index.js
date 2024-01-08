@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from "vue-router"
 import AuthorizationView from "@/views/AuthorizationView.vue"
 import RegistrationView from "@/views/RegistrationView.vue"
 import NewsView from "@/views/NewsView.vue"
-import NomeView from "@/views/HomeView.vue"
+// import NomeView from "@/views/HomeView.vue"
 
 // import { useAuthStore } from "@/stores/AuthStore.vue"
 
@@ -24,12 +24,12 @@ const router = createRouter({
             name: "sign-up",
             component: RegistrationView,
         },
-        {
-            path: "/auth/home",
-            name: "home",
-            component: NomeView,
-            meta: { requiresAuth: true },
-        },
+        // {
+        //     path: "/auth/home",
+        //     name: "home",
+        //     component: NomeView,
+        //     meta: { requiresAuth: true },
+        // },
         {
             path: "/news/fresh-news",
             name: "news",

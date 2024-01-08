@@ -12,6 +12,7 @@ export const useAuthStore = defineStore("auth", {
         reg_users: [],
         news: null,
         user_role: "",
+        user_name: ''
     }),
     actions: {
         async updateAccessToken() {
@@ -58,6 +59,7 @@ export const useAuthStore = defineStore("auth", {
                 )
                 console.log(response)
                 if (response.ok) {
+                    window.location.reload()
                     router.push("/auth/sign-in")
                     sessionStorage.removeItem("jwtToken")
                     sessionStorage.removeItem("jwtRefreshToken")
@@ -113,8 +115,8 @@ export const useAuthStore = defineStore("auth", {
                 const jwtRefreshToken = responseData.refreshToken
                 sessionStorage.setItem("jwtRefreshToken", jwtRefreshToken)
 
-                //const name = responseData.name
-                console.log(responseData)
+
+                sessionStorage.setItem("user_name", responseData.name)
 
                 this.role = responseData.roles[0]
                 console.log(responseData.roles[0])
