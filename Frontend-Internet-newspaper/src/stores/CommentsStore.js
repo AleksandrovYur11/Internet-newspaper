@@ -20,11 +20,18 @@ export const useCommentsStore = defineStore("comments", {
                 .map((item) => item.toggleShow = false)
         },
         getCommentsInfo(post_id) {
+            console.log('000')
+            console.log(this.commentsCountInfo
+                .filter((item) => item.post_id === post_id)
+                .map((item) => item.show)[0])
             return this.commentsCountInfo
                 .filter((item) => item.post_id === post_id)
                 .map((item) => item.show)[0]
         },
         checkCommentsToggle(post_id){
+            console.log(this.commentsCountInfo
+                .filter((item) => item.post_id === post_id)
+                .map((item) => item.toggleShow)[0])
             return  this.commentsCountInfo
                 .filter((item) => item.post_id === post_id)
                 .map((item) => item.toggleShow)[0]
@@ -64,7 +71,7 @@ export const useCommentsStore = defineStore("comments", {
                 commentsCount: commentsCount,
                 existsComments: 0,
                 show: false,
-                toggleShow: false
+                toggleShow: true
             }
 
             for (let i = 0; i < 3; i++) {
@@ -115,44 +122,29 @@ export const useCommentsStore = defineStore("comments", {
                     console.error("Fetch error:", error)
                 }
             }
-            // для comments count
+            
+            // для тогла
+
             const index = this.commentsCountInfo.findIndex(
-                (item) => item.news_id === commentInfo.news_id
+                (item) => item.post_id === news_id
             )
-            index !== -1
-                ? (this.commentsCountInfo[index] = commentInfo)
-                : this.commentsCountInfo.push(commentInfo)
-
-            const foundObject = this.commentsCountInfo.find(
-                (item) => item.post_id == news_id
-            )
-
-            if (foundObject) {
-                foundObject.show =
-                    foundObject.existsComments < foundObject.commentsCount
-
-                // для возможности скрыть комментарии
-                foundObject.toggleShow = true
-                // делайте что-то с найденным объектом
+        
+            if (index !== -1) {
+                this.commentsCountInfo[index] = {
+                    ...this.commentsCountInfo[index],
+                    existsComments: commentInfo.existsComments,
+                    show: commentInfo.existsComments < commentInfo.commentsCount,
+                    toggleShow: true 
+                }
+            } else {
+                commentInfo.show = commentInfo.existsComments < commentInfo.commentsCount
+                this.commentsCountInfo.push(commentInfo)
             }
-
+            // this.$patch({
+            //     commentsCountInfo: this.commentsCountInfo,
+            // })
             console.log(this.commentsCountInfo)
-            this.$patch({
-                commentsCountInfo: this.commentsCountInfo,
-            })
-
-            //this.toggle = true
         },
-        // closeComments(post_id) {
-        //     const isExistsComment = this.comments.find(
-        //         (item) => item.news_id === post_id
-        //     )
-
-        //     if (isExistsComment) {
-        //         this.comments.filter()
-        //     }
-                
-        // },
         async sendcomment(id_news, new_comment) {
             if (!new_comment.trim()) {
                 console.error("Комментарий пуст!")
