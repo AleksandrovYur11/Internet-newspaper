@@ -1,10 +1,9 @@
 version: '3.8'
 
 services:
-  myapp:
-    build:
-      context: .
-    container_name: internet-newspaper
+  backend:
+    image: aleksandrovyur11/internet_newspaper:backend
+    container_name: backend
     depends_on:
       - psql-db
     ports:
@@ -14,6 +13,11 @@ services:
       - SPRING_DATASOURCE_USER=postgres
       - SPRING_DATASOURCE_PASSWORD=postgre
 
+  frontend:
+    image: aleksandrovyur11/internet_newspaper:frontend
+    container_name: frontend
+    ports:
+      - "5173:5173"
 
   psql-db:
     image: postgres:latest
@@ -24,3 +28,5 @@ services:
       - POSTGRES_PASSWORD=postgre
     ports:
       - "5432:5432"
+    volumes:
+      - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
