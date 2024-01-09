@@ -79,6 +79,7 @@ public class AuthenticationController {
                 .refreshToken(refreshToken.getToken())
                 .id(userDetails.getId())
                 .name(userDetails.getName())
+                .surname(userDetails.getSurname())
                 .roles(roles)
                 .build();
         return new ResponseEntity<>(signinResponseDto, HttpStatus.OK);

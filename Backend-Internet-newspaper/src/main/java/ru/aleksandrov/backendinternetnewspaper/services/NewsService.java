@@ -48,7 +48,7 @@ public class NewsService {
         newNews.setDatePublishedNews(LocalDateTime.now());
         setPictureAndThemesForNews(newNews, newNewsDto.getPicture(), newNewsDto.getThemes());
         newsRepository.save(newNews);
-        log.info("Create new news by title = {}: Success", newNews.getNewsTitle());
+        log.info("Save new news by title = {}: Success", newNews.getNewsTitle());
         return newNews;
     }
 
