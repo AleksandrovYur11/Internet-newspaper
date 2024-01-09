@@ -40,6 +40,8 @@ export const useNewsStore = defineStore("news", {
                 const responseData = await response.json()
                 this.news = responseData
 
+                console.log(this.news)
+
                 // const CommentsStore = useCommentsStore()
                 // CommentsStore.showComments()
 

@@ -25,6 +25,20 @@ import CommentBlock from "@/components/CommentBlock.vue"
 
 const user_id = ref(sessionStorage.getItem("user_id"))
 const user_role = ref(sessionStorage.getItem("user_role"))
+
+const formatPublishedDate = (dateString) => {
+  const date = new Date(dateString);
+  const formatter = new Intl.DateTimeFormat('ru', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+
+  return `Опубликовано ${formatter.format(date).replace(/\./g, ':')}`
+}
+
 </script>
 
 <template>
@@ -45,7 +59,7 @@ const user_role = ref(sessionStorage.getItem("user_role"))
                 "
             >
                 <span>
-                    {{ post.timePublishedNewsMSK }}
+                    {{ formatPublishedDate(post.datePublishedNews) }}
                 </span>
 
                 <div class="themes">
@@ -79,7 +93,6 @@ const user_role = ref(sessionStorage.getItem("user_role"))
                         ><b>{{ post.likes.length || 0 }}</b></span
                     >
                 </div>
-                <!-- {{ CommentsStore.checkCommentsToggle(post.id) }} -->
                 <a
                     href=""
                     @click.prevent="CommentsStore.showComments(post.id, 1)"

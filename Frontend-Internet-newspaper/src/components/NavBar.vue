@@ -13,6 +13,7 @@ const { emit } = defineEmits(['show-modal'])
 
 const user_id = ref(sessionStorage.getItem('user_id'))
 const user_role = ref(sessionStorage.getItem('user_role'))
+const user_name = ref(sessionStorage.getItem('user_name'))
 
 </script>
 
@@ -44,7 +45,7 @@ const user_role = ref(sessionStorage.getItem('user_role'))
                     "
                     class="d-flex flex-direction-row"
                 >
-                    <span>{{ user_role }}</span>
+                    <span>{{ user_name }}</span>
                     <b-button  v-if =  "user_role == 'ROLE_ADMIN'" @click="NewsStore.showModal()"> + </b-button>
                     <b-nav-item
                         to="/auth/sign-in"
