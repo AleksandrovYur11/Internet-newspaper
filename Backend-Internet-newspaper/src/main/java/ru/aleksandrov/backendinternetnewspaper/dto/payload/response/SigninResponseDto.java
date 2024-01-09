@@ -16,5 +16,6 @@ public class SigninResponseDto {
     private String refreshToken;
     private Integer id;
     private String name;
+    private String surname;
     private List<String> roles;
 }
