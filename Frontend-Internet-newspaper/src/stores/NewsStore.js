@@ -52,6 +52,17 @@ export const useNewsStore = defineStore("news", {
                 console.error("Fetch error:", error)
             }
         },
+        isLiked(id_news, user_id) {
+            
+            const existNews = this.news.find((news) => news.id === id_news)
+
+            console.log(existNews)
+            const existLike = existNews.likes.some(
+                (like) => like.user.id === Number(user_id)
+            )
+
+            return existLike
+        },
         async addLike(id_news, user_id) {
             const jwtToken = sessionStorage.getItem("jwtToken")
             if (!jwtToken) {
@@ -60,11 +71,13 @@ export const useNewsStore = defineStore("news", {
                 return
             }
             try {
-                const existNews = this.news.find((news) => news.id === id_news)
+                // const existNews = this.news.find((news) => news.id === id_news)
 
-                const existLike = existNews.likes.some(
-                    (like) => like.user.id === Number(user_id)
-                )
+                // const existLike = existNews.likes.some(
+                //     (like) => like.user.id === Number(user_id)
+                // )
+
+                const existLike = this.isLiked(id_news, user_id)
 
                 let response
                 if (existLike) {

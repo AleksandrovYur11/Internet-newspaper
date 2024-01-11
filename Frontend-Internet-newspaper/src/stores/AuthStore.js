@@ -59,13 +59,13 @@ export const useAuthStore = defineStore("auth", {
                 )
                 console.log(response)
                 if (response.ok) {
-                    window.location.reload()
+                    // window.location.reload()
                     router.push("/auth/sign-in")
                     sessionStorage.removeItem("jwtToken")
                     sessionStorage.removeItem("jwtRefreshToken")
                     sessionStorage.removeItem("user_role")
                     sessionStorage.removeItem("user_id")
-                    alert("Ваша сессия истекла, требуется войти заново")
+                    //alert("Ваша сессия истекла, требуется войти заново")
                     return true
                 } else {
                     throw new Error("refresh не дошел")
@@ -75,6 +75,7 @@ export const useAuthStore = defineStore("auth", {
             }
         },
         async login(textEmail, textPassword) {
+            console.log('888')
             const loginData = {
                 email: textEmail,
                 password: textPassword,

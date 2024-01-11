@@ -51,8 +51,8 @@ const validation_password = computed(() => {
 const validation_name = computed(() => {
     if (regData.value.textName) {
         if (regData.value.textName.length <= 1) {
-            return "Ваше имя точно длинее одного символа"
-        } else if (regData.value.textName.length > 15) {
+            return "Имя содержит не менее 2 символов"
+        } else if (regData.value.textName.length > 255) {
             return "Слишком длинное имя"
         } else {
             return true
@@ -63,8 +63,8 @@ const validation_name = computed(() => {
 const validation_surname = computed(() => {
     if (regData.value.textSurname) {
         if (regData.value.textSurname.length <= 1) {
-            return "Слишком короткая фамилия для русского"
-        } else if (regData.value.textSurname.length > 15) {
+            return "Фамилия содержит не менее 2 символов"
+        } else if (regData.value.textSurname.length > 255) {
             return "Слишком длинная фамилия"
         } else {
             return true
@@ -112,8 +112,7 @@ const signUpValidation = () => {
 
 <template>
     <main-block>
-        <template #header> </template>
-        <template #container>
+        <template #cont>
             <b-form class="custom-form">
                 <h4>Sign Up</h4>
                 <b-form-group
@@ -134,7 +133,7 @@ const signUpValidation = () => {
                         {{ typeof validation_name === 'string' ? validation_name : '' }}
                     </b-form-invalid-feedback>
                     <b-form-valid-feedback :state="validation_name">
-                        Теперь хорошо
+                        Ок
                     </b-form-valid-feedback>
                 </b-form-group>
                 <b-form-group
@@ -155,7 +154,7 @@ const signUpValidation = () => {
                         {{ typeof validation_surname === 'string' ? validation_surname : '' }}
                     </b-form-invalid-feedback>
                     <b-form-valid-feedback :state="validation_surname">
-                        Так то лучше
+                        Ок
                     </b-form-valid-feedback>
                 </b-form-group>
                 <b-form-group
@@ -173,10 +172,10 @@ const signUpValidation = () => {
                         required
                     ></b-form-input>
                     <b-form-invalid-feedback :state="validation_email">
-                        Проверьте правильность email
+                        Некорректный email
                     </b-form-invalid-feedback>
                     <b-form-valid-feedback :state="validation_email">
-                        Выглядит хорошо!
+                        Ок
                     </b-form-valid-feedback>
                 </b-form-group>
                 <b-form-group
@@ -194,7 +193,7 @@ const signUpValidation = () => {
                         :state="validation_password"
                     ></b-form-input>
                      <b-form-valid-feedback :state="validation_password">
-                        Выглядит отлично!
+                        Ок
                     </b-form-valid-feedback>
                     <b-form-invalid-feedback :state="!validation_password">
                         {{ typeof validation_password === 'string' ? validation_password : '' }}
@@ -217,10 +216,10 @@ const signUpValidation = () => {
                     <b-form-invalid-feedback
                         :state="validation_repeat_password"
                     >
-                        Пароли не совпадают!
+                        Пароли не совпадают
                     </b-form-invalid-feedback>
                     <b-form-valid-feedback :state="validation_repeat_password">
-                        Теперь совпадают!
+                        Пароли совпадают
                     </b-form-valid-feedback>
                 </b-form-group>
                 <b-button

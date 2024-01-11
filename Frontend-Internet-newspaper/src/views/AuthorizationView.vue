@@ -43,8 +43,7 @@ const signInValidation = () => {
 
 <template>
     <main-block>
-        <template #header> </template>
-        <template #container>
+        <template #cont>
             <b-form
                 class="custom-form"
             >
@@ -64,10 +63,10 @@ const signInValidation = () => {
                         required
                     ></b-form-input>
                     <b-form-invalid-feedback :state="validation_email">
-                        Проверьте правильность email
+                        Введите корректный email
                     </b-form-invalid-feedback>
                     <b-form-valid-feedback :state="validation_email">
-                        Выглядит хорошо!
+                        Ок
                     </b-form-valid-feedback>
                 </b-form-group>
                 <b-form-group
@@ -84,10 +83,10 @@ const signInValidation = () => {
                         :state="validation_password"
                     ></b-form-input>
                     <b-form-invalid-feedback :state="validation_password">
-                        Больше символов...
+                        Введите не менеее 8 символов
                     </b-form-invalid-feedback>
                     <b-form-valid-feedback :state="validation_password">
-                        Выглядит отлично!
+                        Ок
                     </b-form-valid-feedback>
                 </b-form-group>
                 <b-button
@@ -102,6 +101,12 @@ const signInValidation = () => {
 </template>
 
 <style scoped>
+
+.bg {
+    background-image: url('@/assets/main_bg.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+}
 .submit_btn {
     bottom: 30px;
     align-self: center;

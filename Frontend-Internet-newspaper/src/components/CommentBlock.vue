@@ -14,31 +14,33 @@ const { props } = defineProps({
 })
 
 const new_comment = ref("")
-
+const user_role = ref(sessionStorage.getItem("user_role"))
 </script>
 
 <template>
     <div class="footer">
         <div class="comment_area">
             <b-form-textarea
+                v-if="user_role === 'ROLE_ADMIN' || user_role === 'ROLE_USER'"
+                id="textarea"
+                rows="3"
+                max-rows="15"
                 size="sm"
                 placeholder="Ваш комментарий..."
                 v-model="new_comment"
                 style="
+                    min-height: 73px;
                     margin-right: 10px;
-                    max-height: 100px;
+                    max-height: 400px;
                     border-radius: 3px;
                 "
             ></b-form-textarea>
-            <b-button
+            <span
+                v-if="user_role === 'ROLE_ADMIN' || user_role === 'ROLE_USER'"
                 @click="CommentsStore.sendcomment(post.id, new_comment)"
-                style="border-radius: 50%; width: 50px; height: 50px"
+                class="icon send"
             >
-                <img
-                    src="@/assets/send.svg"
-                    alt="Your SVG Image"
-                />
-            </b-button>
+            </span>
         </div>
     </div>
     <div class="comments_content">
@@ -76,6 +78,7 @@ const new_comment = ref("")
     flex-direction: row;
     justify-content: space-between;
     background-color: #fff;
+    /* align-items: center; */
 }
 
 img[data-v-9d1a3feb] {
@@ -85,5 +88,10 @@ img[data-v-9d1a3feb] {
 .input_card {
     display: flex;
     flex-direction: row;
+}
+
+.send {
+    background-image: url("@/assets/send_icon.png");
+    margin-right: 0;
 }
 </style>

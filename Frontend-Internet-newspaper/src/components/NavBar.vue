@@ -7,14 +7,13 @@ const NewsStore = useNewsStore()
 
 import FiltrBlock from "@/components/FiltrBlock.vue"
 
-import {ref,  defineEmits } from 'vue';
+import { ref, defineEmits } from "vue"
 
-const { emit } = defineEmits(['show-modal'])
+const { emit } = defineEmits(["show-modal"])
 
-const user_id = ref(sessionStorage.getItem('user_id'))
-const user_role = ref(sessionStorage.getItem('user_role'))
-const user_name = ref(sessionStorage.getItem('user_name'))
-
+const user_id = ref(sessionStorage.getItem("user_id"))
+const user_role = ref(sessionStorage.getItem("user_role"))
+const user_name = ref(sessionStorage.getItem("user_name"))
 </script>
 
 <template>
@@ -24,10 +23,15 @@ const user_name = ref(sessionStorage.getItem('user_name'))
         style="box-shadow: 0px 13px 4px rgba(0, 0, 0, 0.1)"
     >
         <b-navbar-brand
+            class="logo"
+            href="#"
+            to="/news/fresh-news"
+        ></b-navbar-brand>
+        <b-navbar-brand
             href="#"
             to="/news/fresh-news"
             style="font-weight: bold"
-            >Gazeta.ru</b-navbar-brand
+            >Маяк</b-navbar-brand
         >
         <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
         <b-collapse
@@ -35,23 +39,31 @@ const user_name = ref(sessionStorage.getItem('user_name'))
             is-nav
         >
             <!-- добавить активность переключателя -->
-            <filtr-block>
-            </filtr-block>
+            <filtr-block></filtr-block>
             <b-navbar-nav>
                 <div
-                    v-if="
-                        user_role == 'ROLE_USER' ||
-                        user_role == 'ROLE_ADMIN'
-                    "
+                    v-if="user_role == 'ROLE_USER' || user_role == 'ROLE_ADMIN'"
                     class="d-flex flex-direction-row"
                 >
                     <span>{{ user_name }}</span>
-                    <b-button  v-if =  "user_role == 'ROLE_ADMIN'" @click="NewsStore.showModal()"> + </b-button>
-                    <b-nav-item
+                    <b-button
+                        v-if="user_role == 'ROLE_ADMIN'"
+                        @click="NewsStore.showModal()"
+                    >
+                        +
+                    </b-button>
+                    <span
+                        class="icon exit"
                         to="/auth/sign-in"
                         @click="AuthUser.deleteToken()"
-                        >Sign Out</b-nav-item
                     >
+                    </span>
+                    <!-- <b-nav-item
+                        to="/auth/sign-in"
+                        @click="AuthUser.deleteToken()"
+                    >
+                        <img class="icon exit"
+                    /></b-nav-item> -->
                 </div>
                 <div
                     v-else
@@ -68,5 +80,17 @@ const user_name = ref(sessionStorage.getItem('user_name'))
 <style>
 .navbar-expand-md .navbar-collapse {
     justify-content: flex-end;
+}
+
+.logo {
+    background-image: url("@/assets/logo.jpg");
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background-size: cover;
+}
+
+.exit {
+    background-image: url("@/assets/exit_icon.png");
 }
 </style>
