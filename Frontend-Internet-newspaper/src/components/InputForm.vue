@@ -17,7 +17,6 @@ const localComputed = computed({
         emit("update:modelValue", newValue)
     },
 })
-
 </script>
 
 <template>
@@ -25,22 +24,41 @@ const localComputed = computed({
         class="mb-1"
         :label="groupLabel"
     >
-        <b-form-textarea
-            v-if="textArea"
-            v-model="localComputed"
-            :placeholder="placeholder"
-            type="text"
-            :state="validation_title"
-            required
-        >
-        </b-form-textarea>
-        <b-form-input
-            v-else
-            v-model="localComputed"
-            :placeholder="placeholder"
-            type="text"
-            :state="validation_title"
-            required
-        ></b-form-input>
+        <div class = "iput_constainer">
+            <b-form-textarea
+                v-if="textArea"
+                v-model="localComputed"
+                :placeholder="placeholder"
+                type="text"
+                :state="validation_title"
+                required
+            >
+            </b-form-textarea>
+            <b-form-input
+                v-else
+                v-model="localComputed"
+                :placeholder="placeholder"
+                type="text"
+                :state="validation_title"
+                required
+            ></b-form-input>
+            <span class="close" @click = "localComputed = '' " >&times; </span>
+        </div>
     </b-form-group>
 </template>
+
+<style scoped>
+
+.iput_constainer {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    cursor: pointer;
+    align-items: center;
+}
+.close {
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+}
+</style>

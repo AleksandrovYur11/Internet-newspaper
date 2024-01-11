@@ -58,7 +58,6 @@ console.log(themes)
 <template>
     <div
         class="container"
-        @click.self="NewsStore.closeModal()"
     >
         <b-form class="custom-form">
             <!-- <div class="modal-content"> -->
@@ -73,23 +72,22 @@ console.log(themes)
             <InputForm
                 v-model="newsTitle"
                 groupLabel="Название:"
-                placeholder="Чертила..."
+                placeholder="Ваша новость"
             ></InputForm>
             <InputForm
                 v-model="themes"
                 groupLabel="Темы:"
-                placeholder="Меркурий, Венера, Земля..."
+                placeholder="природа, космос, IT..."
             ></InputForm>
             <InputForm
                 v-model="newsText"
                 groupLabel="Текст:"
-                placeholder="...название этот вид получил из-за очень непривлекательной внешности. - это не факт, это википедия"
-                textArea="textArea"
+                placeholder="Текст вашей новости"
             ></InputForm>
             <InputForm
                 v-model="picture"
                 groupLabel="Изображение:"
-                placeholder="https://dikoed.ru/upload/iblock/361/16025-morskoy-chert-s-golovoy.jpg"
+                placeholder=".jpeg .jpg .gif .png .bmp .svg"
             ></InputForm>
             <div class="footer_modal">
                 <b-button
