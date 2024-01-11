@@ -43,24 +43,4 @@ public class ThemeService {
         }
         return savedThemes;
     }
-
-//    public Theme findByName(String themeName) {
-//        Optional<Theme> themeOptional = themeRepository.findThemeByName(themeName);
-//        if (themeOptional.isPresent()) {
-//            return themeOptional.get();
-//        } else {
-//            log.error("Theme with this " + themeName + " not found");
-//            throw new EntityNotFoundException("Theme with this " + themeName + " not found");
-//        }
-//    }
-//
-//    public Theme findByName(Integer themeId) {
-//        Optional<Theme> themeOptional = themeRepository.findById(themeId);
-//        if (themeOptional.isPresent()) {
-//            return themeOptional.get();
-//        } else {
-//            log.error("Theme with this " + themeId + " not found");
-//            throw new EntityNotFoundException("Theme with this " + themeId + " not found");
-//        }
-//    }
 }

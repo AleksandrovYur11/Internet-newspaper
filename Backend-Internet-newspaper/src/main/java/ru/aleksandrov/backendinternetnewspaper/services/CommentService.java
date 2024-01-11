@@ -15,12 +15,10 @@ import ru.aleksandrov.backendinternetnewspaper.utils.MappingUtil;
 
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
 
 @Service
 @Slf4j
@@ -40,16 +38,6 @@ public class CommentService {
         this.mappingUtil = mappingUtil;
     }
 
-
-    public List<Comment> findAll() {
-        return commentRepository.findAll();
-    }
-
-    public List<Comment> findByNews(News news) {
-        return commentRepository.findByNews(news);
-    }
-
-
     public Comment getCommentById(Integer commentId) {
         return commentRepository.findById(commentId)
                 .orElseThrow(() -> {
@@ -68,16 +56,13 @@ public class CommentService {
         }
     }
 
-
     public Comment saveComment(UserDetailsImpl userDetailsImpl, Comment comment, Integer newsId) {
-        LocalDateTime moscowTimeNow = LocalDateTime.now(ZoneId.of("Europe/Moscow"));
         Comment newComment = new Comment();
         newComment.setAuthorComment(userService.getUserById(userDetailsImpl.getId()));
         newComment.setNews(newsService.getNewsById(newsId));
         newComment.setTextComment(comment.getTextComment());
-        newComment.setDatePublishedComment(moscowTimeNow);
-//        loadedCommentsCountMap.put(newsId, newComment.getId());
-        log.info("Save new comment from user (email) = " + userDetailsImpl.getEmail());
+        newComment.setDatePublishedComment(LocalDateTime.now());
+        log.info("Save new comment from user (email) = " + userDetailsImpl.getEmail() + ": Success");
         Comment savedComment = commentRepository.save(newComment);
         loadedCommentsCountMap.put(newsId, loadedCommentsCountMap.getOrDefault(newsId, 0) + 1);
         return savedComment;
@@ -87,7 +72,7 @@ public class CommentService {
         int userId = userDetailsImpl.getId();
         if (userId == getCommentById(commentId).getAuthorComment().getId()) {
             commentRepository.deleteCommentByUserIdAndCommentId(userDetailsImpl.getId(), commentId);
-            log.info("Delete comment with id = " + commentId + ": Success");
+            log.info("Delete comment from user (email) = " + userDetailsImpl.getEmail() + ": Success");
         } else {
             throw new EntityNotFoundException("Comment with id = " + commentId + " and user (id) = " +
                     userId + ": Not Found");
@@ -97,38 +82,13 @@ public class CommentService {
     public CommentDto convertToCommentDto(Comment comment) {
         CommentDto commentDto = mappingUtil.convertToCommentDto(comment);
         commentDto.setUser(mappingUtil.convertToUserDto(comment.getAuthorComment()));
-//
-//        List<Like> likes = news.getLikes();
-//        newsDTO.setLikes(likes.stream().map(mappingUtil::convertToLikeDto)
-//                .collect(Collectors.toList()));
-//
-//        List<Comment> comments = news.getComments();
-//        newsDTO.setComments(comments.stream().map((comment) -> {
-//                    CommentDto commentDto = mappingUtil.convertToCommentDto(comment);
-//                    commentDto.setUser(mappingUtil.convertToUserDto(comment.getAuthorComment()));
-//                    return commentDto;
-//                })
-//                .collect(Collectors.toList()));
-//
-//        Picture picture = news.getPicture();
-//        newsDTO.setPicture(mappingUtil.convertToPictureDto(picture));
-//
-//        Set<Theme> themes = news.getTheme();
-//        newsDTO.setThemes(themes.stream().map(mappingUtil::convertToThemeDto).collect(Collectors.toSet()));
         return commentDto;
     }
 
     public List<CommentDto> getThreeComments(Integer newsId) {
-
-//        Integer loadedCommentsCount = loadedCommentsCountMap.getOrDefault(newsId, 0);
-//        Pageable pageable = PageRequest.of(loadedCommentsCount / 3, 3,
-//                Sort.by(Sort.Direction.DESC, "datePublishedComment"));
-//Работает
         Integer loadedCommentsCount = loadedCommentsCountMap.getOrDefault(newsId, 0);
-        Pageable pageable = PageRequest.of(loadedCommentsCount , 1,
+        Pageable pageable = PageRequest.of(loadedCommentsCount, 1,
                 Sort.by(Sort.Direction.DESC, "datePublishedComment"));
-// Работает
-
         Slice<Comment> commentsSlice = commentRepository.findThreeComments(newsId, pageable);
         List<CommentDto> commentDto = commentsSlice.getContent().stream()
                 .map(this::convertToCommentDto).collect(Collectors.toList());

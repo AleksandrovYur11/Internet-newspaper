@@ -8,60 +8,38 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.aleksandrov.backendinternetnewspaper.models.News;
 import ru.aleksandrov.backendinternetnewspaper.models.Theme;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 @Repository
 public interface NewsRepository extends JpaRepository<News, Integer> {
-    @Transactional
-    Optional<News> findByNewsTitle(String title);
 
     @Transactional
     Optional<News> findById(Integer newsId);
 
     @Transactional
-    @Query(value = "SELECT n FROM news n WHERE n.datePublishedNews >= :twentyFourHoursAgo ORDER BY n.datePublishedNews DESC")
-    List<News> findNewsInLastTwentyFourHours(@Param("twentyFourHoursAgo") LocalDateTime twentyFourHoursAgo);
-    //------------------------------
-//    @Transactional
-//    @Query("SELECT DISTINCT n FROM news n JOIN n.theme t " +
-//            "WHERE t IN :favoritesThemes AND t NOT IN :forbiddenThemes")
-//    List<News> findNewsByUserThemes(
-//            @Param("favoritesThemes") Set<Theme> favoritesThemes,
-//            @Param("forbiddenThemes") Set<Theme> forbiddenThemes);
+    @Query(value = "SELECT * FROM news WHERE date_published_news >= NOW() - INTERVAL '1 day' " +
+            "ORDER BY date_published_news DESC",
+            nativeQuery = true)
+    List<News> findNewsInLastTwentyFourHours();
 
     @Transactional
-    @Query("SELECT n FROM news n " +
-            "WHERE (EXISTS (SELECT t1 FROM n.theme t1 WHERE t1 IN :favoritesThemes)) AND " +
-            "NOT EXISTS (SELECT t2 FROM n.theme t2 WHERE t2 IN :forbiddenThemes)")
+    @Query("SELECT DISTINCT n FROM news n JOIN n.theme t " +
+            "WHERE t IN :favoritesThemes AND n NOT IN " +
+            "(SELECT x FROM news x JOIN x.theme t2 WHERE t2 IN :forbiddenThemes)")
     List<News> findNewsByThemes(
             @Param("favoritesThemes") Set<Theme> favoritesThemes,
             @Param("forbiddenThemes") Set<Theme> forbiddenThemes);
-//-------------------------------------------
 
     @Transactional
-    @Query("SELECT n FROM news n JOIN n.theme t " +
-            "WHERE t IN :favoritesThemes ")
+    @Query("SELECT DISTINCT n FROM news n JOIN n.theme t WHERE t IN :favoritesThemes ")
     List<News> findNewsByFavoriteThemes(
             @Param("favoritesThemes") Set<Theme> favoritesThemes);
-//    @Transactional
-//    @Query("SELECT n FROM news n WHERE n.theme IN :favoritesThemes")
-//    List<News> findNewsByFavoriteThemes(@Param("favoritesThemes") Set<Theme> favoritesThemes);
 
-
-    //-----------------------------
-
-        @Transactional
-    @Query("SELECT n FROM news n " +
-            "WHERE (EXISTS (SELECT t1 FROM n.theme t1)) AND " +
-            "NOT EXISTS (SELECT t2 FROM n.theme t2 WHERE t2 IN :forbiddenThemes)")
+    @Transactional
+    @Query("SELECT DISTINCT n FROM news n " +
+            "WHERE n NOT IN (SELECT DISTINCT x FROM news x JOIN x.theme t WHERE t IN :forbiddenThemes)")
     List<News> findNewsByForbiddenThemes(
             @Param("forbiddenThemes") Set<Theme> forbiddenThemes);
-//    @Transactional
-//    @Query("SELECT n FROM news n WHERE n.theme NOT IN :forbiddenThemes")
-//    List<News> findNewsByForbiddenThemes(
-//            @Param("forbiddenThemes") Set<Theme> forbiddenThemes);
-    //---------------------------------
 }

@@ -6,7 +6,6 @@ import io.jsonwebtoken.security.SignatureException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import ru.aleksandrov.backendinternetnewspaper.security.exception.TokenRefreshException;
 import ru.aleksandrov.backendinternetnewspaper.security.services.UserDetailsImpl;
 
 import javax.crypto.SecretKey;

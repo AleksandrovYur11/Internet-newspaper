@@ -31,18 +31,6 @@ public class CommentController {
         this.mappingUtil = mappingUtil;
     }
 
-//    @GetMapping("/show")
-//    public ResponseEntity<List<CommentDto>> getCommentsForNews(@RequestParam("newsId") Integer newsId) {
-//        Integer loadedCommentsCount = loadedCommentsCountMap.getOrDefault(newsId, 0);
-//        Pageable pageable = PageRequest.of(loadedCommentsCount / 3, 3,
-//                Sort.by(Sort.Direction.DESC, "datePublishedComment"));
-//        Slice<Comment> commentsSlice = commentService.getThreeComments(newsId, pageable);
-//        List<CommentDto> commentDto = commentsSlice.getContent().stream()
-//                .map(commentService::convertToCommentDto).collect(Collectors.toList());
-//        loadedCommentsCountMap.put(newsId, loadedCommentsCount + commentDto.size());
-//        return new ResponseEntity<>(commentDto, HttpStatus.OK);
-//    }
-
     @GetMapping("/show")
     public ResponseEntity<List<CommentDto>> getCommentsForNews(@RequestParam("newsId") Integer newsId) {
         List<CommentDto> commentDto = commentService.getThreeComments(newsId);
@@ -54,7 +42,6 @@ public class CommentController {
         Map<String, Integer> countComment = new HashMap<>();
         countComment.put("countComment", commentService.getCountComments(newsId));
         return new ResponseEntity<>(countComment, HttpStatus.OK);
-
     }
 
     @PostMapping("/save")
@@ -64,7 +51,6 @@ public class CommentController {
                                                   @RequestBody @Valid CommentDto commentDTO) {
         Comment newComment = mappingUtil.convertToComment(commentDTO);
         Comment savedComment = commentService.saveComment(userDetailsImpl, newComment, newsId);
-//        commentService.loadedCommentsCountMap++;
         CommentDto savedCommentDto = commentService.convertToCommentDto(savedComment);
         return new ResponseEntity<>(savedCommentDto, HttpStatus.CREATED);
     }

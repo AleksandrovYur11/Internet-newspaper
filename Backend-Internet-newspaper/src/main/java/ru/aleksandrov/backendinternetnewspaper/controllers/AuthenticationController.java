@@ -4,12 +4,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -81,6 +79,7 @@ public class AuthenticationController {
                 .refreshToken(refreshToken.getToken())
                 .id(userDetails.getId())
                 .name(userDetails.getName())
+                .surname(userDetails.getSurname())
                 .roles(roles)
                 .build();
         return new ResponseEntity<>(signinResponseDto, HttpStatus.OK);
@@ -112,7 +111,6 @@ public class AuthenticationController {
                 .map(refreshTokenService::verifyExpiration)
                 .map(RefreshToken::getUser)
                 .map(user -> {
-//                    Collection<? extends GrantedAuthority> authorities = new ArrayList<>(user.getRoles());
                     String newAccessToken = jwtUtils.generateJwtToken(UserDetailsImpl.build(user));
                     return ResponseEntity.ok(new RefreshTokenResponseDto(newAccessToken, refreshToken));
                 })
@@ -120,7 +118,6 @@ public class AuthenticationController {
     }
 
     @PostMapping("/sign-out")
-//    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<?> logout(@Valid @RequestBody RefreshTokenRequestDto refreshTokenRequestDto) {
         String refreshToken = refreshTokenRequestDto.getRefreshToken();
         refreshTokenService.deleteRefreshToken(refreshToken);

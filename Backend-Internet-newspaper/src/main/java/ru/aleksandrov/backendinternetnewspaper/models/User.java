@@ -18,7 +18,6 @@ import java.util.List;
 @Setter
 @Builder
 public class User {
-
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)

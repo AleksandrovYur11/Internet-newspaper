@@ -17,6 +17,7 @@ import ru.aleksandrov.backendinternetnewspaper.services.UserService;
 @RestController
 @RequestMapping("/likes")
 public class LikesController {
+
     private final NewsService newsService;
     private final LikesService likesService;
     private final UserService userService;
