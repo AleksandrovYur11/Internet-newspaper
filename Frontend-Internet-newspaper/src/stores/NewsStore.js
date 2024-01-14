@@ -16,8 +16,15 @@ export const useNewsStore = defineStore("news", {
 
         //with comments
         newCommets: [],
+
+        //filtr
+        positive: ""
     }),
     actions: {
+        setPositiveTheme(theme_name){
+            this.positive = theme_name
+            console.log( this.positive)
+        },
         async getAuthStoreMethods() {
             const AuthStore = useAuthStore()
             return await AuthStore.updateAccessToken()
