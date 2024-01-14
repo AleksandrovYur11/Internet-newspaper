@@ -1,11 +1,20 @@
 <script setup>
-import { ref } from "vue"
+import { ref, computed } from "vue"
+
+import { useNewsStore } from "@/stores/NewsStore.js"
+const NewsStore = useNewsStore()
 
 const positive = ref("")
 const negative = ref("")
 
-import { useNewsStore } from "@/stores/NewsStore.js"
-const NewsStore = useNewsStore()
+
+const setPositiveTheme = computed(()=>{
+    return positive.value = NewsStore.positive
+})
+
+const changePositive=(theme)=>{
+    positive.value = theme
+}
 
 const clearThemes = () => {
     positive.value = ""
@@ -37,7 +46,8 @@ const filterThemes = () => {
                     id="dropdown-form-positive"
                     size="sm"
                     placeholder="Добавить"
-                    v-model="positive"
+                    @change="changePositive"
+                    v-model="setPositiveTheme"
                     @click.stop
                 ></b-form-input>
             </b-form-group>

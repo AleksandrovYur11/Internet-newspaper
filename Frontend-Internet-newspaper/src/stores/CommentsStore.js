@@ -19,18 +19,11 @@ export const useCommentsStore = defineStore("comments", {
                 .map((item) => item.toggleShow = false)
         },
         getCommentsInfo(post_id) {
-            // console.log('000')
-            // console.log(this.commentsCountInfo
-            //     .filter((item) => item.post_id === post_id)
-            //     .map((item) => item.show)[0])
             return this.commentsCountInfo
                 .filter((item) => item.post_id === post_id)
                 .map((item) => item.show)[0]
         },
         checkCommentsToggle(post_id){
-            // console.log(this.commentsCountInfo
-            //     .filter((item) => item.post_id === post_id)
-            //     .map((item) => item.toggleShow)[0])
             return  this.commentsCountInfo
                 .filter((item) => item.post_id === post_id)
                 .map((item) => item.toggleShow)[0]

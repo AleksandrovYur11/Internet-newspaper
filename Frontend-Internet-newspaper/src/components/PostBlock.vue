@@ -55,8 +55,9 @@ const errorImage = (event) => {
 }
 
 const openFiltr = (theme_name) => {
-    
+
     NewsStore.filterThemes(theme_name, '')
+    NewsStore.setPositiveTheme(theme_name)
 }
 
 
