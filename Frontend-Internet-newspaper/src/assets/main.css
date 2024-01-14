@@ -54,6 +54,55 @@ p {
   margin-right: 10px;
 }
 
+.main_container {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+.modal_bg {
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000000;
+  position: fixed;
+  align-items: center;
+  justify-content: center;
+}
+
+.cont {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  margin: 0;
+  padding: 0; 
+
+  flex-direction: column;
+}
+
+.cont h1 {
+  margin-bottom: 40px;
+  color: #3157CC;
+}
+
+.custom_form {
+  color: #007bff; /* Белый цвет текста */
+  background-color: #ffffff;
+  min-height: 50vh;
+  min-width: 30vw;
+  /* height: 50vh;
+  width: 30vw; */
+  border-radius: 15px;
+  padding: 25px 30px;
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  position: relative;
+  box-shadow: 10px 12px 4px rgba(0, 0, 0, 0.1);
+}
+
 
 
 

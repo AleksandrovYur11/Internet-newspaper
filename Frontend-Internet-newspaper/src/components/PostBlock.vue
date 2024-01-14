@@ -39,20 +39,27 @@ const formatPublishedDate = (dateString) => {
     return `Опубликовано ${formatter.format(date).replace(/\./g, ":")}`
 }
 
-const isLiked = ref(false)
+// const isLiked = ref(false)
 
-const toggleLike = (post_id, user_id) => {
-    isLiked.value = !isLiked.value
+// const toggleLike = (post_id, user_id) => {
+//     isLiked.value = !isLiked.value
 
-    console.log(isLiked.value)
-    NewsStore.addLike(post_id, user_id)
-}
+//     console.log(isLiked.value)
+//     NewsStore.addLike(post_id, user_id)
+// }
 
 import errorFile from "@/assets/error_file.png"
 
 const errorImage = (event) => {
     event.target.src = errorFile
 }
+
+const openFiltr = (theme_name) => {
+    
+    NewsStore.filterThemes(theme_name, '')
+}
+
+
 </script>
 
 <template>
@@ -67,6 +74,7 @@ const errorImage = (event) => {
                     class="theme"
                     v-for="(theme, index) in post.themes"
                     :key="index"
+                    @click = "openFiltr(theme.name)"
                 >
                     #{{ theme.name }}
                 </span>
@@ -77,61 +85,19 @@ const errorImage = (event) => {
                     @error="errorImage"
                     style="margin-right: 30px"
                 />
-                <!-- <p>&nbsp;&nbsp;&nbsp;&nbsp;{{  post.newsText }}</p> -->
-                <p style="text-align: justify">
-                    &nbsp;&nbsp;&nbsp;&nbsp;Lorem, ipsum dolor sit amet
-                    consectetur adipisicing elit. Optio in dignissimos quo
-                    temporibus cum blanditiis eaque minus, natus deleniti vitae
-                    itaque, placeat quis molestias nostrum voluptate est labore
-                    ipsum recusandae. Lorem, ipsum dolor sit amet consectetur
-                    adipisicing elit. Optio in dignissimos quo temporibus cum
-                    blanditiis eaque minus, natus deleniti vitae itaque, placeat
-                    quis molestias nostrum voluptate est labore ipsum
-                    recusandae. Lorem, ipsum dolor sit amet consectetur
-                    adipisicing elit. Optio in dignissimos quo temporibus cum
-                    blanditiis eaque minus, natus deleniti vitae itaque, placeat
-                    quis molestias nostrum voluptate est labore ipsum
-                    recusandae. Lorem, ipsum dolor sit amet consectetur
-                    adipisicing elit. Optio in dignissimos quo temporibus cum
-                    blanditiis eaque minus, natus deleniti vitae itaque, placeat
-                    quis molestias nostrum voluptate est labore ipsum
-                    recusandae. Lorem, ipsum dolor sit amet consectetur
-                    adipisicing elit. Optio in dignissimos quo temporibus cum
-                    blanditiis eaque minus, natus deleniti vitae itaque, placeat
-                    quis molestias nostrum voluptate est labore ipsum
-                    recusandae. Lorem, ipsum dolor sit amet consectetur
-                    adipisicing elit. Optio in dignissimos quo temporibus cum
-                    blanditiis eaque minus, natus deleniti vitae itaque, placeat
-                    quis molestias nostrum voluptate est labore ipsum
-                    recusandae. Lorem, ipsum dolor sit amet consectetur
-                    adipisicing elit. Optio in dignissimos quo temporibus cum
-                    blanditiis eaque minus, natus deleniti vitae itaque, placeat
-                    quis molestias nostrum voluptate est labore ipsum
-                    recusandae. Lorem, ipsum dolor sit amet consectetur
-                    adipisicing elit. Optio in dignissimos quo temporibus cum
-                    blanditiis eaque minus, natus deleniti vitae itaque, placeat
-                    quis molestias nostrum voluptate est labore ipsum
-                    recusandae. Lorem, ipsum dolor sit amet consectetur
-                    adipisicing elit. Optio in dignissimos quo temporibus cum
-                    blanditiis eaque minus, natus deleniti vitae itaque, placeat
-                    quis molestias nostrum voluptate est labore ipsum
-                    recusandae. Lorem, ipsum dolor sit amet consectetur
-                    adipisicing elit. Optio in dignissimos quo temporibus cum
-                    blanditiis eaque minus, natus deleniti vitae itaque, placeat
-                    quis molestias nostrum voluptate est labore ipsum
-                    recusandae.
-                </p>
+                <p>&nbsp;&nbsp;&nbsp;&nbsp;{{  post.newsText }}</p>
             </div>
             <br />
             <div class="likes_info">
                 <span class="likes_count">
                     <b>{{ post.likes.length || "" }}</b>
                 </span>
-                <span
-                    @click="toggleLike(post.id, user_id)"
-                    v-bind:class="
+                <!-- v-bind:class="
                         post.likes.length ? 'icon dislike' : 'icon like'
-                    "
+                    " -->
+                <span
+                    @click.prevent="NewsStore.addLike(post.id, user_id)"
+                    v-bind:class = "NewsStore.isLiked(post.id, user_id)? 'icon dislike' : 'icon like' "
                 ></span>
                 <span
                     @click.prevent="CommentsStore.showComments(post.id, 1)"

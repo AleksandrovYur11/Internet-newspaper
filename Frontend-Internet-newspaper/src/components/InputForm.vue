@@ -6,6 +6,7 @@ const props = defineProps({
     groupLabel: String,
     placeholder: String,
     textArea: String,
+    // validation_input: String
 })
 const emit = defineEmits(["update:modelValue"])
 
@@ -24,13 +25,14 @@ const localComputed = computed({
         class="mb-1"
         :label="groupLabel"
     >
-        <div class = "iput_constainer">
+        <div class = "iput_container">
             <b-form-textarea
                 v-if="textArea"
                 v-model="localComputed"
                 :placeholder="placeholder"
                 type="text"
                 :state="validation_title"
+                rows="15"
                 required
             >
             </b-form-textarea>
@@ -42,6 +44,10 @@ const localComputed = computed({
                 :state="validation_title"
                 required
             ></b-form-input>
+            <b-form-invalid-feedback :state="validation_email">
+            </b-form-invalid-feedback>
+            <b-form-valid-feedback :state="validation_email">
+            </b-form-valid-feedback>
             <span class="close" @click = "localComputed = '' " >&times; </span>
         </div>
     </b-form-group>
@@ -49,7 +55,7 @@ const localComputed = computed({
 
 <style scoped>
 
-.iput_constainer {
+.iput_container {
     display: flex;
     flex-direction: row;
     gap: 10px;

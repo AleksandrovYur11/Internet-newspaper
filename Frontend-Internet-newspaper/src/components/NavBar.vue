@@ -20,60 +20,68 @@ const user_name = ref(sessionStorage.getItem("user_name"))
     <b-navbar
         toggleable="md"
         sticky="top"
-        style="box-shadow: 0px 13px 4px rgba(0, 0, 0, 0.1)"
+        style="
+            box-shadow: 0px 13px 4px rgba(0, 0, 0, 0.1);
+            background-color: rgb(255, 255, 255);
+        "
     >
-        <b-navbar-brand
-            class="logo"
-            href="#"
-            to="/news/fresh-news"
-        ></b-navbar-brand>
-        <b-navbar-brand
-            href="#"
-            to="/news/fresh-news"
-            style="font-weight: bold"
-            >Маяк</b-navbar-brand
+        <div class="nav_item_right">
+            <b-navbar-brand
+                class="logo"
+                href="#"
+                to="/news/fresh-news"
+            ></b-navbar-brand>
+            <b-navbar-brand
+                href="#"
+                to="/news/fresh-news"
+                style="font-weight: bold"
+                >Маяк</b-navbar-brand
+            >
+        </div>
+        <div
+            v-if="user_role == 'ROLE_USER' || user_role == 'ROLE_ADMIN'"
+            class="nav_item_right"
         >
-        <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
-        <b-collapse
-            id="nav-collapse"
-            is-nav
-        >
-            <!-- добавить активность переключателя -->
+            <span style=" font-size: 18px">{{ user_name }}</span>
             <filtr-block></filtr-block>
-            <b-navbar-nav>
-                <div
-                    v-if="user_role == 'ROLE_USER' || user_role == 'ROLE_ADMIN'"
-                    class="d-flex flex-direction-row"
+            <b-button
+                v-if="user_role == 'ROLE_ADMIN'"
+                @click="NewsStore.showModal()"
+                style="
+                    background-color: #007bff;
+                    border: none;
+                    font-weight: bolder;
+                    cursor: pointer;
+                "
+            >
+                +
+            </b-button>
+            <span
+                class="icon exit"
+                to="/auth/sign-in"
+                @click="AuthUser.deleteToken()"
+            >
+            </span>
+        </div>
+        <div
+            v-else
+            class="d-flex flex-direction-row"
+        >
+            <filtr-block></filtr-block>
+            <div class="nav_item_right">
+                <a
+                    style="color: #007bff"
+                    href="/auth/sign-in"
+                    >Sign In</a
                 >
-                    <span>{{ user_name }}</span>
-                    <b-button
-                        v-if="user_role == 'ROLE_ADMIN'"
-                        @click="NewsStore.showModal()"
-                    >
-                        +
-                    </b-button>
-                    <span
-                        class="icon exit"
-                        to="/auth/sign-in"
-                        @click="AuthUser.deleteToken()"
-                    >
-                    </span>
-                    <!-- <b-nav-item
-                        to="/auth/sign-in"
-                        @click="AuthUser.deleteToken()"
-                    >
-                        <img class="icon exit"
-                    /></b-nav-item> -->
-                </div>
-                <div
-                    v-else
-                    class="d-flex flex-direction-row"
+
+                <a
+                    style="color: #007bff"
+                    href="/auth/sign-up"
+                    >Sign Up</a
                 >
-                    <b-nav-item to="/auth/sign-in">Sign In</b-nav-item>
-                    <b-nav-item to="/auth/sign-up">Sign Up</b-nav-item>
-                </div>
-            </b-navbar-nav>
-        </b-collapse>
+            </div>
+        </div>
     </b-navbar>
 </template>
 
@@ -92,5 +100,16 @@ const user_name = ref(sessionStorage.getItem("user_name"))
 
 .exit {
     background-image: url("@/assets/exit_icon.png");
+}
+
+.nav_item_right {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+}
+
+a {
+    cursor: pointer;
 }
 </style>

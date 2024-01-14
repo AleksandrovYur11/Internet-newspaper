@@ -23,22 +23,20 @@ onBeforeMount(() => {
 </script>
 
 <template>
-    <edit-form v-if="FormStore.edit"/>
-    <modal-form v-if="NewsStore.modal === true" />
-    <main-block>
-        <template #header>
-            <nav-bar></nav-bar>
-        </template>
-        <template #cont>
+    <div class="main_container">
+        <edit-form v-if="FormStore.edit" />
+        <modal-form v-if="NewsStore.modal === true" />
+        <nav-bar></nav-bar>
+        <div class="cont news">
             <div class="news_container">
                 <post-block
                     v-for="post in NewsStore.news"
                     :post="post"
                     :key="post.id"
-             ></post-block> 
+                ></post-block>
             </div>
-        </template>
-    </main-block>
+        </div>
+    </div>
     <div class="footer">
         <div class="footer_container">
             <div class="info_block">
@@ -60,8 +58,18 @@ onBeforeMount(() => {
 </template>
 
 <style scoped>
+.news {
+    background: linear-gradient(
+        to bottom,
+        #d5e6f3 20%,
+        #a8c2d5 35%,
+        #8aa4ba 55%,
+        #060912 95%
+    );
+}
+
 .news_container {
-    width: 60%;
+    width: 50%;
     margin: 30px 0px;
 }
 
@@ -71,7 +79,7 @@ onBeforeMount(() => {
     display: flex;
     flex-direction: row;
     justify-content: center;
-    background-image: url('@/assets/footer_bg.jpg');
+    background-image: url("@/assets/footer_bg.jpg");
     background-repeat: no-repeat;
     background-size: cover;
     height: 450px;
@@ -92,13 +100,12 @@ onBeforeMount(() => {
 .info_title {
     -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased;
-    border-bottom: 1px solid rgba(146,156,165,.4);
+    border-bottom: 1px solid rgba(146, 156, 165, 0.4);
     color: #fff;
-    font-size: .875rem;
+    font-size: 0.875rem;
     font-style: normal;
     font-weight: 700;
     line-height: 1.0625rem;
     padding-bottom: 16px;
 }
-
 </style>

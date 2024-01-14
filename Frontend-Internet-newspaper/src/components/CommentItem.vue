@@ -26,7 +26,7 @@ const dateFormating = (date) => {
         currentDate.getFullYear(),
         currentDate.getMonth(),
         currentDate.getDate()
-    ) 
+    )
 
     const yesterdayDate = new Date(todayDate)
     yesterdayDate.setDate(todayDate.getDate() - 1)
@@ -48,9 +48,9 @@ const dateFormating = (date) => {
     if (receivedDate >= todayDate) {
         return `Сегодня в ${formatTime(receivedDate)}`
     } else if (receivedDate >= yesterdayDate) {
-       return `Вчера в ${formatTime(receivedDate)}`
+        return `Вчера в ${formatTime(receivedDate)}`
     } else {
-       return `${formatDate(receivedDate)} ${formatTime(receivedDate)}`
+        return `${formatDate(receivedDate)} ${formatTime(receivedDate)}`
     }
 }
 </script>
@@ -63,27 +63,30 @@ const dateFormating = (date) => {
                     comment.user.name + " " + comment.user.surname
                 }}</b></span
             >
-            <span class="text-gray-500 uppercase text-xs">{{
-                dateFormating(comment.datePublishedComment)
-            }}</span>
+            <span
+                class="close"
+                v-if="user_id == comment.user.id || user_role === 'ROLE_ADMIN'"
+                @click="CommentsStore.deleteComment(comment.id)"
+                >&times;</span
+            > 
         </div>
         <div class="com_cont">
             <p>{{ comment.textComment }}</p>
-            <span
-                v-if="user_id == comment.user.id || user_role === 'ROLE_ADMIN'"
-                @click="CommentsStore.deleteComment(comment.id)"
-                style="cursor: pointer"
-            >
-                <img
-                    src="@/assets/urna.svg"
-                    alt="urna"
-                />
-            </span>
+            <span class="text-gray-500 uppercase text-xs" style=" color: #007bff">{{
+                dateFormating(comment.datePublishedComment)
+            }}</span>
         </div>
     </b-card>
 </template>
 
 <style scoped>
+.close {
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
 .com_cont {
     display: flex;
     flex-direction: row;

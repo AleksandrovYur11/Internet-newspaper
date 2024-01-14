@@ -10,11 +10,11 @@ const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
     linkActiveClass: "active",
     routes: [
-        // {
-        //     path: "/",
-        //     redirect: "/news/fresh-news", // перенаправление старта
-        //     component: NewsView,
-        // },
+        {
+            path: "/",
+            redirect: "/news/fresh-news", // перенаправление старта
+            component: NewsView,
+        },
         {
             path: "/auth/sign-in",
             name: "sign-in",
@@ -25,12 +25,6 @@ const router = createRouter({
             name: "sign-up",
             component: RegistrationView,
         },
-        // {
-        //     path: "/auth/home",
-        //     name: "home",
-        //     component: NomeView,
-        //     meta: { requiresAuth: true },
-        // },
         {
             path: "/news/fresh-news",
             name: "news",

@@ -15,6 +15,15 @@ const { props } = defineProps({
 
 const new_comment = ref("")
 const user_role = ref(sessionStorage.getItem("user_role"))
+
+const sendComment = (post_id, comment)=>{
+    if (comment === "") {
+                alert("Комментарий пуст!")
+    } else {
+        CommentsStore.sendcomment(post_id, comment)
+        new_comment.value = ""
+    }
+}
 </script>
 
 <template>
@@ -37,7 +46,7 @@ const user_role = ref(sessionStorage.getItem("user_role"))
             ></b-form-textarea>
             <span
                 v-if="user_role === 'ROLE_ADMIN' || user_role === 'ROLE_USER'"
-                @click="CommentsStore.sendcomment(post.id, new_comment)"
+                @click="sendComment(post.id, new_comment)"
                 class="icon send"
             >
             </span>
@@ -57,7 +66,7 @@ const user_role = ref(sessionStorage.getItem("user_role"))
     <a
         v-if="CommentsStore.getCommentsInfo(post.id)"
         href=""
-        @click.prevent="CommentsStore.showComments(post.id, 2)"
+        @click.prevent="CommentsStore.showComments(post.id)"
         >Еще
     </a>
 </template>

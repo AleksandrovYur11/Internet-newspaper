@@ -2,6 +2,7 @@ import { defineStore } from "pinia"
 import router from "@/router/index.js"
 
 import { useNewsStore } from "@/stores/NewsStore"
+import { useCommentsStore } from "@/stores/CommentsStore"
 
 export const useAuthStore = defineStore("auth", {
     state: () => ({
@@ -59,12 +60,17 @@ export const useAuthStore = defineStore("auth", {
                 )
                 console.log(response)
                 if (response.ok) {
-                    // window.location.reload()
+                    // window.location.reload() - ???
                     router.push("/auth/sign-in")
                     sessionStorage.removeItem("jwtToken")
                     sessionStorage.removeItem("jwtRefreshToken")
                     sessionStorage.removeItem("user_role")
                     sessionStorage.removeItem("user_id")
+
+                    const CommentStore = useCommentsStore()
+                    CommentStore.commentsCountInfo = []
+                    console.log(CommentStore.commentsCountInfo)
+
                     //alert("Ваша сессия истекла, требуется войти заново")
                     return true
                 } else {
@@ -115,7 +121,6 @@ export const useAuthStore = defineStore("auth", {
                 const jwtToken = responseData.accessToken
                 const jwtRefreshToken = responseData.refreshToken
                 sessionStorage.setItem("jwtRefreshToken", jwtRefreshToken)
-
 
                 sessionStorage.setItem("user_name", responseData.name)
 
