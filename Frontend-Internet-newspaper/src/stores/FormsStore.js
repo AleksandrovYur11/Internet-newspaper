@@ -102,6 +102,10 @@ export const useFormsStore = defineStore("forms", {
             const picture_url_obj = {
                 url: picture,
             }
+            console.log(themes)
+            console.log(themes
+                .split(",")
+                .map((theme) => ({ name: theme.trim() })))
             const newsData = {
                 newsTitle: newsTitle,
                 newsText: newsText,
@@ -163,9 +167,9 @@ export const useFormsStore = defineStore("forms", {
             const urlRegex = /\.(jpeg|jpg|gif|png|bmp|svg)$/i
             const maxTextLength = 255
             console.log(themes)
-            const themeInvalidLength = themes
-                .split(",")
-                .some((theme) => theme.trim().length > maxTextLength)
+            // const themeInvalidLength = themes
+            //     .split(",")
+            //     .some((theme) => theme.trim().length > maxTextLength)
             if (
                 newsTitle.length === 0 ||
                 newsText.length === 0 ||
@@ -175,9 +179,7 @@ export const useFormsStore = defineStore("forms", {
                 alert("Заполните все поля!")
             } else if (newsTitle.length > maxTextLength) {
                 alert("Название не должно превышать 255 символов")
-            } else if (themeInvalidLength) {
-                alert("Одна тема не должна превышать 255 символов")
-            } else if (!urlRegex.test(picture)) {
+            }  else if (!urlRegex.test(picture)) {
                 console.log(picture)
                 console.log(urlRegex.test(picture))
                 alert("Некорректный URL картинки")

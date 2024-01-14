@@ -13,6 +13,7 @@ const router = createRouter({
         {
             path: "/",
             redirect: "/news/fresh-news", // перенаправление старта
+            component: NewsView,
         },
         {
             path: "/auth/sign-in",
@@ -24,12 +25,6 @@ const router = createRouter({
             name: "sign-up",
             component: RegistrationView,
         },
-        // {
-        //     path: "/auth/home",
-        //     name: "home",
-        //     component: NomeView,
-        //     meta: { requiresAuth: true },
-        // },
         {
             path: "/news/fresh-news",
             name: "news",
@@ -37,23 +32,5 @@ const router = createRouter({
         },
     ],
 })
-
-// router.beforeEach((to, from, next) => {
-//   if (to.matched.some(record => record.meta.requiresAuth)) {
-
-//     const jwtToken = localStorage.getItem('jwtToken'); // Получение токена из localStorage
-
-//     if (!jwtToken) {
-//       // Если токена нет, перенаправляем на страницу входа
-//       next({ path: '/auth/signin' });
-//     } else {
-//       // Если токен есть, разрешаем доступ к защищенному маршруту
-//       next();
-//     }
-//   } else {
-//     // Для открытых маршрутов
-//     next();
-//   }
-// });
 
 export default router

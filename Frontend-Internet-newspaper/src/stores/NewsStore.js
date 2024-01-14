@@ -16,8 +16,15 @@ export const useNewsStore = defineStore("news", {
 
         //with comments
         newCommets: [],
+
+        //filtr
+        positive: ""
     }),
     actions: {
+        setPositiveTheme(theme_name){
+            this.positive = theme_name
+            console.log( this.positive)
+        },
         async getAuthStoreMethods() {
             const AuthStore = useAuthStore()
             return await AuthStore.updateAccessToken()
@@ -52,7 +59,103 @@ export const useNewsStore = defineStore("news", {
                 console.error("Fetch error:", error)
             }
         },
+        // isLiked(id_news, user_id) {
+            
+        //     const existNews = this.news.find((news) => news.id === id_news)
+
+        //     console.log(existNews)
+        //     const existLike = existNews.likes.some(
+        //         (like) => like.user.id === Number(user_id)
+        //     )
+
+        //     return existLike
+        // },
+        isLiked(id_news, user_id) {
+            const existNews = this.news.find((news) => news.id === id_news)
+            const existLike = existNews.likes.some(
+                (like) => like.user.id === Number(user_id)
+            )
+            return existLike
+        },
         async addLike(id_news, user_id) {
+
+            const jwtToken = sessionStorage.getItem("jwtToken")
+            if (!jwtToken) {
+                router.push("/auth/sign-in")
+                alert("Войдите или зарегестрируйтесь")
+                return
+            }
+
+            const existLike = this.isLiked(id_news, user_id)
+
+            // const existNews = this.news.find((news) => news.id === id_news)
+            //     const existLike = existNews.likes.some(
+            //         (like) => like.user.id === Number(user_id)
+            //     )
+           
+          
+            try {
+
+
+                console.log(existLike)
+
+                let response
+                if (existLike) {
+                    response = await fetch(
+                        `http://localhost:8085/likes?newsId=${id_news}`,
+                        {
+                            method: "DELETE",
+                            headers: new Headers({
+                                Authorization: "Bearer " + jwtToken,
+                                "Content-Type": "application/json",
+                            }),
+                        }
+                    )
+                } else {
+                    response = await fetch(
+                        `http://localhost:8085/likes/save?newsId=${id_news}`,
+                        {
+                            method: "POST",
+                            headers: new Headers({
+                                Authorization: "Bearer " + jwtToken,
+                                "Content-Type": "application/json",
+                            }),
+                        }
+                    )
+                }
+
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        const result = await this.getAuthStoreMethods()
+                        if (result) {
+                            return this.addLike(id_news, user_id)
+                        } else {
+                            console.log("false в update access")
+                        }
+                    } else {
+                        console.log("какой то другой статус")
+                    }
+                    throw new Error("Authentication failed")
+                }
+
+                const updatedNewsIndex = this.news.findIndex(
+                    // обновление
+                    (news) => news.id === id_news
+                )
+                if (existLike) {
+                    this.news[updatedNewsIndex].likes = this.news[ // удаление
+                        updatedNewsIndex
+                    ].likes
+                        .filter((like) => like.user.id !== Number(user_id))
+                } else {
+                    const newLike = { user: { id: Number(user_id) } } // добавление
+                    this.news[updatedNewsIndex].likes.push(newLike)
+                }
+            } catch (error) {
+                console.error("Ошибка лайка:", error)
+            }
+        },
+        async addLike0(id_news, user_id) {
             const jwtToken = sessionStorage.getItem("jwtToken")
             if (!jwtToken) {
                 router.push("/auth/sign-in")
@@ -60,11 +163,21 @@ export const useNewsStore = defineStore("news", {
                 return
             }
             try {
-                const existNews = this.news.find((news) => news.id === id_news)
 
-                const existLike = existNews.likes.some(
-                    (like) => like.user.id === Number(user_id)
-                )
+              
+
+                const existNews = this.news.find((news) => news.id === id_news)
+                console.log(existNews)
+
+                let existLike
+
+                if (existNews) {
+                         existLike = existNews.likes.some(
+                        (like) => like.user.id === Number(user_id)
+                    )
+                }
+               
+
 
                 let response
                 if (existLike) {

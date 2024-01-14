@@ -1,7 +1,6 @@
 import { defineStore } from "pinia"
-import { useNewsStore } from "@/stores/NewsStore.js"
 import { useAuthStore } from "@/stores/AuthStore.js"
-import router from "@/router/index.js"
+import { useNewsStore } from "@/stores/NewsStore.js"
 
 export const useCommentsStore = defineStore("comments", {
     state: () => ({
@@ -20,18 +19,11 @@ export const useCommentsStore = defineStore("comments", {
                 .map((item) => item.toggleShow = false)
         },
         getCommentsInfo(post_id) {
-            console.log('000')
-            console.log(this.commentsCountInfo
-                .filter((item) => item.post_id === post_id)
-                .map((item) => item.show)[0])
             return this.commentsCountInfo
                 .filter((item) => item.post_id === post_id)
                 .map((item) => item.show)[0]
         },
         checkCommentsToggle(post_id){
-            console.log(this.commentsCountInfo
-                .filter((item) => item.post_id === post_id)
-                .map((item) => item.toggleShow)[0])
             return  this.commentsCountInfo
                 .filter((item) => item.post_id === post_id)
                 .map((item) => item.toggleShow)[0]
@@ -62,7 +54,7 @@ export const useCommentsStore = defineStore("comments", {
                 console.error("Request error:", error)
             }
         },
-        async showComments(news_id, num) {
+        async showComments(news_id) {
             const commentsCount = await this.checkCommentsCount(news_id) // кол-во комментариев для поста в бд
 
             // информация о комментариях поста для тоглов
@@ -89,6 +81,8 @@ export const useCommentsStore = defineStore("comments", {
                         throw new Error("Failed to load comments")
                     }
                     const responseData = await response.json()
+
+                    console.log(i)
                     console.log(responseData)
 
                     const com_id_news = {
@@ -97,32 +91,52 @@ export const useCommentsStore = defineStore("comments", {
                         showed: false,
                     }
 
+                    console.log('выведенные уже')
+                    console.log(this.comments)
+
                     const isExistsComment = this.comments.find(
                         // проверяем существование выведенных комментариев для поста
                         (item) => item.news_id === news_id
                     )
 
+
                     if (isExistsComment) {
+                        console.log('exist')
+                        // console.log(isExistsComment)
+                        console.log(isExistsComment.comments.length)
                         if (isExistsComment.comments.length < commentsCount) {
                             isExistsComment.comments.push(
                                 ...com_id_news.comments
                             )
                         }
+
+                        // console.log('01')
+                        // console.log(isExistsComment)
+
                         commentInfo.existsComments =
                             isExistsComment.comments.length
                     } else {
                         this.comments.push(com_id_news)
+                        // console.log('02')
                         commentInfo.existsComments = 3
                     }
 
-                    this.$patch({
-                        comments: this.comments,
-                    })
+                    // this.$patch({
+                    //     comments: this.comments,
+                    // })
+
+                    // console.log(this.comments)
                 } catch (error) {
                     console.error("Fetch error:", error)
                 }
             }
-            
+
+            //?????///
+            // this.$patch({
+            //     comments: this.comments,
+            // })
+
+            console.log(this.comments)
             // для тогла
 
             const index = this.commentsCountInfo.findIndex(
@@ -140,17 +154,13 @@ export const useCommentsStore = defineStore("comments", {
                 commentInfo.show = commentInfo.existsComments < commentInfo.commentsCount
                 this.commentsCountInfo.push(commentInfo)
             }
-            // this.$patch({
-            //     commentsCountInfo: this.commentsCountInfo,
-            // })
-            console.log(this.commentsCountInfo)
+            this.$patch({
+                commentsCountInfo: this.commentsCountInfo,
+            })
+            // console.log(this.commentsCountInfo)
         },
         async sendcomment(id_news, new_comment) {
-            if (!new_comment.trim()) {
-                console.error("Комментарий пуст!")
-                alert("Комментарий пуст!")
-                return
-            }
+            
             const textComment = {
                 textComment: new_comment,
             }
@@ -197,9 +207,9 @@ export const useCommentsStore = defineStore("comments", {
                         comments: [responseData],
                     })
                 }
-                this.$patch({
-                    comments: this.comments,
-                })
+                // this.$patch({
+                //     comments: this.comments,
+                // })
             } catch (error) {
                 // console.error("Authentication error:", error)
             }
@@ -274,11 +284,13 @@ export const useCommentsStore = defineStore("comments", {
                     return { news_id: com.news_id, comments: filtrComments }
                 })
 
-                console.log(updatedComments)
+                // console.log(updatedComments)
 
                 this.$patch({
                     comments: updatedComments,
                 })
+
+                console.log(this.comments)
             } catch (error) {
                 console.error("Authentication error:", error)
             }

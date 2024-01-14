@@ -69,10 +69,9 @@ onBeforeMount(async () => {
 
 <template>
     <div
-        class="container"
-        @click.self="FormStore.closeEdit()"
+        class="main_container modal_bg"
     >
-        <b-form class="custom-form">
+        <b-form class="custom_form">
             <div class="header_modal">
                 <h4>Edit news</h4>
                 <span
@@ -98,20 +97,19 @@ onBeforeMount(async () => {
                 v-model="picture"
                 groupLabel="Изображение:"
             ></InputForm>
-            <!-- @click="editFormValidation()" -->
             <div class="footer_modal">
                 <b-button
                     type="submit"
                     class="submit_btn"
                     @click="FormStore.formsValidation(newsTitle, newsText, picture, themes, 'edit', FormStore.edit_post_id)" 
-                    >Edit</b-button
+                    >Редактировать</b-button
                 >
                 <b-button
                     type="submit"
                     @click="FormStore.deleteNews(FormStore.edit_post_id)"
                     class="submit_btn"
                 >
-                    Delete
+                    Удалить
                 </b-button>
             </div>
         </b-form>
@@ -119,21 +117,7 @@ onBeforeMount(async () => {
 </template>
 
 <style scoped>
-.custom-form {
-    color: #007bff; /* Белый цвет текста */
-    background-color: #ffffff;
-    min-height: 50vh;
-    min-width: 30vw;
-    /* height: 50vh;
-    width: 30vw; */
-    border-radius: 15px;
-    padding: 25px 30px;
-    display: flex;
-    flex-direction: column;
-    align-content: center;
-    position: relative;
-    box-shadow: 10px 12px 4px rgba(0, 0, 0, 0.1);
-}
+
 
 h4 {
     color: #868686;
@@ -143,11 +127,6 @@ h4 {
     display: flex;
     justify-content: space-between;
 }
-/* .submit_btn {
-    /* bottom: 20px;
-    position: absolute;
-    width: 25%; */
-
 .header_modal {
     display: flex;
     flex-direction: row;
@@ -196,6 +175,7 @@ h4 {
     color: #aaa;
     font-size: 28px;
     font-weight: bold;
+    cursor: pointer;
 }
 
 .close:hover,

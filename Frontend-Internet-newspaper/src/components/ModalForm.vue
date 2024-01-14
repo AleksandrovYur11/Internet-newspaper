@@ -57,11 +57,9 @@ console.log(themes)
 
 <template>
     <div
-        class="container"
-        @click.self="NewsStore.closeModal()"
+        class="main_container modal_bg"
     >
-        <b-form class="custom-form">
-            <!-- <div class="modal-content"> -->
+        <b-form class="custom_form">
             <div class="header_modal">
                 <h4>Create news</h4>
                 <span
@@ -73,30 +71,30 @@ console.log(themes)
             <InputForm
                 v-model="newsTitle"
                 groupLabel="Название:"
-                placeholder="Чертила..."
+                placeholder="Ваша новость"
             ></InputForm>
             <InputForm
                 v-model="themes"
                 groupLabel="Темы:"
-                placeholder="Меркурий, Венера, Земля..."
+                placeholder="природа, космос, IT..."
             ></InputForm>
             <InputForm
                 v-model="newsText"
                 groupLabel="Текст:"
-                placeholder="...название этот вид получил из-за очень непривлекательной внешности. - это не факт, это википедия"
+                placeholder="Текст вашей новости"
                 textArea="textArea"
             ></InputForm>
             <InputForm
                 v-model="picture"
                 groupLabel="Изображение:"
-                placeholder="https://dikoed.ru/upload/iblock/361/16025-morskoy-chert-s-golovoy.jpg"
+                placeholder=".jpeg .jpg .gif .png .bmp .svg"
             ></InputForm>
             <div class="footer_modal">
                 <b-button
                     type="submit"
                     @click="FormStore.formsValidation(newsTitle, newsText, picture, themes, 'modal')" 
                     class="submit_btn"
-                    >Create</b-button
+                    >Создать</b-button
                 >
             </div>
         </b-form>
@@ -104,21 +102,7 @@ console.log(themes)
 </template>
 
 <style scoped>
-.custom-form {
-    color: #007bff; /* Белый цвет текста */
-    background-color: #ffffff;
-    min-height: 50vh;
-    min-width: 30vw;
-    /* height: 50vh;
-    width: 30vw; */
-    border-radius: 15px;
-    padding: 25px 30px;
-    display: flex;
-    flex-direction: column;
-    align-content: center;
-    position: relative;
-    box-shadow: 10px 12px 4px rgba(0, 0, 0, 0.1);
-}
+
 
 h4 {
     color: #868686;
@@ -127,11 +111,6 @@ h4 {
 .footer_modal {
     display: flex;
     justify-content: flex-end;
-}
-.submit_btn {
-    bottom: 20px;
-    position: absolute;
-    width: 25%;
 }
 
 .header_modal {

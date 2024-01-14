@@ -38,18 +38,12 @@ const signInValidation = () => {
         textPassword.value = null
     }
 }
-
 </script>
 
 <template>
     <main-block>
-        <template #header> </template>
-        <template #container>
-            <b-form
-                class="custom-form"
-            >
-                <h4>Sign In</h4>
-                <b-form-group
+        <template #content>
+            <b-form-group
                     class="mb-3"
                     id="email_group"
                     label="Email"
@@ -64,10 +58,10 @@ const signInValidation = () => {
                         required
                     ></b-form-input>
                     <b-form-invalid-feedback :state="validation_email">
-                        Проверьте правильность email
+                        Введите корректный email
                     </b-form-invalid-feedback>
                     <b-form-valid-feedback :state="validation_email">
-                        Выглядит хорошо!
+                        Ок
                     </b-form-valid-feedback>
                 </b-form-group>
                 <b-form-group
@@ -84,50 +78,23 @@ const signInValidation = () => {
                         :state="validation_password"
                     ></b-form-input>
                     <b-form-invalid-feedback :state="validation_password">
-                        Больше символов...
+                        Введите не менеее 8 символов
                     </b-form-invalid-feedback>
                     <b-form-valid-feedback :state="validation_password">
-                        Выглядит отлично!
+                        Ок
                     </b-form-valid-feedback>
                 </b-form-group>
-                <b-button
+        </template>
+        <template #btn>
+            <b-button
                     @click="signInValidation()"
                     variant="primary"
-                    class="submit_btn"
-                    >Submit</b-button
+                    >Войти</b-button
                 >
-            </b-form>
+        </template>
+        <template #toggle>
+            <a href="/auth/sign-up">Еще не зарегестрированы?</a>
         </template>
     </main-block>
-</template>
+</template> 
 
-<style scoped>
-.submit_btn {
-    bottom: 30px;
-    align-self: center;
-    position: absolute;
-    width: 50%;
-}
-
-h4 {
-    color: #868686;
-    display: flex;
-    justify-content: center;
-}
-
-.custom-form {
-    color: #007bff; /* Белый цвет текста */
-    background-color: #ffffff;
-    min-height: 50vh;
-    min-width: 30vw;
-    /* height: 50vh;
-    width: 30vw; */
-    border-radius: 15px;
-    padding: 25px 30px;
-    display: flex;
-    flex-direction: column;
-    align-content: center;
-    position: relative;
-    box-shadow: 10px 12px 4px rgba(0, 0, 0, 0.1);
-}
-</style>

@@ -51,8 +51,8 @@ const validation_password = computed(() => {
 const validation_name = computed(() => {
     if (regData.value.textName) {
         if (regData.value.textName.length <= 1) {
-            return "Ваше имя точно длинее одного символа"
-        } else if (regData.value.textName.length > 15) {
+            return "Имя содержит не менее 2 символов"
+        } else if (regData.value.textName.length > 255) {
             return "Слишком длинное имя"
         } else {
             return true
@@ -63,8 +63,8 @@ const validation_name = computed(() => {
 const validation_surname = computed(() => {
     if (regData.value.textSurname) {
         if (regData.value.textSurname.length <= 1) {
-            return "Слишком короткая фамилия для русского"
-        } else if (regData.value.textSurname.length > 15) {
+            return "Фамилия содержит не менее 2 символов"
+        } else if (regData.value.textSurname.length > 255) {
             return "Слишком длинная фамилия"
         } else {
             return true
@@ -112,154 +112,136 @@ const signUpValidation = () => {
 
 <template>
     <main-block>
-        <template #header> </template>
-        <template #container>
-            <b-form class="custom-form">
-                <h4>Sign Up</h4>
-                <b-form-group
-                    class="mb-2"
-                    id="name_group"
-                    label="Name"
-                    label-for="text_name"
-                >
-                    <b-form-input
-                        id="text_name"
-                        v-model="regData.textName"
-                        type="text"
-                        placeholder="Александр"
-                        :state="validation_name"
-                        required
-                    ></b-form-input>
-                    <b-form-invalid-feedback :state="!validation_name">
-                        {{ typeof validation_name === 'string' ? validation_name : '' }}
-                    </b-form-invalid-feedback>
-                    <b-form-valid-feedback :state="validation_name">
-                        Теперь хорошо
-                    </b-form-valid-feedback>
-                </b-form-group>
-                <b-form-group
-                    class="mb-2"
-                    id="surname_group"
-                    label="Surname"
-                    label-for="text_surname"
-                >
-                    <b-form-input
-                        id="text_surname"
-                        v-model="regData.textSurname"
-                        type="text"
-                        placeholder="Александров"
-                        :state="validation_surname"
-                        required
-                    ></b-form-input>
-                    <b-form-invalid-feedback :state="!validation_surname">
-                        {{ typeof validation_surname === 'string' ? validation_surname : '' }}
-                    </b-form-invalid-feedback>
-                    <b-form-valid-feedback :state="validation_surname">
-                        Так то лучше
-                    </b-form-valid-feedback>
-                </b-form-group>
-                <b-form-group
-                    class="mb-2"
-                    id="email_group"
-                    label="Email"
-                    label-for="text_email"
-                >
-                    <b-form-input
-                        id="text_email"
-                        v-model="regData.textEmail"
-                        type="email"
-                        placeholder="user.userovich@gmail.com"
-                        :state="validation_email"
-                        required
-                    ></b-form-input>
-                    <b-form-invalid-feedback :state="validation_email">
-                        Проверьте правильность email
-                    </b-form-invalid-feedback>
-                    <b-form-valid-feedback :state="validation_email">
-                        Выглядит хорошо!
-                    </b-form-valid-feedback>
-                </b-form-group>
-                <b-form-group
-                    id="password_group"
-                    label="Password"
-                    label-for="text_password"
-                    class="mb-2"
-                >
-                    <b-form-input
-                        v-model="regData.textPassword"
-                        required
-                        type="password"
-                        id="text-password"
-                        aria-describedby="password-help-block"
-                        :state="validation_password"
-                    ></b-form-input>
-                     <b-form-valid-feedback :state="validation_password">
-                        Выглядит отлично!
-                    </b-form-valid-feedback>
-                    <b-form-invalid-feedback :state="!validation_password">
-                        {{ typeof validation_password === 'string' ? validation_password : '' }}
-                    </b-form-invalid-feedback>
-                </b-form-group>
-                <b-form-group
-                    id="password_repeat_group"
-                    label="Repeat password"
-                    label-for="text_repeat_password"
-                    class="mb-2"
-                >
-                    <b-form-input
-                        v-model="regData.textRepeatPassword"
-                        required
-                        type="password"
-                        id="text_repeat_password"
-                        aria-describedby="password-help-block"
-                        :state="validation_repeat_password"
-                    ></b-form-input>
-                    <b-form-invalid-feedback
-                        :state="validation_repeat_password"
-                    >
-                        Пароли не совпадают!
-                    </b-form-invalid-feedback>
-                    <b-form-valid-feedback :state="validation_repeat_password">
-                        Теперь совпадают!
-                    </b-form-valid-feedback>
-                </b-form-group>
-                <b-button
-                    type="submit"
-                    variant="success"
-                    class="submit_btn"
-                    @click="signUpValidation()"
-                    >Submit</b-button
-                >
-            </b-form>
+        <template #content>
+            <b-form-group
+                class="mb-2"
+                id="name_group"
+                label="Name"
+                label-for="text_name"
+            >
+                <b-form-input
+                    id="text_name"
+                    v-model="regData.textName"
+                    type="text"
+                    placeholder="Александр"
+                    :state="validation_name"
+                    required
+                ></b-form-input>
+                <b-form-invalid-feedback :state="!validation_name">
+                    {{
+                        typeof validation_name === "string"
+                            ? validation_name
+                            : ""
+                    }}
+                </b-form-invalid-feedback>
+                <b-form-valid-feedback :state="validation_name">
+                    Ок
+                </b-form-valid-feedback>
+            </b-form-group>
+            <b-form-group
+                class="mb-2"
+                id="surname_group"
+                label="Surname"
+                label-for="text_surname"
+            >
+                <b-form-input
+                    id="text_surname"
+                    v-model="regData.textSurname"
+                    type="text"
+                    placeholder="Александров"
+                    :state="validation_surname"
+                    required
+                ></b-form-input>
+                <b-form-invalid-feedback :state="!validation_surname">
+                    {{
+                        typeof validation_surname === "string"
+                            ? validation_surname
+                            : ""
+                    }}
+                </b-form-invalid-feedback>
+                <b-form-valid-feedback :state="validation_surname">
+                    Ок
+                </b-form-valid-feedback>
+            </b-form-group>
+            <b-form-group
+                class="mb-2"
+                id="email_group"
+                label="Email"
+                label-for="text_email"
+            >
+                <b-form-input
+                    id="text_email"
+                    v-model="regData.textEmail"
+                    type="email"
+                    placeholder="user.userovich@gmail.com"
+                    :state="validation_email"
+                    required
+                ></b-form-input>
+                <b-form-invalid-feedback :state="validation_email">
+                    Некорректный email
+                </b-form-invalid-feedback>
+                <b-form-valid-feedback :state="validation_email">
+                    Ок
+                </b-form-valid-feedback>
+            </b-form-group>
+            <b-form-group
+                id="password_group"
+                label="Password"
+                label-for="text_password"
+                class="mb-2"
+            >
+                <b-form-input
+                    v-model="regData.textPassword"
+                    required
+                    type="password"
+                    id="text-password"
+                    aria-describedby="password-help-block"
+                    :state="validation_password"
+                ></b-form-input>
+                <b-form-valid-feedback :state="validation_password">
+                    Ок
+                </b-form-valid-feedback>
+                <b-form-invalid-feedback :state="!validation_password">
+                    {{
+                        typeof validation_password === "string"
+                            ? validation_password
+                            : ""
+                    }}
+                </b-form-invalid-feedback>
+            </b-form-group>
+            <b-form-group
+                id="password_repeat_group"
+                label="Repeat password"
+                label-for="text_repeat_password"
+                class="mb-2"
+            >
+                <b-form-input
+                    v-model="regData.textRepeatPassword"
+                    required
+                    type="password"
+                    id="text_repeat_password"
+                    aria-describedby="password-help-block"
+                    :state="validation_repeat_password"
+                ></b-form-input>
+                <b-form-invalid-feedback :state="validation_repeat_password">
+                    Пароли не совпадают
+                </b-form-invalid-feedback>
+                <b-form-valid-feedback :state="validation_repeat_password">
+                    Пароли совпадают
+                </b-form-valid-feedback>
+            </b-form-group>
+        </template>
+        <template #btn>
+            <b-button
+                type="submit"
+                variant="success"
+                @click="signUpValidation()"
+                >Зарегестрироваться</b-button
+            >
+        </template>
+        <template #toggle>
+                <a href="/auth/sign-in">Перейти ко входу</a>
         </template>
     </main-block>
 </template>
 
-<style scoped>
-.submit_btn {
-    bottom: 30px;
-    align-self: center;
-    position: absolute;
-    width: 50%;
-}
-
-h4 {
-    color: #868686;
-    display: flex;
-    justify-content: center;
-}
-
-.custom-form {
-    color: #007bff; /* Белый цвет текста */
-    background-color: #ffffff;
-    min-height: 85vh;
-    min-width: 30vw;
-    border-radius: 15px;
-    padding: 25px 30px;
-    display: flex;
-    flex-direction: column;
-    align-content: center;
-    position: relative;
-    box-shadow: 10px 12px 4px rgba(0, 0, 0, 0.1);
-}
-</style>

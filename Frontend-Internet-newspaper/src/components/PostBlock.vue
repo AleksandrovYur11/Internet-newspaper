@@ -27,105 +27,169 @@ const user_id = ref(sessionStorage.getItem("user_id"))
 const user_role = ref(sessionStorage.getItem("user_role"))
 
 const formatPublishedDate = (dateString) => {
-  const date = new Date(dateString);
-  const formatter = new Intl.DateTimeFormat('ru', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
+    const date = new Date(dateString)
+    const formatter = new Intl.DateTimeFormat("ru", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+    })
 
-  return `Опубликовано ${formatter.format(date).replace(/\./g, ':')}`
+    return `Опубликовано ${formatter.format(date).replace(/\./g, ":")}`
 }
+
+// const isLiked = ref(false)
+
+// const toggleLike = (post_id, user_id) => {
+//     isLiked.value = !isLiked.value
+
+//     console.log(isLiked.value)
+//     NewsStore.addLike(post_id, user_id)
+// }
+
+import errorFile from "@/assets/error_file.png"
+
+const errorImage = (event) => {
+    event.target.src = errorFile
+}
+
+const openFiltr = (theme_name) => {
+
+    NewsStore.filterThemes(theme_name, '')
+    NewsStore.setPositiveTheme(theme_name)
+}
+
 
 </script>
 
 <template>
-    <div class="cont">
-        <b-button
-            style="margin-right: 10px"
-            v-if="user_role === 'ROLE_ADMIN'"
-            @click="FormStore.showEdit(post.id)"
-            :post="post"
-            >red</b-button
-        >
-        <div class="news_container">
-            <div
-                style="
-                    display: flex;
-                    flex-direction: row;
-                    justify-content: space-between;
-                "
-            >
-                <span>
-                    {{ formatPublishedDate(post.datePublishedNews) }}
-                </span>
-
-                <div class="themes">
-                    <span
-                        class="theme"
-                        v-for="(theme, index) in post.themes"
-                        :key="index"
-                    >
-                        # {{ theme.name }}
-                    </span>
-                </div>
-            </div>
+    <div class="block_container">
+        <div class="post_container">
+            <span style="color: #007bff">
+                {{ formatPublishedDate(post.datePublishedNews) }}
+            </span>
             <h3>{{ post.newsTitle }}</h3>
+            <div class="themes">
+                <span
+                    class="theme"
+                    v-for="(theme, index) in post.themes"
+                    :key="index"
+                    @click = "openFiltr(theme.name)"
+                >
+                    #{{ theme.name }}
+                </span>
+            </div>
             <div class="post_body">
                 <img
                     :src="post.picture.url"
+                    @error="errorImage"
                     style="margin-right: 30px"
                 />
-                <p>{{ post.newsText }}</p>
+                <p>&nbsp;&nbsp;&nbsp;&nbsp;{{  post.newsText }}</p>
             </div>
             <br />
             <div class="likes_info">
-                <div class="likes">
-                    <span @click="NewsStore.addLike(post.id, user_id)">
-                        <img
-                            src="@/assets/class.svg"
-                            alt=""
-                        />
-                    </span>
-                    <span
-                        ><b>{{ post.likes.length || 0 }}</b></span
-                    >
-                </div>
-                <a
-                    href=""
+                <span class="likes_count">
+                    <b>{{ post.likes.length || "" }}</b>
+                </span>
+                <!-- v-bind:class="
+                        post.likes.length ? 'icon dislike' : 'icon like'
+                    " -->
+                <span
+                    @click.prevent="NewsStore.addLike(post.id, user_id)"
+                    v-bind:class = "NewsStore.isLiked(post.id, user_id)? 'icon dislike' : 'icon like' "
+                ></span>
+                <span
                     @click.prevent="CommentsStore.showComments(post.id, 1)"
                     v-if="
                         !CommentsStore.checkCommentsToggle(post.id) ||
                         CommentsStore.checkCommentsToggle(post.id) === undefined
                     "
+                    class="icon comments"
                 >
-                    Комментарии</a
-                >
-                <a
-                    href=""
+                </span>
+                <span
+                    class="icon close"
                     v-else
                     @click.prevent="CommentsStore.closeComments(post.id)"
-                >
-                    Скрыть</a
-                >
+                ></span>
             </div>
             <comment-block
                 :post="post"
                 v-if="CommentsStore.checkCommentsToggle(post.id)"
             ></comment-block>
         </div>
+        <span
+            class="edit_btn icon"
+            v-if="user_role === 'ROLE_ADMIN'"
+            @click="FormStore.showEdit(post.id)"
+            :post="post"
+        ></span>
     </div>
 </template>
 
 <style scoped>
-.cont {
-    display: flex;
+.likes_count {
+    color: #007bff;
+    margin-right: 10px;
+    font-size: 22px;
+}
+.block_container {
     flex-direction: row;
-    margin-bottom: 30px;
-    margin-top: 30px;
-    align-items: flex-start;
+    display: flex;
+    position: relative;
+    margin-top: 20px;
+}
+
+/* .edit_btn_zone {
+    position: absolute;
+    right: -50px;
+    background-color: #fff;
+    width: 40px;
+    height: 40px;
+    padding: 7px;
+    border-radius: 50%;
+} */
+
+.edit_btn {
+    position: absolute;
+    right: -60px;
+    background-image: url("@/assets/edit_icon.png");
+}
+
+
+/* .icon {
+    width: 35px;
+    height: 35px;
+    background-position: center;
+    background-size: cover;
+    cursor: pointer;
+    margin-right: 10px;
+} */
+
+.like {
+    background-image: url("@/assets/like_icon.png");
+}
+
+.dislike {
+    background-image: url("@/assets/dislike_icon.png");
+}
+
+.comments {
+    background-image: url("@/assets/comment_icon.png");
+}
+
+.close {
+    background-image: url("@/assets/close_icon.png");
+}
+
+.post_container {
+    background-color: #fff;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
 }
 
 .likes {
@@ -136,8 +200,8 @@ const formatPublishedDate = (dateString) => {
 .likes_info {
     display: flex;
     flex-direction: row;
+    justify-content: flex-end;
     align-items: center;
-    justify-content: space-between;
 }
 .comment_header {
     display: flex;
@@ -149,50 +213,44 @@ const formatPublishedDate = (dateString) => {
 .news_container {
     background-color: #fff;
     color: #000;
-    border-radius: 15px;
-    padding: 20px 20px;
-    /* margin: 30px; */
+    padding: 25px 25px;
     display: flex;
-    /* align-items: left; */
     flex-direction: column;
 }
 
-img {
-    /* height: 300px; */
-    max-width: 200px;
-    margin-right: 25px;
+.post_body img {
+    min-height: 300px;
+    max-height: 400px;
+    max-width: 400px;
+    float: left;
 }
 
 h3 {
-    margin-top: 10px;
+    margin-top: 30px;
 }
 
 .themes {
     display: flex;
     flex-direction: row;
-    justify-content: flex-end;
+    margin-bottom: 30px;
 }
 .theme {
-    background-color: rgba(25, 189, 63, 0.545);
-    padding: 4px 8px;
+    /* background-color: rgba(25, 189, 63, 0.545); */
+    /* padding: 4px 8px; */
     border-radius: 15px;
-    font-size: 12px;
+    padding-right: 5px;
+    font-size: 18px;
     margin-right: 5px;
+    color: #50667c;
+}
+
+.theme:hover {
+    color: #007bff;
 }
 
 .comment_btn {
     padding: 4px 8px;
     border-radius: 15px;
     font-size: 12px;
-}
-
-.post_body {
-    display: flex;
-    align-items: flex-start;
-    margin-top: 20px;
-}
-
-p {
-    flex: 1;
 }
 </style>

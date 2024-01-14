@@ -1,23 +1,110 @@
 @import './base.css';
 
-#app {
-  max-width: 100vw;
-  margin: 0 auto;
-  font-weight: normal;
-  box-sizing: border-box;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
+html, body, #app {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-style: normal;
+  text-decoration: none;
+  color: #000;
+  font-weight: 500;
+  font-family: "Times New Roman", serif;
+  line-height: 15px;
   top: 0;
   right: 0;
   left: 0;
   bottom: 0;
 }
 
-a,
-.green {
+a {
+  color: #007bff;
   text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
 }
+
+div {
+  box-sizing: border-box;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: Georgia, serif;
+  font-weight: 700;
+  font-style: normal;
+  line-height: 30px;
+  letter-spacing: -0.01em;
+  color: #161613;
+}
+
+p {
+  font-size: 20px;
+  font-family: "Times New Roman", serif;
+  font-weight: 400;
+  font-style: normal;
+  line-height: 22px;
+  text-decoration: none;
+  text-transform: none;
+  color: #535350;
+}
+
+.icon {
+  width: 35px;
+  height: 35px;
+  background-position: center;
+  background-size: cover;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.main_container {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+.modal_bg {
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000000;
+  position: fixed;
+  align-items: center;
+  justify-content: center;
+}
+
+.cont {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  margin: 0;
+  padding: 0; 
+
+  flex-direction: column;
+}
+
+.cont h1 {
+  margin-bottom: 40px;
+  color: #3157CC;
+}
+
+.custom_form {
+  color: #007bff; /* Белый цвет текста */
+  background-color: #ffffff;
+  min-height: 50vh;
+  min-width: 30vw;
+  /* height: 50vh;
+  width: 30vw; */
+  border-radius: 15px;
+  padding: 25px 30px;
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  position: relative;
+  box-shadow: 10px 12px 4px rgba(0, 0, 0, 0.1);
+}
+
+
+
+
+
 
