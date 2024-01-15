@@ -34,9 +34,6 @@ public class User {
     private String email;
 
     @ManyToOne
-//    @JoinTable(name =  "user_roles",
-//    joinColumns = @JoinColumn(name = "user_id"),
-//    inverseJoinColumns = @JoinColumn(name = "role_name"))
     private Role role;
 
     @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-zA-Z]).{8,}$",

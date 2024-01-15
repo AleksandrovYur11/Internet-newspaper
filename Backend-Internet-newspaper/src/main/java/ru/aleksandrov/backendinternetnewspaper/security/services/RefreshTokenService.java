@@ -55,12 +55,5 @@ public class RefreshTokenService {
                     return new EntityNotFoundException("Refresh token with string = " + refreshToken + ": Not Found");
                 });
         refreshTokenRepository.deleteByToken(deleteRefreshToken.getToken());
-
-//
-//        if (refreshTokenRepository.exists(refreshTokenId)) {
-//            refreshTokenRepository.deleteById(refreshTokenId);
-//        } else {
-//            throw new EntityNotFoundException("Refresh token with id = " + refreshTokenId + ": Not Found");
-//        }
     }
 }
