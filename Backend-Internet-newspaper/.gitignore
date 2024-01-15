@@ -33,3 +33,4 @@ build/
 .vscode/
 /src/main/resources/application-dev.properties
 /src/main/java/ru/aleksandrov/backendinternetnewspaper/utils/DbInitializer.java
+/src/main/java/ru/aleksandrov/backendinternetnewspaper/util/DbInitializer.java

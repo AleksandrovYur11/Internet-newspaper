@@ -1,10 +1,10 @@
 <script setup>
-import { ref, computed, defineProps } from "vue"
+import { ref, defineProps } from "vue"
+
+import CommentItem from "@/components/CommentItem.vue"
 
 import { useCommentsStore } from "@/stores/CommentsStore.js"
 const CommentsStore = useCommentsStore()
-
-import CommentItem from "@/components/CommentItem.vue"
 
 const { props } = defineProps({
     post: {
@@ -13,15 +13,23 @@ const { props } = defineProps({
     },
 })
 
+const maxWidth = 1000
 const new_comment = ref("")
 const user_role = ref(sessionStorage.getItem("user_role"))
 
-const sendComment = (post_id, comment)=>{
+const sendComment = (post_id, comment) => {
     if (comment === "") {
-                alert("Комментарий пуст!")
+        alert("Комментарий пуст!")
     } else {
         CommentsStore.sendcomment(post_id, comment)
         new_comment.value = ""
+    }
+}
+
+const validation_comment = () => {
+    if (new_comment.value.length > maxWidth) {
+        new_comment.value = new_comment.value.slice(0, maxWidth)
+        alert("Введите комментарий не более 1000 символов!")
     }
 }
 </script>
@@ -37,12 +45,8 @@ const sendComment = (post_id, comment)=>{
                 size="sm"
                 placeholder="Ваш комментарий..."
                 v-model="new_comment"
-                style="
-                    min-height: 73px;
-                    margin-right: 10px;
-                    max-height: 400px;
-                    border-radius: 3px;
-                "
+                @input="validation_comment"
+                class="text_area_style"
             ></b-form-textarea>
             <span
                 v-if="user_role === 'ROLE_ADMIN' || user_role === 'ROLE_USER'"
@@ -53,27 +57,35 @@ const sendComment = (post_id, comment)=>{
         </div>
     </div>
     <div class="comments_content">
-        <comment-item
+        <CommentItem
             v-for="comment in CommentsStore.comments
                 .filter((obj) => obj.news_id === post.id)
                 .flatMap((obj) => obj.comments)"
             :key="comment.id"
             :comment="comment"
             :post="post"
-        >
-        </comment-item>
+            @input="validation_comment"
+        />
     </div>
-    <a
+    <b-button
         v-if="CommentsStore.getCommentsInfo(post.id)"
-        href=""
         @click.prevent="CommentsStore.showComments(post.id)"
+        variant="outline-primary"
+        style="margin-top: 10px; cursor: pointer"
         >Еще
-    </a>
+    </b-button>
 </template>
 
 <style scoped>
 .footer {
     background-color: #fff;
+}
+
+.text_area_style {
+    min-height: 73px;
+    margin-right: 10px;
+    max-height: 400px;
+    border-radius: 3px;
 }
 
 .comments_content {
@@ -87,7 +99,6 @@ const sendComment = (post_id, comment)=>{
     flex-direction: row;
     justify-content: space-between;
     background-color: #fff;
-    /* align-items: center; */
 }
 
 img[data-v-9d1a3feb] {

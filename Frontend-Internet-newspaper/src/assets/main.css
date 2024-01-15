@@ -88,12 +88,10 @@ p {
 }
 
 .custom_form {
-  color: #007bff; /* Белый цвет текста */
+  color: #007bff;
   background-color: #ffffff;
   min-height: 50vh;
   min-width: 30vw;
-  /* height: 50vh;
-  width: 30vw; */
   border-radius: 15px;
   padding: 25px 30px;
   display: flex;
@@ -101,6 +99,74 @@ p {
   align-content: center;
   position: relative;
   box-shadow: 10px 12px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* modal/edit froms */
+
+h4 {
+  color: #868686;
+}
+
+.footer_modal {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.header_modal {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.container {
+  z-index: 1000000;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+  background-color: #fefefe;
+  padding: 20px;
+  width: 40%;
+  min-height: 60%;
+  animation: modal-show 0.5s;
+}
+
+@keyframes modal-show {
+  from {
+      opacity: 0;
+  }
+  to {
+      opacity: 1;
+  }
+}
+
+.close {
+  color: #aaa;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
 }
 
 

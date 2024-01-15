@@ -1,6 +1,5 @@
 import { defineStore } from "pinia"
 import { useAuthStore } from "@/stores/AuthStore.js"
-import { useNewsStore } from "@/stores/NewsStore.js"
 
 export const useCommentsStore = defineStore("comments", {
     state: () => ({
@@ -13,26 +12,12 @@ export const useCommentsStore = defineStore("comments", {
         toggle: false,
     }),
     actions: {
-        closeComments(post_id) {
-            this.commentsCountInfo
-                .filter((item) => item.post_id === post_id)
-                .map((item) => item.toggleShow = false)
-        },
-        getCommentsInfo(post_id) {
-            return this.commentsCountInfo
-                .filter((item) => item.post_id === post_id)
-                .map((item) => item.show)[0]
-        },
-        checkCommentsToggle(post_id){
-            return  this.commentsCountInfo
-                .filter((item) => item.post_id === post_id)
-                .map((item) => item.toggleShow)[0]
-        },
         async getAuthStoreMethods() {
             const AuthStore = useAuthStore()
             return await AuthStore.updateAccessToken()
         },
-        async checkCommentsCount(id_news) {
+
+        async checkCommentsCount(id_news) { // сколько комментариев хранится на сервере для конкретного поста
             try {
                 const response = await fetch(
                     `http://localhost:8085/comment/check-db?newsId=${id_news}`,
@@ -49,24 +34,45 @@ export const useCommentsStore = defineStore("comments", {
 
                 const responseData = await response.json()
                 this.commentsCount = responseData.countComment
+
                 return responseData.countComment
             } catch (error) {
-                console.error("Request error:", error)
+                console.error("Check comments error:", error)
             }
         },
+
+        closeComments(post_id) {
+            this.commentsCountInfo
+                .filter((item) => item.post_id === post_id)
+                .map((item) => (item.toggleShow = false))
+        },
+
+        getCommentsInfo(post_id) {
+            return this.commentsCountInfo
+                .filter((item) => item.post_id === post_id)
+                .map((item) => item.show)[0]
+        },
+
+        checkCommentsToggle(post_id) {
+            return this.commentsCountInfo
+                .filter((item) => item.post_id === post_id)
+                .map((item) => item.toggleShow)[0]
+        },
+
         async showComments(news_id) {
-            const commentsCount = await this.checkCommentsCount(news_id) // кол-во комментариев для поста в бд
+            const commentsCount = await this.checkCommentsCount(news_id) // кол-во комментариев поста на сервере
 
             // информация о комментариях поста для тоглов
             const commentInfo = {
                 post_id: news_id,
                 commentsCount: commentsCount,
                 existsComments: 0,
-                show: false,
-                toggleShow: true
+                show: false, // кнопка "eще"
+                toggleShow: true, // закрыть/открыть комментарии
             }
 
             for (let i = 0; i < 3; i++) {
+                // выводим по три комментария за один запрос
                 try {
                     const response = await fetch(
                         `http://localhost:8085/comment/show?newsId=${news_id}`,
@@ -82,93 +88,63 @@ export const useCommentsStore = defineStore("comments", {
                     }
                     const responseData = await response.json()
 
-                    console.log(i)
-                    console.log(responseData)
-
                     const com_id_news = {
+                        // содержание комментария
                         news_id: news_id,
                         comments: responseData,
                         showed: false,
                     }
 
-                    console.log('выведенные уже')
-                    console.log(this.comments)
-
                     const isExistsComment = this.comments.find(
-                        // проверяем существование выведенных комментариев для поста
+                        //проверяем уже выведенные ком-ии
                         (item) => item.news_id === news_id
                     )
 
-
                     if (isExistsComment) {
-                        console.log('exist')
-                        // console.log(isExistsComment)
-                        console.log(isExistsComment.comments.length)
                         if (isExistsComment.comments.length < commentsCount) {
                             isExistsComment.comments.push(
                                 ...com_id_news.comments
                             )
                         }
-
-                        // console.log('01')
-                        // console.log(isExistsComment)
-
                         commentInfo.existsComments =
                             isExistsComment.comments.length
                     } else {
                         this.comments.push(com_id_news)
-                        // console.log('02')
-                        commentInfo.existsComments = 3
+                        commentInfo.existsComments = 3 // для поддержания системы вывода ком-ев по тройкам
                     }
-
-                    // this.$patch({
-                    //     comments: this.comments,
-                    // })
-
-                    // console.log(this.comments)
                 } catch (error) {
-                    console.error("Fetch error:", error)
+                    console.error("Show comments error:", error)
                 }
             }
 
-            //?????///
-            // this.$patch({
-            //     comments: this.comments,
-            // })
-
-            console.log(this.comments)
-            // для тогла
-
+            // для переключателя открытия/закрытия ком-ев
             const index = this.commentsCountInfo.findIndex(
                 (item) => item.post_id === news_id
             )
-        
+
             if (index !== -1) {
                 this.commentsCountInfo[index] = {
                     ...this.commentsCountInfo[index],
                     existsComments: commentInfo.existsComments,
-                    show: commentInfo.existsComments < commentInfo.commentsCount,
-                    toggleShow: true 
+                    show:
+                        commentInfo.existsComments < commentInfo.commentsCount,
+                    toggleShow: true,
                 }
             } else {
-                commentInfo.show = commentInfo.existsComments < commentInfo.commentsCount
+                commentInfo.show =
+                    commentInfo.existsComments < commentInfo.commentsCount // отображение кнопки еще зависит от кол-ва существующих ком-ев
                 this.commentsCountInfo.push(commentInfo)
             }
             this.$patch({
                 commentsCountInfo: this.commentsCountInfo,
             })
-            // console.log(this.commentsCountInfo)
         },
+
         async sendcomment(id_news, new_comment) {
-            
             const textComment = {
                 textComment: new_comment,
             }
             const jwtToken = sessionStorage.getItem("jwtToken")
-            if (!jwtToken) {
-                console.error("Отсутствует JWT-токен!")
-                return
-            }
             try {
                 const response = await fetch(
                     `http://localhost:8085/comment/save?newsId=${id_news}`,
@@ -187,14 +163,12 @@ export const useCommentsStore = defineStore("comments", {
                         if (result) {
                             return this.sendcomment(id_news, new_comment)
                         } else {
-                            console.log("false в update access")
+                            console.log("Failed to update access token")
                         }
-                    } else {
-                        console.log("какой то другой статус")
                     }
+                    throw new Error("Access token update required")
                 }
 
-                ////////////////
                 const responseData = await response.json()
                 const updatedComments = this.comments.find(
                     (item) => item.news_id === id_news
@@ -207,92 +181,54 @@ export const useCommentsStore = defineStore("comments", {
                         comments: [responseData],
                     })
                 }
-                // this.$patch({
-                //     comments: this.comments,
-                // })
             } catch (error) {
-                // console.error("Authentication error:", error)
+                console.error("Send comment error:", error)
             }
         },
+
         async deleteComment(id_comment) {
             const role = sessionStorage.getItem("user_role")
             const jwtToken = sessionStorage.getItem("jwtToken")
+            const url_ = "http://localhost:8085/comment/"
 
-            if (!jwtToken) {
-                console.error("Отсутствует JWT-токен!")
-                return
-            } else {
-                console.log(jwtToken)
-            }
             try {
-                if (role == "ROLE_ADMIN") {
-                    const response = await fetch(
-                        `http://localhost:8085/comment/admin/${id_comment}`,
-                        {
-                            method: "DELETE",
-                            headers: new Headers({
-                                Authorization: "Bearer " + jwtToken,
-                                "Content-Type": "application/json",
-                            }),
-                        }
-                    )
+                const url =
+                    role === "ROLE_ADMIN"
+                        ? `${url_}admin/${id_comment}`
+                        : `${url_}user/${id_comment}`
 
-                    if (!response.ok) {
-                        alert("Удаление не прошло")
-                        throw new Error("Authentication failed")
-                    }
-
-                    if (response.status === 204) {
-                        console.log("Комментарий успешно удален")
-                    }
-                } else if (role == "ROLE_USER") {
-                    const response = await fetch(
-                        `http://localhost:8085/comment/user/${id_comment}`,
-                        {
-                            method: "DELETE",
-                            headers: new Headers({
-                                Authorization: "Bearer " + jwtToken,
-                                "Content-Type": "application/json",
-                            }),
-                        }
-                    )
-                    if (!response.ok) {
-                        if (response.status === 401) {
-                            const result = await this.getAuthStoreMethods()
-                            if (result) {
-                                return this.deleteComment(id_comment)
-                            } else {
-                                console.log("false в update access")
-                            }
-                        } else {
-                            console.log("какой то другой статус")
-                        }
-
-                        //alert("Удаление не прошло")
-                        throw new Error("Authentication failed")
-                    }
-
-                    if (response.status === 204) {
-                        console.log("Комментарий успешно удален")
-                    }
-                }
-
-                const updatedComments = this.comments.map((com) => {
-                    const filtrComments = com.comments.filter(
-                        (comment) => comment.id !== id_comment
-                    )
-                    return { news_id: com.news_id, comments: filtrComments }
+                const response = await fetch(url, {
+                    method: "DELETE",
+                    headers: new Headers({
+                        Authorization: "Bearer " + jwtToken,
+                        "Content-Type": "application/json",
+                    }),
                 })
 
-                // console.log(updatedComments)
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        const result = await this.getAuthStoreMethods()
+                        if (result) {
+                            return this.deleteComment(id_comment)
+                        } else {
+                            console.log("false в update access")
+                        }
+                    } else {
+                        console.log("Failed to update access token")
+                    }
+                    throw new Error("Access token update required")
+                }
+
+                const updatedComments = this.comments.map((com) => ({
+                    news_id: com.news_id,
+                    comments: com.comments.filter((comment) => comment.id !== id_comment),
+                }))
 
                 this.$patch({
                     comments: updatedComments,
                 })
-
-                console.log(this.comments)
             } catch (error) {
-                console.error("Authentication error:", error)
+                console.error("Delete comment error:", error)
             }
         },
     },

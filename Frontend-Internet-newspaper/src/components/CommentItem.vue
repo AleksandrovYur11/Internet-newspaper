@@ -1,4 +1,9 @@
 <script setup>
+import { ref } from "vue"
+
+import { useCommentsStore } from "@/stores/CommentsStore.js"
+const CommentsStore = useCommentsStore()
+
 const { props } = defineProps({
     comment: {
         type: Object,
@@ -9,11 +14,6 @@ const { props } = defineProps({
         required: true,
     },
 })
-
-import { ref, computed } from "vue"
-
-import { useCommentsStore } from "@/stores/CommentsStore.js"
-const CommentsStore = useCommentsStore()
 
 const user_id = ref(sessionStorage.getItem("user_id"))
 const user_role = ref(sessionStorage.getItem("user_role"))

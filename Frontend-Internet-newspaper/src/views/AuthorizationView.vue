@@ -1,6 +1,7 @@
 <script setup>
-import MainBlock from "@/components/MainBlock.vue"
 import { ref, computed } from "vue"
+
+import MainBlock from "@/components/MainBlock.vue"
 
 import { useAuthStore } from "@/stores/AuthStore"
 const AuthUser = useAuthStore()
@@ -22,18 +23,16 @@ const validation_password = computed(() => {
 })
 
 const isInputValid = computed(() => {
-    console.log(validation_email.value && validation_password.value)
     return validation_email.value && validation_password.value
 })
 
 const signInValidation = () => {
-    console.log(textEmail.value)
     if (!textEmail.value || !textPassword.value) {
         alert("Заполните все поля!")
     } else if (!isInputValid.value) {
         alert("Проверьте правильность ввода!")
     } else {
-        AuthUser.login(textEmail.value, textPassword.value)
+        AuthUser.authorization(textEmail.value, textPassword.value)
         textEmail.value = null
         textPassword.value = null
     }
@@ -41,16 +40,13 @@ const signInValidation = () => {
 </script>
 
 <template>
-    <main-block>
+    <MainBlock>
         <template #content>
             <b-form-group
                     class="mb-3"
-                    id="email_group"
                     label="Email"
-                    label-for="text_email"
                 >
                     <b-form-input
-                        id="text_email"
                         v-model="textEmail"
                         type="email"
                         placeholder="user.userovich@gmail.com"
@@ -65,15 +61,12 @@ const signInValidation = () => {
                     </b-form-valid-feedback>
                 </b-form-group>
                 <b-form-group
-                    id="password_group"
                     label="Password"
-                    label-for="text_password"
                 >
                     <b-form-input
                         v-model="textPassword"
                         required
                         type="password"
-                        id="text-password"
                         aria-describedby="password-help-block"
                         :state="validation_password"
                     ></b-form-input>
@@ -95,6 +88,6 @@ const signInValidation = () => {
         <template #toggle>
             <a href="/auth/sign-up">Еще не зарегестрированы?</a>
         </template>
-    </main-block>
+    </MainBlock>
 </template> 
 

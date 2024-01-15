@@ -1,16 +1,8 @@
 <script setup>
-import { defineProps } from "vue"
-import { ref, onMounted } from "vue"
+import { ref, defineProps } from "vue"
 
-const { props } = defineProps({
-    post: {
-        type: Object,
-        required: true,
-    },
-})
-
-import { useAuthStore } from "@/stores/AuthStore.js"
-const AuthUser = useAuthStore()
+import CommentBlock from "@/components/CommentBlock.vue"
+import errorFile from "@/assets/error_file.png"
 
 import { useNewsStore } from "@/stores/NewsStore"
 const NewsStore = useNewsStore()
@@ -21,7 +13,12 @@ const CommentsStore = useCommentsStore()
 import { useFormsStore } from "@/stores/FormsStore.js"
 const FormStore = useFormsStore()
 
-import CommentBlock from "@/components/CommentBlock.vue"
+const { props } = defineProps({
+    post: {
+        type: Object,
+        required: true,
+    },
+})
 
 const user_id = ref(sessionStorage.getItem("user_id"))
 const user_role = ref(sessionStorage.getItem("user_role"))
@@ -35,32 +32,18 @@ const formatPublishedDate = (dateString) => {
         hour: "2-digit",
         minute: "2-digit",
     })
-
-    return `Опубликовано ${formatter.format(date).replace(/\./g, ":")}`
+    return `Опубликовано ${formatter.format(date)}`
 }
-
-// const isLiked = ref(false)
-
-// const toggleLike = (post_id, user_id) => {
-//     isLiked.value = !isLiked.value
-
-//     console.log(isLiked.value)
-//     NewsStore.addLike(post_id, user_id)
-// }
-
-import errorFile from "@/assets/error_file.png"
 
 const errorImage = (event) => {
     event.target.src = errorFile
 }
 
 const openFiltr = (theme_name) => {
-
-    NewsStore.filterThemes(theme_name, '')
+    // добавить открытие фильтр формы
+    NewsStore.filterThemes(theme_name, "")
     NewsStore.setPositiveTheme(theme_name)
 }
-
-
 </script>
 
 <template>
@@ -75,7 +58,7 @@ const openFiltr = (theme_name) => {
                     class="theme"
                     v-for="(theme, index) in post.themes"
                     :key="index"
-                    @click = "openFiltr(theme.name)"
+                    @click="openFiltr(theme.name)"
                 >
                     #{{ theme.name }}
                 </span>
@@ -86,19 +69,20 @@ const openFiltr = (theme_name) => {
                     @error="errorImage"
                     style="margin-right: 30px"
                 />
-                <p>&nbsp;&nbsp;&nbsp;&nbsp;{{  post.newsText }}</p>
+                <p>&nbsp;&nbsp;&nbsp;&nbsp;{{ post.newsText }}</p>
             </div>
             <br />
             <div class="likes_info">
                 <span class="likes_count">
                     <b>{{ post.likes.length || "" }}</b>
                 </span>
-                <!-- v-bind:class="
-                        post.likes.length ? 'icon dislike' : 'icon like'
-                    " -->
                 <span
                     @click.prevent="NewsStore.addLike(post.id, user_id)"
-                    v-bind:class = "NewsStore.isLiked(post.id, user_id)? 'icon dislike' : 'icon like' "
+                    v-bind:class="
+                        NewsStore.isLiked(post.id, user_id)
+                            ? 'icon dislike'
+                            : 'icon like'
+                    "
                 ></span>
                 <span
                     @click.prevent="CommentsStore.showComments(post.id, 1)"
@@ -115,10 +99,10 @@ const openFiltr = (theme_name) => {
                     @click.prevent="CommentsStore.closeComments(post.id)"
                 ></span>
             </div>
-            <comment-block
+            <CommentBlock
                 :post="post"
                 v-if="CommentsStore.checkCommentsToggle(post.id)"
-            ></comment-block>
+            />
         </div>
         <span
             class="edit_btn icon"
@@ -141,32 +125,11 @@ const openFiltr = (theme_name) => {
     position: relative;
     margin-top: 20px;
 }
-
-/* .edit_btn_zone {
-    position: absolute;
-    right: -50px;
-    background-color: #fff;
-    width: 40px;
-    height: 40px;
-    padding: 7px;
-    border-radius: 50%;
-} */
-
 .edit_btn {
     position: absolute;
     right: -60px;
     background-image: url("@/assets/edit_icon.png");
 }
-
-
-/* .icon {
-    width: 35px;
-    height: 35px;
-    background-position: center;
-    background-size: cover;
-    cursor: pointer;
-    margin-right: 10px;
-} */
 
 .like {
     background-image: url("@/assets/like_icon.png");
@@ -235,8 +198,6 @@ h3 {
     margin-bottom: 30px;
 }
 .theme {
-    /* background-color: rgba(25, 189, 63, 0.545); */
-    /* padding: 4px 8px; */
     border-radius: 15px;
     padding-right: 5px;
     font-size: 18px;

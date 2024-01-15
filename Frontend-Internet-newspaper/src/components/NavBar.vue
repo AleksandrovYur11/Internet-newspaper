@@ -1,17 +1,16 @@
 <script setup>
+import { ref, defineEmits } from "vue"
+
+import FiltrBlock from "@/components/FiltrBlock.vue"
+
 import { useAuthStore } from "@/stores/AuthStore"
 const AuthUser = useAuthStore()
 
 import { useNewsStore } from "@/stores/NewsStore"
 const NewsStore = useNewsStore()
 
-import FiltrBlock from "@/components/FiltrBlock.vue"
-
-import { ref, defineEmits } from "vue"
-
 const { emit } = defineEmits(["show-modal"])
 
-const user_id = ref(sessionStorage.getItem("user_id"))
 const user_role = ref(sessionStorage.getItem("user_role"))
 const user_name = ref(sessionStorage.getItem("user_name"))
 </script>
@@ -28,12 +27,10 @@ const user_name = ref(sessionStorage.getItem("user_name"))
         <div class="nav_item_right">
             <b-navbar-brand
                 class="logo"
-                href="#"
-                to="/news/fresh-news"
+                href="/news/fresh-news"
             ></b-navbar-brand>
             <b-navbar-brand
-                href="#"
-                to="/news/fresh-news"
+                href="/news/fresh-news"
                 style="font-weight: bold"
                 >Маяк</b-navbar-brand
             >
@@ -42,8 +39,8 @@ const user_name = ref(sessionStorage.getItem("user_name"))
             v-if="user_role == 'ROLE_USER' || user_role == 'ROLE_ADMIN'"
             class="nav_item_right"
         >
-            <span style=" font-size: 18px">{{ user_name }}</span>
-            <filtr-block></filtr-block>
+            <FiltrBlock />
+            <span style="font-size: 18px">{{ user_name }}</span>
             <b-button
                 v-if="user_role == 'ROLE_ADMIN'"
                 @click="NewsStore.showModal()"
@@ -67,7 +64,7 @@ const user_name = ref(sessionStorage.getItem("user_name"))
             v-else
             class="d-flex flex-direction-row"
         >
-            <filtr-block></filtr-block>
+            <FiltrBlock />
             <div class="nav_item_right">
                 <a
                     style="color: #007bff"

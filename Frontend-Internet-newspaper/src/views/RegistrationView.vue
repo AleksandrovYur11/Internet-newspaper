@@ -1,6 +1,7 @@
 <script setup>
-import MainBlock from "@/components/MainBlock.vue"
 import { ref, computed } from "vue"
+
+import MainBlock from "@/components/MainBlock.vue"
 
 import { useAuthStore } from "@/stores/AuthStore.js"
 const AuthStore = useAuthStore()
@@ -47,7 +48,6 @@ const validation_password = computed(() => {
     }
 })
 
-// тоже динамическая проверка! на слишком длинное
 const validation_name = computed(() => {
     if (regData.value.textName) {
         if (regData.value.textName.length <= 1) {
@@ -100,7 +100,7 @@ const signUpValidation = () => {
     } else if (!isInputValid.value) {
         alert("Проверьте правильность ввода!")
     } else {
-        AuthStore.register(regData.value)
+        AuthStore.registration(regData.value)
         regData.value.textName = null
         regData.value.textSurname = null
         regData.value.textEmail = null
@@ -111,16 +111,13 @@ const signUpValidation = () => {
 </script>
 
 <template>
-    <main-block>
+    <MainBlock>
         <template #content>
             <b-form-group
                 class="mb-2"
-                id="name_group"
                 label="Name"
-                label-for="text_name"
             >
                 <b-form-input
-                    id="text_name"
                     v-model="regData.textName"
                     type="text"
                     placeholder="Александр"
@@ -140,12 +137,9 @@ const signUpValidation = () => {
             </b-form-group>
             <b-form-group
                 class="mb-2"
-                id="surname_group"
                 label="Surname"
-                label-for="text_surname"
             >
                 <b-form-input
-                    id="text_surname"
                     v-model="regData.textSurname"
                     type="text"
                     placeholder="Александров"
@@ -165,12 +159,9 @@ const signUpValidation = () => {
             </b-form-group>
             <b-form-group
                 class="mb-2"
-                id="email_group"
                 label="Email"
-                label-for="text_email"
             >
                 <b-form-input
-                    id="text_email"
                     v-model="regData.textEmail"
                     type="email"
                     placeholder="user.userovich@gmail.com"
@@ -185,16 +176,13 @@ const signUpValidation = () => {
                 </b-form-valid-feedback>
             </b-form-group>
             <b-form-group
-                id="password_group"
                 label="Password"
-                label-for="text_password"
                 class="mb-2"
             >
                 <b-form-input
                     v-model="regData.textPassword"
                     required
                     type="password"
-                    id="text-password"
                     aria-describedby="password-help-block"
                     :state="validation_password"
                 ></b-form-input>
@@ -210,16 +198,13 @@ const signUpValidation = () => {
                 </b-form-invalid-feedback>
             </b-form-group>
             <b-form-group
-                id="password_repeat_group"
                 label="Repeat password"
-                label-for="text_repeat_password"
                 class="mb-2"
             >
                 <b-form-input
                     v-model="regData.textRepeatPassword"
                     required
                     type="password"
-                    id="text_repeat_password"
                     aria-describedby="password-help-block"
                     :state="validation_repeat_password"
                 ></b-form-input>
@@ -242,6 +227,6 @@ const signUpValidation = () => {
         <template #toggle>
                 <a href="/auth/sign-in">Перейти ко входу</a>
         </template>
-    </main-block>
+    </MainBlock>
 </template>
 
