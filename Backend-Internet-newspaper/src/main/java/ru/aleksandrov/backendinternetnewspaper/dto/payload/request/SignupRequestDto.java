@@ -10,6 +10,7 @@ import javax.validation.constraints.Size;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class SignupRequestDto {
     @Size(min = 2, message = "The name should have a minimum length of 2 characters")
     private String name;
