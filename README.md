@@ -28,7 +28,7 @@ rm -rf Internet-newspaper-master.tar.gz
 docker-compose up
 ```
 
-### Шаг 5: Переейти на страничку с последними новосятми
+### Шаг 5: Переейти на страницу с последними новосятми
 
 ```bash
 http://localhost:5173/news/fresh-news
