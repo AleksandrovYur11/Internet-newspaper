@@ -48,7 +48,10 @@ public class CommentService {
 
     public void deleteCommentById(Integer commentId) {
         if (commentRepository.existsById(commentId)) {
+            Comment comment = getCommentById(commentId);
             commentRepository.deleteById(commentId);
+            loadedCommentsCountMap.put(comment.getNews().getId(), loadedCommentsCountMap
+                    .getOrDefault(comment.getNews().getId(), 0) - 1);
             log.info("Delete comment with id = " + commentId + ": Success");
         } else {
             log.error("Comment with id = " + commentId + ": Not Found");
@@ -70,8 +73,11 @@ public class CommentService {
 
     public void deleteUserComment(UserDetailsImpl userDetailsImpl, Integer commentId) {
         int userId = userDetailsImpl.getId();
-        if (userId == getCommentById(commentId).getAuthorComment().getId()) {
+        Comment comment = getCommentById(commentId);
+        if (userId == comment.getAuthorComment().getId()) {
             commentRepository.deleteCommentByUserIdAndCommentId(userDetailsImpl.getId(), commentId);
+            loadedCommentsCountMap.put(comment.getNews().getId(), loadedCommentsCountMap
+                    .getOrDefault(comment.getNews().getId(), 0) - 1);
             log.info("Delete comment from user (email) = " + userDetailsImpl.getEmail() + ": Success");
         } else {
             throw new EntityNotFoundException("Comment with id = " + commentId + " and user (id) = " +

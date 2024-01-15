@@ -9,6 +9,7 @@ import javax.validation.constraints.Pattern;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class SigninRequestDto {
     @Email(message = "Please enter a valid email address")
     private String email;

@@ -24,7 +24,7 @@ public class ThemeService {
     public Set<Theme> getThemesFromDb(Set<Theme> themes){
         Set<Theme> dbThemes = new HashSet<>();
         for (Theme theme : themes) {
-            Optional<Theme> themeOptional = themeRepository.findThemeByName(theme.getName());
+            Optional<Theme> themeOptional = themeRepository.findThemeByNameIgnoreCase(theme.getName());
             themeOptional.ifPresent(dbThemes::add);
         }
         return dbThemes;
@@ -33,7 +33,7 @@ public class ThemeService {
     public Set<Theme> saveThemes(Set<Theme> themes){
         Set<Theme> savedThemes = new HashSet<>();
         for (Theme theme : themes) {
-            Optional<Theme> dbTheme = themeRepository.findThemeByName(theme.getName());
+            Optional<Theme> dbTheme = themeRepository.findThemeByNameIgnoreCase(theme.getName());
             if (!dbTheme.isPresent()) {
                 themeRepository.save(theme);
                 savedThemes.add(theme);
