@@ -1,4 +1,4 @@
--- CREATE EXTENSION pgcrypto;
+CREATE EXTENSION pgcrypto;
 SET TIME ZONE 'Europe/Moscow';
 
 -- Создание таблиц
