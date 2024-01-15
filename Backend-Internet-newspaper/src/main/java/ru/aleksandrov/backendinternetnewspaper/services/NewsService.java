@@ -12,6 +12,7 @@ import ru.aleksandrov.backendinternetnewspaper.utils.MappingUtil;
 
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -45,7 +46,7 @@ public class NewsService {
         News newNews = new News();
         newNews.setNewsTitle(newNewsDto.getNewsTitle());
         newNews.setNewsText(newNewsDto.getNewsText());
-        newNews.setDatePublishedNews(LocalDateTime.now());
+        newNews.setDatePublishedNews(LocalDateTime.now(ZoneId.of("Europe/Moscow")));
         setPictureAndThemesForNews(newNews, newNewsDto.getPicture(), newNewsDto.getThemes());
         newsRepository.save(newNews);
         log.info("Save new news by title = {}: Success", newNews.getNewsTitle());

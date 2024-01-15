@@ -15,6 +15,7 @@ import ru.aleksandrov.backendinternetnewspaper.utils.MappingUtil;
 
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,7 +65,7 @@ public class CommentService {
         newComment.setAuthorComment(userService.getUserById(userDetailsImpl.getId()));
         newComment.setNews(newsService.getNewsById(newsId));
         newComment.setTextComment(comment.getTextComment());
-        newComment.setDatePublishedComment(LocalDateTime.now());
+        newComment.setDatePublishedComment(LocalDateTime.now(ZoneId.of("Europe/Moscow")));
         log.info("Save new comment from user (email) = " + userDetailsImpl.getEmail() + ": Success");
         Comment savedComment = commentRepository.save(newComment);
         loadedCommentsCountMap.put(newsId, loadedCommentsCountMap.getOrDefault(newsId, 0) + 1);
