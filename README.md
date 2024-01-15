@@ -37,5 +37,5 @@ docker-compose up
 ## Email: sokolova@yandex.ru password: Sokolova92 - USER
 
 ## Email: denisov@yandex.ru password: Denisov198 - USER
-Схема Базы данных:
+## Схема Базы данных:
 <img width="658" alt="Internet-newspaper_DB" src="https://github.com/AleksandrovYur11/Internet-newspaper/assets/107943033/5e14ac40-b215-48e0-b6ce-df169f398fbb">
