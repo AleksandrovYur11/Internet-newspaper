@@ -7,7 +7,6 @@ const NewsStore = useNewsStore()
 const positive = ref("")
 const negative = ref("")
 
-
 const setPositiveTheme = computed(()=>{
     return positive.value = NewsStore.positive
 })
@@ -35,11 +34,10 @@ const filterThemes = () => {
     <b-dropdown
         text="Поиск по темам"
         ref="dropdown"
-        class="m-2"
+        style = "margin-right: 40px !important;"
         variant="outline-primary"
-        dropleft
     >
-        <b-dropdown-form style = "width: 300px;" >
+        <b-dropdown-form style="width: 300px; margin-right: 20px">
             <b-form-group class="mb-2">
                 <b-form-input
                     class="input_theme"

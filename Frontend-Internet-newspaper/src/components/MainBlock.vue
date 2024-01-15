@@ -1,5 +1,3 @@
-<script setup></script>
-
 <template>
     <div class="main_container bg">
         <div class="cont">
@@ -10,7 +8,7 @@
                     <h4>
                         <a href="/news/fresh-news">МАЯК</a>
                     </h4>
-                    <p>современная интернет-газета</p>
+                    <p>новостная интернет-газета</p>
                 </div>
                 <div class="custom_form_content">
                     <slot name="content"></slot>
@@ -23,7 +21,6 @@
         </div>
     </div>
 </template>
-
 
 <style scoped>
 .bg {
@@ -85,6 +82,5 @@ a {
     border-radius: 50%;
     background-size: cover;
 }
-
 
 </style>

@@ -1,8 +1,5 @@
 <script setup>
 import { RouterView } from 'vue-router'
-import { useRouter } from 'vue-router'
-
-
 </script>
 
 <template>
@@ -11,6 +8,3 @@ import { useRouter } from 'vue-router'
     </div>
 </template>
 
-<style>
-
-</style>
