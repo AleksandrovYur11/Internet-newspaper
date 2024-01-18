@@ -38,10 +38,10 @@ import ru.aleksandrov.backendinternetnewspaper.models.Role;
 import ru.aleksandrov.backendinternetnewspaper.models.User;
 import ru.aleksandrov.backendinternetnewspaper.security.JWT.JwtUtils;
 import ru.aleksandrov.backendinternetnewspaper.security.exception.TokenRefreshException;
-import ru.aleksandrov.backendinternetnewspaper.security.services.RefreshTokenService;
-import ru.aleksandrov.backendinternetnewspaper.security.services.UserDetailsImpl;
-import ru.aleksandrov.backendinternetnewspaper.services.RegistrationService;
-import ru.aleksandrov.backendinternetnewspaper.services.RoleService;
+import ru.aleksandrov.backendinternetnewspaper.security.services.impl.RefreshTokenServiceImpl;
+import ru.aleksandrov.backendinternetnewspaper.security.services.impl.UserDetailsImpl;
+import ru.aleksandrov.backendinternetnewspaper.services.impl.RegistrationServiceImpl;
+import ru.aleksandrov.backendinternetnewspaper.services.impl.RoleServiceImpl;
 import ru.aleksandrov.backendinternetnewspaper.utils.MappingUtil;
 import ru.aleksandrov.backendinternetnewspaper.utils.UserValidator;
 
@@ -58,13 +58,13 @@ public class AuthenticationControllerTest {
     private JwtUtils jwtUtils;
 
     @MockBean
-    private RefreshTokenService refreshTokenService;
+    private RefreshTokenServiceImpl refreshTokenServiceImpl;
 
     @MockBean
-    private RegistrationService registrationService;
+    private RegistrationServiceImpl registrationServiceImpl;
 
     @MockBean
-    private RoleService roleService;
+    private RoleServiceImpl roleServiceImpl;
 
     @MockBean
     private MappingUtil mappingUtil;
@@ -96,8 +96,8 @@ public class AuthenticationControllerTest {
         user.setRefreshToken(Collections.singletonList(testRefreshToken));
 
         Optional<RefreshToken> ofResult = Optional.of(testRefreshToken);
-        when(refreshTokenService.verifyExpiration(any(RefreshToken.class))).thenReturn(testRefreshToken);
-        when(refreshTokenService.findByToken(anyString())).thenReturn(ofResult);
+        when(refreshTokenServiceImpl.verifyExpiration(any(RefreshToken.class))).thenReturn(testRefreshToken);
+        when(refreshTokenServiceImpl.findByToken(anyString())).thenReturn(ofResult);
 
         RefreshTokenRequestDto refreshTokenRequestDto = new RefreshTokenRequestDto();
         refreshTokenRequestDto.setRefreshToken(testRefreshToken.getToken());
@@ -139,8 +139,8 @@ public class AuthenticationControllerTest {
         user.setRefreshToken(Collections.singletonList(testRefreshToken));
 
         Optional<RefreshToken> ofResult = Optional.of(testRefreshToken);
-        when(refreshTokenService.verifyExpiration(any(RefreshToken.class))).thenReturn(testRefreshToken);
-        when(refreshTokenService.findByToken(anyString())).thenReturn(ofResult);
+        when(refreshTokenServiceImpl.verifyExpiration(any(RefreshToken.class))).thenReturn(testRefreshToken);
+        when(refreshTokenServiceImpl.findByToken(anyString())).thenReturn(ofResult);
 
         RefreshTokenRequestDto refreshTokenRequestDto = new RefreshTokenRequestDto();
         refreshTokenRequestDto.setRefreshToken(testRefreshToken.getToken());
@@ -161,7 +161,7 @@ public class AuthenticationControllerTest {
      */
     @Test
     public void testLogout() throws Exception {
-        doNothing().when(refreshTokenService).deleteRefreshToken(any());
+        doNothing().when(refreshTokenServiceImpl).deleteRefreshToken(any());
 
         RefreshTokenRequestDto refreshTokenRequestDto = RefreshTokenRequestDto.builder()
                 .refreshToken("ABC123")
