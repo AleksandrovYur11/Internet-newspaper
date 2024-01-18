@@ -8,8 +8,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import ru.aleksandrov.backendinternetnewspaper.dto.model.CommentDto;
 import ru.aleksandrov.backendinternetnewspaper.models.Comment;
-import ru.aleksandrov.backendinternetnewspaper.security.services.UserDetailsImpl;
-import ru.aleksandrov.backendinternetnewspaper.services.CommentService;
+import ru.aleksandrov.backendinternetnewspaper.security.services.impl.UserDetailsImpl;
+import ru.aleksandrov.backendinternetnewspaper.services.impl.CommentServiceImpl;
 import ru.aleksandrov.backendinternetnewspaper.utils.MappingUtil;
 
 import javax.validation.Valid;
@@ -22,25 +22,25 @@ import java.util.Map;
 @RequestMapping("/comment")
 public class CommentController {
 
-    private final CommentService commentService;
+    private final CommentServiceImpl commentServiceImpl;
     private final MappingUtil mappingUtil;
 
     @Autowired
-    public CommentController(CommentService commentService, MappingUtil mappingUtil) {
-        this.commentService = commentService;
+    public CommentController(CommentServiceImpl commentServiceImpl, MappingUtil mappingUtil) {
+        this.commentServiceImpl = commentServiceImpl;
         this.mappingUtil = mappingUtil;
     }
 
     @GetMapping("/show")
     public ResponseEntity<List<CommentDto>> getCommentsForNews(@RequestParam("newsId") Integer newsId) {
-        List<CommentDto> commentDto = commentService.getThreeComments(newsId);
+        List<CommentDto> commentDto = commentServiceImpl.getThreeComments(newsId);
         return new ResponseEntity<>(commentDto, HttpStatus.OK);
     }
 
     @PostMapping("/check-db")
     public ResponseEntity<Map<String, Integer>> checkExistComment(@RequestParam("newsId") Integer newsId) {
         Map<String, Integer> countComment = new HashMap<>();
-        countComment.put("countComment", commentService.getCountComments(newsId));
+        countComment.put("countComment", commentServiceImpl.getCountComments(newsId));
         return new ResponseEntity<>(countComment, HttpStatus.OK);
     }
 
@@ -50,8 +50,8 @@ public class CommentController {
                                                   @RequestParam("newsId") Integer newsId,
                                                   @RequestBody @Valid CommentDto commentDTO) {
         Comment newComment = mappingUtil.convertToComment(commentDTO);
-        Comment savedComment = commentService.saveComment(userDetailsImpl, newComment, newsId);
-        CommentDto savedCommentDto = commentService.convertToCommentDto(savedComment);
+        Comment savedComment = commentServiceImpl.saveComment(userDetailsImpl, newComment, newsId);
+        CommentDto savedCommentDto = commentServiceImpl.convertToCommentDto(savedComment);
         return new ResponseEntity<>(savedCommentDto, HttpStatus.CREATED);
     }
 
@@ -59,14 +59,14 @@ public class CommentController {
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<HttpStatus> userDeleteComment(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl,
                                                         @PathVariable("commentId") Integer commentId) {
-        commentService.deleteUserComment(userDetailsImpl, commentId);
+        commentServiceImpl.deleteUserComment(userDetailsImpl, commentId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @DeleteMapping("/admin/{commentId}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<HttpStatus> adminDeleteComment(@PathVariable("commentId") Integer commentId) {
-        commentService.deleteCommentById(commentId);
+        commentServiceImpl.deleteCommentById(commentId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

@@ -25,15 +25,15 @@ import ru.aleksandrov.backendinternetnewspaper.dto.payload.request.NewsRequestDt
 import ru.aleksandrov.backendinternetnewspaper.models.News;
 import ru.aleksandrov.backendinternetnewspaper.models.Picture;
 import ru.aleksandrov.backendinternetnewspaper.models.Theme;
-import ru.aleksandrov.backendinternetnewspaper.services.CommentService;
-import ru.aleksandrov.backendinternetnewspaper.services.NewsService;
+import ru.aleksandrov.backendinternetnewspaper.services.impl.CommentServiceImpl;
+import ru.aleksandrov.backendinternetnewspaper.services.impl.NewsServiceImpl;
 import ru.aleksandrov.backendinternetnewspaper.utils.MappingUtil;
 
 @ContextConfiguration(classes = {NewsController.class})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class NewsControllerTest {
     @MockBean
-    private CommentService commentService;
+    private CommentServiceImpl commentServiceImpl;
 
     @MockBean
     private MappingUtil mappingUtil;
@@ -42,7 +42,7 @@ public class NewsControllerTest {
     private NewsController newsController;
 
     @MockBean
-    private NewsService newsService;
+    private NewsServiceImpl newsServiceImpl;
 
     /**
      * Method under test: {@link NewsController#getNewsById(Integer)}
@@ -62,7 +62,7 @@ public class NewsControllerTest {
                 .picture(picture)
                 .build();
 
-        when(newsService.getNewsById((Integer) any())).thenReturn(news);
+        when(newsServiceImpl.getNewsById((Integer) any())).thenReturn(news);
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/news/{newsId}", 123);
         MockMvcBuilders.standaloneSetup(newsController)
                 .build()
@@ -75,7 +75,7 @@ public class NewsControllerTest {
      */
     @Test
     public void testDeleteNews() throws Exception {
-        doNothing().when(newsService).deleteNewsById((Integer) any());
+        doNothing().when(newsServiceImpl).deleteNewsById((Integer) any());
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.delete("/news/{newsId}", 123);
         MockMvcBuilders.standaloneSetup(newsController)
                 .build()
@@ -88,8 +88,8 @@ public class NewsControllerTest {
      */
     @Test
     public void testGetAllNewsAtTwentyFourHours() throws Exception {
-        when(newsService.getNewsInLastTwentyFourHours()).thenReturn(new ArrayList<>());
-        doNothing().when(commentService).clearLoadedCommentsCountMap();
+        when(newsServiceImpl.getNewsInLastTwentyFourHours()).thenReturn(new ArrayList<>());
+        doNothing().when(commentServiceImpl).clearLoadedCommentsCountMap();
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/news/fresh-news");
         MockMvcBuilders.standaloneSetup(newsController)
                 .build()
@@ -102,7 +102,7 @@ public class NewsControllerTest {
      */
     @Test
     public void testGetNewsByUserThemes() throws Exception {
-        when(newsService.getNewsByThemes((Set<Theme>) any(), (Set<Theme>) any())).thenReturn(new ArrayList<>());
+        when(newsServiceImpl.getNewsByThemes((Set<Theme>) any(), (Set<Theme>) any())).thenReturn(new ArrayList<>());
 
         NewsRequestDto newsRequestDto = new NewsRequestDto();
         newsRequestDto.setFavoritesThemes(new ArrayList<>());

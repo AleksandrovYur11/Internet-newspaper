@@ -1,4 +1,4 @@
-package ru.aleksandrov.backendinternetnewspaper.security.services;
+package ru.aleksandrov.backendinternetnewspaper.security.services.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import ru.aleksandrov.backendinternetnewspaper.models.User;
 import ru.aleksandrov.backendinternetnewspaper.repositories.UserRepository;
+import ru.aleksandrov.backendinternetnewspaper.security.services.impl.UserDetailsImpl;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {

@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import ru.aleksandrov.backendinternetnewspaper.dto.model.NewsDto;
 import ru.aleksandrov.backendinternetnewspaper.models.*;
 import ru.aleksandrov.backendinternetnewspaper.dto.payload.request.NewsRequestDto;
-import ru.aleksandrov.backendinternetnewspaper.services.CommentService;
-import ru.aleksandrov.backendinternetnewspaper.services.NewsService;
+import ru.aleksandrov.backendinternetnewspaper.services.impl.CommentServiceImpl;
+import ru.aleksandrov.backendinternetnewspaper.services.impl.NewsServiceImpl;
 import ru.aleksandrov.backendinternetnewspaper.utils.MappingUtil;
 
 import javax.validation.Valid;
@@ -23,22 +23,22 @@ import java.util.stream.Collectors;
 @RequestMapping("/news")
 public class NewsController {
 
-    private final NewsService newsService;
+    private final NewsServiceImpl newsServiceImpl;
     private final MappingUtil mappingUtil;
-    private final CommentService commentService;
+    private final CommentServiceImpl commentServiceImpl;
 
     @Autowired
-    public NewsController(NewsService newsService, MappingUtil mappingUtil, CommentService commentService) {
-        this.newsService = newsService;
+    public NewsController(NewsServiceImpl newsServiceImpl, MappingUtil mappingUtil, CommentServiceImpl commentServiceImpl) {
+        this.newsServiceImpl = newsServiceImpl;
         this.mappingUtil = mappingUtil;
-        this.commentService = commentService;
+        this.commentServiceImpl = commentServiceImpl;
     }
 
     @GetMapping("/fresh-news")
     public ResponseEntity<List<NewsDto>> getAllNewsAtTwentyFourHours() {
-        List<NewsDto> newsListDto = newsService.getNewsInLastTwentyFourHours().stream()
-                .map(newsService::convertToNewsDto).collect(Collectors.toList());
-        commentService.clearLoadedCommentsCountMap();
+        List<NewsDto> newsListDto = newsServiceImpl.getNewsInLastTwentyFourHours().stream()
+                .map(newsServiceImpl::convertToNewsDto).collect(Collectors.toList());
+        commentServiceImpl.clearLoadedCommentsCountMap();
         return new ResponseEntity<>(newsListDto, HttpStatus.OK);
     }
 
@@ -56,23 +56,23 @@ public class NewsController {
                         .collect(Collectors.toSet()) :
                 Collections.emptySet();
 
-        List<NewsDto> newsListDto = newsService.getNewsByThemes(favoriteThemes, forbiddenThemes);
+        List<NewsDto> newsListDto = newsServiceImpl.getNewsByThemes(favoriteThemes, forbiddenThemes);
         return new ResponseEntity<>(newsListDto, HttpStatus.OK);
     }
 
     @PostMapping("/save")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> createNews(@RequestBody @Valid NewsDto newNewsDto) {
-        News savedNews = newsService.saveNews(newNewsDto);
-        NewsDto savedNewsDto = newsService.convertToNewsDto(savedNews);
+        News savedNews = newsServiceImpl.saveNews(newNewsDto);
+        NewsDto savedNewsDto = newsServiceImpl.convertToNewsDto(savedNews);
         return new ResponseEntity<>(savedNewsDto, HttpStatus.CREATED);
     }
 
     @GetMapping("/{newsId}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<NewsDto> getNewsById(@PathVariable("newsId") Integer newsId) {
-        News news = newsService.getNewsById(newsId);
-        NewsDto editNewsDto = newsService.convertToNewsDto(news);
+        News news = newsServiceImpl.getNewsById(newsId);
+        NewsDto editNewsDto = newsServiceImpl.convertToNewsDto(news);
         return new ResponseEntity<>(editNewsDto, HttpStatus.OK);
     }
 
@@ -80,14 +80,14 @@ public class NewsController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> updateNews(@PathVariable("newsId") Integer newsId,
                                         @RequestBody @Valid NewsDto updatedNewsDto) {
-        newsService.updateNews(newsId, updatedNewsDto);
+        newsServiceImpl.updateNews(newsId, updatedNewsDto);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{newsId}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteNews(@PathVariable("newsId") Integer newsId) {
-        newsService.deleteNewsById(newsId);
+        newsServiceImpl.deleteNewsById(newsId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

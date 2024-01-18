@@ -3,8 +3,6 @@ package ru.aleksandrov.backendinternetnewspaper.controllers;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.util.ArrayList;
 
 import org.junit.Test;
@@ -19,7 +17,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.aleksandrov.backendinternetnewspaper.repositories.CommentRepository;
-import ru.aleksandrov.backendinternetnewspaper.services.CommentService;
+import ru.aleksandrov.backendinternetnewspaper.services.impl.CommentServiceImpl;
 import ru.aleksandrov.backendinternetnewspaper.utils.MappingUtil;
 
 @ContextConfiguration(classes = {CommentController.class})
@@ -29,7 +27,7 @@ public class CommentControllerTest {
     private CommentController commentController;
 
     @MockBean
-    private CommentService commentService;
+    private CommentServiceImpl commentServiceImpl;
 
     @MockBean
     private CommentRepository commentRepository;
@@ -41,7 +39,7 @@ public class CommentControllerTest {
      */
     @Test
     public void testAdminDeleteComment() throws Exception {
-        doNothing().when(commentService).deleteCommentById((Integer) any());
+        doNothing().when(commentServiceImpl).deleteCommentById((Integer) any());
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.delete("/comment/admin/{commentId}", 123);
         ResultActions actualPerformResult = MockMvcBuilders.standaloneSetup(commentController)
                 .build()
@@ -54,7 +52,7 @@ public class CommentControllerTest {
      */
     @Test
     public void testCheckExistComment() throws Exception {
-        when(commentService.getCountComments((Integer) any())).thenReturn(3);
+        when(commentServiceImpl.getCountComments((Integer) any())).thenReturn(3);
         MockHttpServletRequestBuilder postResult = MockMvcRequestBuilders.post("/comment/check-db");
         MockHttpServletRequestBuilder requestBuilder = postResult.param("newsId", String.valueOf(1));
         MockMvcBuilders.standaloneSetup(commentController)
@@ -68,7 +66,7 @@ public class CommentControllerTest {
      */
     @Test
     public void testGetCommentsForNews() throws Exception {
-        when(commentService.getThreeComments((Integer) any())).thenReturn(new ArrayList<>());
+        when(commentServiceImpl.getThreeComments((Integer) any())).thenReturn(new ArrayList<>());
         MockHttpServletRequestBuilder getResult = MockMvcRequestBuilders.get("/comment/show");
         MockHttpServletRequestBuilder requestBuilder = getResult.param("newsId", String.valueOf(1));
         MockMvcBuilders.standaloneSetup(commentController)

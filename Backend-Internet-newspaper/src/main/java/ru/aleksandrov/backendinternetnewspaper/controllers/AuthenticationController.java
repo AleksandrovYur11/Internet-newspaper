@@ -21,10 +21,10 @@ import ru.aleksandrov.backendinternetnewspaper.dto.payload.response.SigninRespon
 import ru.aleksandrov.backendinternetnewspaper.dto.payload.response.RefreshTokenResponseDto;
 import ru.aleksandrov.backendinternetnewspaper.security.JWT.JwtUtils;
 import ru.aleksandrov.backendinternetnewspaper.security.exception.TokenRefreshException;
-import ru.aleksandrov.backendinternetnewspaper.security.services.RefreshTokenService;
-import ru.aleksandrov.backendinternetnewspaper.security.services.UserDetailsImpl;
-import ru.aleksandrov.backendinternetnewspaper.services.RegistrationService;
-import ru.aleksandrov.backendinternetnewspaper.services.RoleService;
+import ru.aleksandrov.backendinternetnewspaper.security.services.impl.RefreshTokenServiceImpl;
+import ru.aleksandrov.backendinternetnewspaper.security.services.impl.UserDetailsImpl;
+import ru.aleksandrov.backendinternetnewspaper.services.impl.RegistrationServiceImpl;
+import ru.aleksandrov.backendinternetnewspaper.services.impl.RoleServiceImpl;
 import ru.aleksandrov.backendinternetnewspaper.utils.MappingUtil;
 import ru.aleksandrov.backendinternetnewspaper.utils.UserValidator;
 
@@ -41,24 +41,25 @@ import java.util.stream.Collectors;
 public class AuthenticationController {
 
     private final UserValidator userValidator;
-    private final RegistrationService registrationService;
+    private final RegistrationServiceImpl registrationServiceImpl;
     private final MappingUtil mappingUtil;
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
-    private final RefreshTokenService refreshTokenService;
-    private final RoleService roleService;
+    private final RefreshTokenServiceImpl refreshTokenServiceImpl;
+    private final RoleServiceImpl roleServiceImpl;
 
     @Autowired
-    public AuthenticationController(UserValidator userValidator, RegistrationService registrationService,
+    public AuthenticationController(UserValidator userValidator, RegistrationServiceImpl registrationServiceImpl,
                                     MappingUtil mappingUtil, AuthenticationManager authenticationManager,
-                                    JwtUtils jwtUtils, RefreshTokenService refreshTokenService, RoleService roleService) {
+                                    JwtUtils jwtUtils, RefreshTokenServiceImpl refreshTokenServiceImpl,
+                                    RoleServiceImpl roleServiceImpl) {
         this.userValidator = userValidator;
-        this.registrationService = registrationService;
+        this.registrationServiceImpl = registrationServiceImpl;
         this.mappingUtil = mappingUtil;
         this.authenticationManager = authenticationManager;
         this.jwtUtils = jwtUtils;
-        this.refreshTokenService = refreshTokenService;
-        this.roleService = roleService;
+        this.refreshTokenServiceImpl = refreshTokenServiceImpl;
+        this.roleServiceImpl = roleServiceImpl;
     }
 
     @PostMapping("/sign-in")
@@ -70,7 +71,7 @@ public class AuthenticationController {
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         String accessJwt = jwtUtils.generateJwtToken(userDetails);
-        RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
+        RefreshToken refreshToken = refreshTokenServiceImpl.createRefreshToken(userDetails.getId());
         List<String> roles = userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
 
@@ -99,16 +100,16 @@ public class AuthenticationController {
             return new ResponseEntity<>(errors, HttpStatus.CONFLICT);
         }
         User newUser = mappingUtil.convertToUser(signupRequestDto);
-        roleService.setDefaultRole(newUser);
-        registrationService.register(newUser);
+        roleServiceImpl.setDefaultRole(newUser);
+        registrationServiceImpl.register(newUser);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PostMapping("/refresh-token")
     public ResponseEntity<?> createNewAccessToken(@Valid @RequestBody RefreshTokenRequestDto refreshTokenRequestDto) {
         String refreshToken = refreshTokenRequestDto.getRefreshToken();
-        return refreshTokenService.findByToken(refreshToken)
-                .map(refreshTokenService::verifyExpiration)
+        return refreshTokenServiceImpl.findByToken(refreshToken)
+                .map(refreshTokenServiceImpl::verifyExpiration)
                 .map(RefreshToken::getUser)
                 .map(user -> {
                     String newAccessToken = jwtUtils.generateJwtToken(UserDetailsImpl.build(user));
@@ -120,7 +121,7 @@ public class AuthenticationController {
     @PostMapping("/sign-out")
     public ResponseEntity<?> logout(@Valid @RequestBody RefreshTokenRequestDto refreshTokenRequestDto) {
         String refreshToken = refreshTokenRequestDto.getRefreshToken();
-        refreshTokenService.deleteRefreshToken(refreshToken);
+        refreshTokenServiceImpl.deleteRefreshToken(refreshToken);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

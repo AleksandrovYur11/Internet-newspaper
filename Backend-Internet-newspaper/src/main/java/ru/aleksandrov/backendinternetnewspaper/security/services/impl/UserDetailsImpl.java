@@ -1,4 +1,4 @@
-package ru.aleksandrov.backendinternetnewspaper.security.services;
+package ru.aleksandrov.backendinternetnewspaper.security.services.impl;
 
 import lombok.Getter;
 import lombok.Setter;
