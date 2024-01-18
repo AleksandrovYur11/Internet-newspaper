@@ -15,15 +15,9 @@ const validation_email = computed(() => {
 })
 
 const textPassword = ref(null)
-const validation_password = computed(() => {
-    if (textPassword.value) {
-        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/
-        return passwordRegex.test(textPassword.value)
-    }
-})
 
 const isInputValid = computed(() => {
-    return validation_email.value && validation_password.value
+    return validation_email.value
 })
 
 const signInValidation = () => {
@@ -68,14 +62,7 @@ const signInValidation = () => {
                         required
                         type="password"
                         aria-describedby="password-help-block"
-                        :state="validation_password"
                     ></b-form-input>
-                    <b-form-invalid-feedback :state="validation_password">
-                        Введите не менеее 8 символов
-                    </b-form-invalid-feedback>
-                    <b-form-valid-feedback :state="validation_password">
-                        Ок
-                    </b-form-valid-feedback>
                 </b-form-group>
         </template>
         <template #btn>
