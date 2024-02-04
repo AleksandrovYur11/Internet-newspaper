@@ -2,6 +2,7 @@ package ru.aleksandrov.backendinternetnewspaper.controllers;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -35,6 +36,7 @@ public class NewsController {
     }
 
     @GetMapping("/fresh-news")
+    @Cacheable(value = "freshNewsCache", key = "'freshNews'")
     public ResponseEntity<List<NewsDto>> getAllNewsAtTwentyFourHours() {
         List<NewsDto> newsListDto = newsServiceImpl.getNewsInLastTwentyFourHours().stream()
                 .map(newsServiceImpl::convertToNewsDto).collect(Collectors.toList());
