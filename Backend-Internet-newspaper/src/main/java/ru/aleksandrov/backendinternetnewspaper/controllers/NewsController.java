@@ -3,6 +3,7 @@ package ru.aleksandrov.backendinternetnewspaper.controllers;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,6 +17,7 @@ import ru.aleksandrov.backendinternetnewspaper.utils.MappingUtil;
 
 import javax.validation.Valid;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @CrossOrigin
@@ -36,12 +38,14 @@ public class NewsController {
     }
 
     @GetMapping("/fresh-news")
-    @Cacheable(value = "freshNewsCache", key = "'freshNews'")
+    @Cacheable(value = "freshNewsCache")
     public ResponseEntity<List<NewsDto>> getAllNewsAtTwentyFourHours() {
         List<NewsDto> newsListDto = newsServiceImpl.getNewsInLastTwentyFourHours().stream()
                 .map(newsServiceImpl::convertToNewsDto).collect(Collectors.toList());
+        HttpHeaders headers = new HttpHeaders();
+        headers.setCacheControl("max-age=" + TimeUnit.HOURS.toSeconds(1));
         commentServiceImpl.clearLoadedCommentsCountMap();
-        return new ResponseEntity<>(newsListDto, HttpStatus.OK);
+        return ResponseEntity.ok().headers(headers).body(newsListDto);
     }
 
     @PostMapping("/user-themes")
