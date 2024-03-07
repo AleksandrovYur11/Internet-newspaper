@@ -2,6 +2,7 @@ package ru.aleksandrov.backendinternetnewspaper.controllers;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -31,7 +32,8 @@ public class NewsController {
     private final CommentServiceImpl commentServiceImpl;
 
     @Autowired
-    public NewsController(NewsServiceImpl newsServiceImpl, MappingUtil mappingUtil, CommentServiceImpl commentServiceImpl) {
+    public NewsController(NewsServiceImpl newsServiceImpl, MappingUtil mappingUtil,
+                          CommentServiceImpl commentServiceImpl) {
         this.newsServiceImpl = newsServiceImpl;
         this.mappingUtil = mappingUtil;
         this.commentServiceImpl = commentServiceImpl;
@@ -44,7 +46,6 @@ public class NewsController {
                 .map(newsServiceImpl::convertToNewsDto).collect(Collectors.toList());
         HttpHeaders headers = new HttpHeaders();
         headers.setCacheControl("max-age=" + TimeUnit.HOURS.toSeconds(1));
-        commentServiceImpl.clearLoadedCommentsCountMap();
         return ResponseEntity.ok().headers(headers).body(newsListDto);
     }
 
@@ -68,6 +69,7 @@ public class NewsController {
 
     @PostMapping("/save")
     @PreAuthorize("hasRole('ADMIN')")
+    @CacheEvict(value = "freshNewsCache", allEntries = true)
     public ResponseEntity<?> createNews(@RequestBody @Valid NewsDto newNewsDto) {
         News savedNews = newsServiceImpl.saveNews(newNewsDto);
         NewsDto savedNewsDto = newsServiceImpl.convertToNewsDto(savedNews);
@@ -84,6 +86,7 @@ public class NewsController {
 
     @PutMapping("/{newsId}")
     @PreAuthorize("hasRole('ADMIN')")
+    @CacheEvict(value = "freshNewsCache", allEntries = true)
     public ResponseEntity<?> updateNews(@PathVariable("newsId") Integer newsId,
                                         @RequestBody @Valid NewsDto updatedNewsDto) {
         newsServiceImpl.updateNews(newsId, updatedNewsDto);
@@ -92,8 +95,14 @@ public class NewsController {
 
     @DeleteMapping("/{newsId}")
     @PreAuthorize("hasRole('ADMIN')")
+    @CacheEvict(value = "freshNewsCache", allEntries = true)
     public ResponseEntity<?> deleteNews(@PathVariable("newsId") Integer newsId) {
         newsServiceImpl.deleteNewsById(newsId);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/reset-comments")
+    public void clearLoaderComments() {
+        commentServiceImpl.clearLoadedCommentsCountMap();
     }
 }

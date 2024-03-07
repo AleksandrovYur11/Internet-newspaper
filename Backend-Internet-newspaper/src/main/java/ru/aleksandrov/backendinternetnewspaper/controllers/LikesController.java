@@ -1,6 +1,7 @@
 package ru.aleksandrov.backendinternetnewspaper.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,6 +23,8 @@ public class LikesController {
     private final LikesServiceImpl likesServiceImpl;
     private final UserServiceImpl userServiceImpl;
 
+
+
     @Autowired
     public LikesController(NewsServiceImpl newsServiceImpl, LikesServiceImpl likesServiceImpl,
                            UserServiceImpl userServiceImpl) {
@@ -32,6 +35,7 @@ public class LikesController {
 
     @PostMapping("/save")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @CacheEvict(value = "freshNewsCache", allEntries = true)
     public ResponseEntity<?> saveLike(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl,
                                      @RequestParam("newsId") int newsId) {
         User user = userServiceImpl.getUserById(userDetailsImpl.getId());
@@ -42,6 +46,7 @@ public class LikesController {
 
     @DeleteMapping
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @CacheEvict(value = "freshNewsCache", allEntries = true)
     public ResponseEntity<?> deleteLike(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl,
                                         @RequestParam("newsId") int newsId) {
         News news = newsServiceImpl.getNewsById(newsId);

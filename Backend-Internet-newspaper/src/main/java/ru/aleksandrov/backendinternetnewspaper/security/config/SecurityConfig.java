@@ -45,7 +45,7 @@ public class SecurityConfig {
                         .authenticationEntryPoint(unauthorizedHandler))
                 .authorizeHttpRequests((requests) -> requests
                         .antMatchers("/auth/**", "/news/fresh-news",
-                                "/news/user-themes", "/comment/show", "/comment/check-db").permitAll()
+                                "/news/user-themes", "/comment/show", "/comment/check-db", "/news/reset-comments").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
